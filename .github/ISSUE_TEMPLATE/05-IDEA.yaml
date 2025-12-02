@@ -1,0 +1,11 @@
+name: Idea
+description: Capture an idea
+title: "💡 "
+labels: ["idea"]
+projects: ["keiranking/6"]
+body:
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: Describe the idea

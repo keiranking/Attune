@@ -1,0 +1,13 @@
+name: Feedback
+description: Provide user feedback
+title: "🤷 "
+labels: ["feedback"]
+projects: ["keiranking/6"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the interaction or aspect of the site you found confusing or frustrating
+    validations:
+      required: true

@@ -1,0 +1,22 @@
+name: Optimization
+description: Improve app performance, usability
+title: "⚡️ "
+labels: ["optimization"]
+projects: ["keiranking/6"]
+body:
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: Describe the slow, complex or brittle behavior
+    validations:
+      required: true
+  - type: textarea
+    id: optimization
+    attributes:
+      label: Optimization
+      description: Suggest ways to improve performance
+      placeholder: |
+        - Expedite...
+        - Simplify...
+        - Ensure...

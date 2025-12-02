@@ -1,0 +1,21 @@
+name: Issue
+description: File an issue
+projects: ["keiranking/6"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the job-to-be-done
+      placeholder: |
+        When I'm /situation/
+        I want to /motivation/
+        So I can /outcome/
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solution
+      description: Suggest a solution
+      placeholder: Consider...

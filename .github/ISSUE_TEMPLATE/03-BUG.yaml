@@ -1,0 +1,18 @@
+name: Bug
+description: File a bug report
+title: "🐞 "
+labels: ["bug"]
+projects: ["keiranking/6"]
+body:
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: Describe the unintended or erroneous behavior
+    validations:
+      required: true
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Describe how someone can reproduce the bug

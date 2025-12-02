@@ -1,17 +1,10 @@
-//
-//  AttuneApp.swift
-//  Attune
-//
-//  Created by Keiran King on 11/30/25.
-//
-
 import SwiftUI
 
 @main
 struct AttuneApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
     var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
+        Settings { Text("No settings") }
     }
 }

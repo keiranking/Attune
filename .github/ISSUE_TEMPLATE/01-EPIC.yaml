@@ -1,0 +1,15 @@
+name: Epic
+description: Create an epic
+title: "🏔️ "
+labels: ["epic"]
+projects: ["keiranking/6"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Briefly describe the scope of work
+      placeholder: |
+        When I'm /situation/
+        I want to /motivation/
+        So I can /outcome/
