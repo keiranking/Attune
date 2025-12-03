@@ -6,40 +6,105 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var popoverController: OverlayWindowController!
     var hotKeyManager: HotKeyManager!
 
-    func applicationDidFinishLaunching(_ notification: Notification) {
-        // 1. Status item: Set to variableLength to allow icon resizing
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+    // Window references to prevent deallocation
+    var tagManagerWindow: NSWindow?
+    var settingsWindow: NSWindow?
 
-        // 2. CRITICAL CHECK: Ensure the status item button was created successfully
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem.button {
-            button.image = NSImage(systemSymbolName: "tag", accessibilityDescription: "MusicTagger")
-            button.action = #selector(togglePopover(_:))
-        } else {
-            // This logs an error if the status item failed to be created (which should not happen
-            // but helps diagnose)
-            NSLog("ERROR: Failed to create NSStatusItem button.")
-            return
+            button.image = NSImage(systemSymbolName: "tag",
+                                   accessibilityDescription: "Attune")
         }
 
-        // Overlay controller
+        let menu = NSMenu()
+        menu.addItem(NSMenuItem(title: "Toggle Attune",
+                                action: #selector(togglePopover(_:)), 
+                                keyEquivalent: "t"))
+
+        menu.addItem(NSMenuItem.separator())
+
+        menu.addItem(NSMenuItem(title: "Manage Tags...",
+                                action: #selector(openTagManager),
+                                keyEquivalent: ","))
+
+        menu.addItem(NSMenuItem(title: "Preferences...",
+                                action: #selector(openSettings),
+                                keyEquivalent: ";"))
+
+        menu.addItem(NSMenuItem.separator())
+
+        menu.addItem(NSMenuItem(title: "Quit Attune",
+                                action: #selector(NSApp.terminate(_:)),
+                                keyEquivalent: "q"))
+
+        statusItem.menu = menu
+
         popoverController = OverlayWindowController()
 
-        // Hotkey: register Cmd+Shift+Space in example (customize)
         hotKeyManager = HotKeyManager()
-        // Spacebar key code is 49
+        // Default: Cmd+Shift+Space (49)
         hotKeyManager.register(hotKey: (cmd:true, shift:true, option:false, control:false, keyCode:49)) { [weak self] in
             self?.togglePopover(nil)
         }
     }
 
+    // MARK: - Actions
+
     @objc func togglePopover(_ sender: Any?) {
         if popoverController.isShown {
             popoverController.hide()
         } else {
-            // Activate the application, ignoring other apps, to ensure it's on top and can receive focus
             NSApp.activate(ignoringOtherApps: true)
-            popoverController.show()
+            if let button = statusItem.button {
+                 let buttonRect = button.window?.frame ?? NSRect.zero
+                 popoverController.showBelow(rect: buttonRect)
+            } else {
+                 popoverController.show()
+            }
         }
+    }
+
+    @objc func openTagManager() {
+        if tagManagerWindow == nil {
+            let contentView = TagManagerView()
+                .environmentObject(TagLibrary.shared)
+
+            let window = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 400, height: 500),
+                styleMask: [.titled, .closable, .miniaturizable, .resizable],
+                backing: .buffered, defer: false
+            )
+            window.title = "Manage Tags"
+            window.center()
+            window.contentView = NSHostingView(rootView: contentView)
+            window.isReleasedWhenClosed = false
+            tagManagerWindow = window
+        }
+
+        NSApp.activate(ignoringOtherApps: true)
+        tagManagerWindow?.makeKeyAndOrderFront(nil)
+    }
+
+    @objc func openSettings() {
+        if settingsWindow == nil {
+            let contentView = SettingsView()
+                .environmentObject(AppSettings.shared)
+
+            let window = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 350, height: 200),
+                styleMask: [.titled, .closable],
+                backing: .buffered, defer: false
+            )
+            window.title = "Preferences"
+            window.center()
+            window.contentView = NSHostingView(rootView: contentView)
+            window.isReleasedWhenClosed = false
+            settingsWindow = window
+        }
+
+        NSApp.activate(ignoringOtherApps: true)
+        settingsWindow?.makeKeyAndOrderFront(nil)
     }
 
     func applicationWillTerminate(_ notification: Notification) {

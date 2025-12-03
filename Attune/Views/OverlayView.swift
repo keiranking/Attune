@@ -2,6 +2,9 @@ import SwiftUI
 
 struct OverlayView: View {
     @State private var text: String = ""
+
+    @EnvironmentObject var library: TagLibrary // accessible via OverlayWindowController
+
     var onCommit: (String) -> Void
 
     @FocusState private var isFocused: Bool
@@ -12,12 +15,12 @@ struct OverlayView: View {
                 .font(.headline)
 
             HStack {
-                TextField("", text: $text, onCommit: { onCommit(text) })
+                TextField("", text: $text, onCommit: { commit() })
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .frame(minWidth: 600)
-                    .focused($isFocused)    // ← SwiftUI-native focus binding
+                    .focused($isFocused)
 
-                Button("OK") { onCommit(text) }
+                Button("OK") { commit() }
             }
         }
         .padding()
@@ -27,13 +30,20 @@ struct OverlayView: View {
         .cornerRadius(10)
         .padding()
         .onAppear {
-            // Delay ensures hosting controller + window are keyed before focus assignment
             DispatchQueue.main.async {
                 self.isFocused = true
             }
         }
     }
 
-    // no longer needed
-    func focusTextField() {}
+    private func commit() {
+        onCommit(text)
+        text = "" // Clear text after commit
+
+        // We need to hide the window manually here if the closure doesn't handle it,
+        // but typically the Controller handles hiding via the closure logic.
+        // In the current architecture, the Controller passes a closure that calls hide().
+        // However, OverlayView doesn't reference the Controller directly.
+        // The simplistic approach is relying on onCommit to trigger the controller's logic.
+    }
 }

@@ -5,20 +5,15 @@ final class MusicTagger {
     static let shared = MusicTagger()
     private init() {}
 
-    // Whitelists (Strict: unknown words are ignored)
-    let commentWhitelist: Set<String> = ["action","advice","ballad","celebration","clip","ethnic","exmas","family","forgiveness","friendship","grand","heroic","island","light","lively","longing","lust","new","nostalgic","old","promise","rare","regret","religious","revenge","romantic","running","sad","secular","seduction","self","sexy","sinister","slow","society","traditional","theme"]
-    let groupingWhitelist: Set<String> = ["boy","girl","vocal","group","choir","acapella","brass","chant","guitar","organ","pan","piano","perc","strings","synth","wind","whistle","solo","band","orchestra"]
-    let genreWhitelist: Set<String> = ["Alternative","Broadway","Blues","Christmas","Classical","Country","Electronica","Folk","Jazz","Karaoke","Latin","OST","Personal","Pop","R&B","Rap","Reggae","Rock","Soca","Soul","Standards"]
+    var commentWhitelist: Set<String> { TagLibrary.shared.getWhitelist(for: .comment) }
+    var groupingWhitelist: Set<String> { TagLibrary.shared.getWhitelist(for: .grouping) }
+    var genreWhitelist: Set<String> { TagLibrary.shared.getWhitelist(for: .genre) }
     let ratingWhitelist: Set<String> = ["0","1","2","3","4","5"]
-
-    // MARK: - State Check
 
     private var isMusicRunning: Bool {
         let runningApps = NSWorkspace.shared.runningApplications
         return runningApps.contains { $0.bundleIdentifier == "com.apple.Music" }
     }
-
-    // MARK: - AppleScript Runner
 
     @discardableResult
     private func runAppleScript(_ source: String) -> String {
@@ -27,29 +22,16 @@ final class MusicTagger {
             return ""
         }
 
-        // Use the bundle ID explicitly for robustness
         let robustSource = source.replacingOccurrences(of: "tell application \"Music\"", with: "tell application id \"com.apple.Music\"")
 
-        NSLog("Running AppleScript:\n\(robustSource)")
-
-        guard let script = NSAppleScript(source: robustSource) else {
-            NSLog("AppleScript compile error")
-            return ""
-        }
+        guard let script = NSAppleScript(source: robustSource) else { return "" }
 
         var err: NSDictionary?
         let result = script.executeAndReturnError(&err)
-
-        if let e = err {
-            // This is where the -1743 error occurs if permission is denied
-            NSLog("AppleScript runtime error: \(e)")
-            return ""
-        }
+        if let e = err { NSLog("AppleScript runtime error: \(e)"); return "" }
 
         return result.stringValue ?? ""
     }
-
-    // MARK: - Command Parser
 
     func process(command: String) {
         let tokens = command
@@ -63,34 +45,28 @@ final class MusicTagger {
         let selCodes = ["s"]
         let delCodes = ["x"]
         let delselCodes = ["xx"]
-
         let head = tokens[0]
 
-        // Rating
         if ratingWhitelist.contains(head) {
             setRatingAndBPM(value: Int(head) ?? 0, forSelection: false)
             return
         }
 
-        // Selection add
         if selCodes.contains(head) {
             applyToSelection(tokens: Array(tokens.dropFirst()))
             return
         }
 
-        // Selection remove specific tags
         if delselCodes.contains(head) {
             removeFromSelection(tokens: Array(tokens.dropFirst()))
             return
         }
 
-        // Delete from current
         if delCodes.contains(head) {
             removeFromCurrent(tokens: Array(tokens.dropFirst()))
             return
         }
 
-        // Default: add tags to current
         addToCurrent(tokens: tokens)
     }
 
@@ -98,6 +74,9 @@ final class MusicTagger {
 
     private func setRatingAndBPM(value: Int, forSelection: Bool) {
         let rating = value * 20
+        let target = forSelection ? "selection" : "current track"
+        let condition = forSelection ? "" : "if player state is playing or player state is paused then"
+        let endCondition = forSelection ? "" : "end if"
 
         let script: String
         if forSelection {
@@ -113,28 +92,23 @@ final class MusicTagger {
         } else {
             script = """
             tell application id "com.apple.Music"
-                if player state is playing or player state is paused then
-                    set rating of current track to \(rating)
-                    set bpm of current track to \(value)
-                end if
+                \(condition)
+                    set rating of \(target) to \(rating)
+                    set bpm of \(target) to \(value)
+                \(endCondition)
             end tell
             """
         }
         runAppleScript(script)
     }
 
-    // MARK: - Current Track Logic (Read-Modify-Write)
-
     private func addToCurrent(tokens: [String]) {
         let (comment, grouping, genre) = partition(tokens: tokens)
         if comment.isEmpty && grouping.isEmpty && genre.isEmpty { return }
-
-        let script = buildMergeScript(target: "current track", comment: comment, grouping: grouping, genre: genre)
-        runAppleScript(script)
+        runAppleScript(buildMergeScript(target: "current track", comment: comment, grouping: grouping, genre: genre))
     }
 
     private func removeFromCurrent(tokens: [String]) {
-        // Read current tags from Music
         let read = """
         tell application id "com.apple.Music"
           if player state is playing or player state is paused then
@@ -145,17 +119,14 @@ final class MusicTagger {
           end if
         end tell
         """
-
         let combined = runAppleScript(read)
         if combined.isEmpty { return }
 
-        // Swift-side processing to remove tokens
         let parts = combined.components(separatedBy: "|||")
         let c = removeList(old: parts[safe: 0] ?? "", remove: tokens)
         let g = removeList(old: parts[safe: 1] ?? "", remove: tokens)
         let ge = removeList(old: parts[safe: 2] ?? "", remove: tokens)
 
-        // Write back the modified tags
         let write = """
         tell application id "com.apple.Music"
           if player state is playing or player state is paused then
@@ -169,13 +140,10 @@ final class MusicTagger {
         runAppleScript(write)
     }
 
-    // MARK: - Selection Logic (Batch Processing)
-
     private func applyToSelection(tokens: [String]) {
         let (comment, grouping, genre) = partition(tokens: tokens)
         if comment.isEmpty && grouping.isEmpty && genre.isEmpty { return }
 
-        // Generates a script that iterates over selection and merges tags
         let script = """
         tell application id "com.apple.Music"
             set sel to selection
@@ -188,16 +156,11 @@ final class MusicTagger {
     }
 
     private func removeFromSelection(tokens: [String]) {
-        // Simple 'xx' implementation: wipe fields that match the types of tokens provided.
-
         let (c, g, ge) = partition(tokens: tokens)
-
         var lines: [String] = []
-
         if !c.isEmpty { lines.append("set comment of t to \"\"") }
         if !g.isEmpty { lines.append("set grouping of t to \"\"") }
         if !ge.isEmpty { lines.append("set genre of t to \"\"") }
-
         if lines.isEmpty { return }
 
         let script = """
@@ -211,37 +174,46 @@ final class MusicTagger {
         runAppleScript(script)
     }
 
-    // MARK: - AppleScript Builders
+    // MARK: - Utilities
+    private func partition(tokens: [String]) -> ([String],[String],[String]) {
+        var c:[String]=[], g:[String]=[], ge:[String]=[]
 
-    // Builds a block of AppleScript that reads a field, checks if new tags exist, and appends them.
+        let cList = commentWhitelist
+        let gList = groupingWhitelist
+        let geList = genreWhitelist
+
+        for t in tokens {
+            let lowerT = t.lowercased()
+
+            if cList.contains(lowerT) { c.append(t) }
+            else if gList.contains(lowerT) { g.append(t) }
+            else if geList.contains(lowerT) { ge.append(t) }
+            else { c.append(t) } // fallback
+        }
+        return (c,g,ge)
+    }
+
     private func buildMergeBlock(variable: String, comment: [String], grouping: [String], genre: [String]) -> String {
         var lines: [String] = []
-
         if !comment.isEmpty {
-            let tags = comment.joined(separator: ", ")
-            lines.append(mergeFieldScript(obj: variable, prop: "comment", newVal: tags))
+            lines.append(mergeFieldScript(obj: variable, prop: "comment", newVal: comment.joined(separator: ", ")))
         }
         if !grouping.isEmpty {
-            let tags = grouping.joined(separator: ", ")
-            lines.append(mergeFieldScript(obj: variable, prop: "grouping", newVal: tags))
+            lines.append(mergeFieldScript(obj: variable, prop: "grouping", newVal: grouping.joined(separator: ", ")))
         }
         if !genre.isEmpty {
-            // Genre is typically a single, primary tag, so we overwrite.
-            let tag = genre.first ?? ""
-            lines.append("set genre of \(variable) to \"\(escape(tag))\"")
+            lines.append("set genre of \(variable) to \"\(escape(genre.first ?? ""))\"")
         }
         return lines.joined(separator: "\n")
     }
 
     private func mergeFieldScript(obj: String, prop: String, newVal: String) -> String {
-        // AppleScript helper to append if not present
         let val = escape(newVal)
         return """
         set curVal to \(prop) of \(obj)
         if curVal is "" then
             set \(prop) of \(obj) to "\(val)"
         else
-            -- Check for exact match of comma-separated tags and append if new
             set tags to words of curVal
             set newTags to words of "\(val)"
             set changed to false
@@ -261,7 +233,6 @@ final class MusicTagger {
     private func buildMergeScript(target: String, comment: [String], grouping: [String], genre: [String]) -> String {
         let condition = target == "current track" ? "if player state is playing or player state is paused then" : ""
         let endCondition = target == "current track" ? "end if" : ""
-
         return """
         tell application id "com.apple.Music"
             \(condition)
@@ -272,41 +243,14 @@ final class MusicTagger {
         """
     }
 
-    // MARK: - Utilities
-
-    private func partition(tokens: [String]) -> ([String],[String],[String]) {
-        var c:[String]=[], g:[String]=[], ge:[String]=[]
-        for t in tokens {
-            if commentWhitelist.contains(t) { c.append(t) }
-            else if groupingWhitelist.contains(t) { g.append(t) }
-            else if genreWhitelist.contains(t) { ge.append(t) }
-            else {
-                // Fallback: If unknown, treat as comment
-                c.append(t)
-            }
-        }
-        return (c,g,ge)
-    }
-
     private func removeList(old: String, remove: [String]) -> String {
-        var parts = old
-            .split(separator: ",")
-            .map { $0.trimmingCharacters(in: .whitespaces) }
-            .filter { !$0.isEmpty }
-
+        var parts = old.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
         parts.removeAll { remove.contains(String($0)) }
         return parts.joined(separator: ", ")
     }
 
     private func escape(_ s: String) -> String {
-        s.replacingOccurrences(of: "\\", with: "\\\\")
-         .replacingOccurrences(of: "\"", with: "\\\"")
+        s.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"")
     }
 }
-
-// safe index helper
-private extension Array {
-    subscript(safe i: Int) -> Element? {
-        indices.contains(i) ? self[i] : nil
-    }
-}
+private extension Array { subscript(safe i: Int) -> Element? { indices.contains(i) ? self[i] : nil } }
