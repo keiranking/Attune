@@ -8,16 +8,30 @@ final class HotKeyManager {
 
     init() {
         var eventSpec = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
-        InstallEventHandler(GetApplicationEventTarget(), { (handlerRef, event, userData) -> OSStatus in
-            var hkID = EventHotKeyID()
-            GetEventParameter(event, EventParamName(kEventParamDirectObject), EventParamType(typeEventHotKeyID), nil, MemoryLayout<EventHotKeyID>.size, nil, &hkID)
-            let id = hkID.id
-            if let dict = Unmanaged<CFMutableDictionary>.fromOpaque(userData!).takeUnretainedValue() as? [String: Any],
-               let mgr = dict["mgr"] as? HotKeyManager {
+
+        let handlerRefCon = Unmanaged.passUnretained(self).toOpaque()
+
+        InstallEventHandler(
+            GetApplicationEventTarget(),
+            { (handlerRef, event, userData) -> OSStatus in
+                var hkID = EventHotKeyID()
+
+                GetEventParameter(event, EventParamName(kEventParamDirectObject), EventParamType(typeEventHotKeyID), nil, MemoryLayout<EventHotKeyID>.size, nil, &hkID)
+                let id = hkID.id
+
+                guard let userData = userData else { return noErr }
+
+                let mgr = Unmanaged<HotKeyManager>.fromOpaque(userData).takeUnretainedValue()
+
                 mgr.trigger(id: id)
-            }
-            return noErr
-        }, 1, &eventSpec, nil, nil)
+
+                return noErr
+            },
+            1,
+            &eventSpec,
+            handlerRefCon,
+            nil
+        )
     }
 
     private func trigger(id: UInt32) {
@@ -33,7 +47,9 @@ final class HotKeyManager {
 
         var gHotKeyRef: EventHotKeyRef? = nil
         let hkID = EventHotKeyID(signature: OSType(0x4d544b47), id: nextID) // "MTKG"
+
         RegisterEventHotKey(hotKey.keyCode, modifiers, hkID, GetApplicationEventTarget(), 0, &gHotKeyRef)
+
         handlers[nextID] = handler
         nextID += 1
     }
