@@ -1,7 +1,12 @@
 import SwiftUI
+import Combine
+
+final class OverlayState: ObservableObject {
+    @Published var text: String = ""
+}
 
 struct OverlayView: View {
-    @State private var text: String = ""
+    @ObservedObject var state: OverlayState
 
     @EnvironmentObject var library: TagLibrary // accessible via OverlayWindowController
 
@@ -15,12 +20,12 @@ struct OverlayView: View {
                 .font(.headline)
 
             HStack {
-                TextField("", text: $text, onCommit: { commit() })
+                TextField("", text: $state.text, onCommit: { onCommit(state.text) })
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .frame(minWidth: 600)
                     .focused($isFocused)
 
-                Button("OK") { commit() }
+                Button("OK") { onCommit(state.text) }
             }
         }
         .padding()
@@ -34,16 +39,5 @@ struct OverlayView: View {
                 self.isFocused = true
             }
         }
-    }
-
-    private func commit() {
-        onCommit(text)
-        text = "" // Clear text after commit
-
-        // We need to hide the window manually here if the closure doesn't handle it,
-        // but typically the Controller handles hiding via the closure logic.
-        // In the current architecture, the Controller passes a closure that calls hide().
-        // However, OverlayView doesn't reference the Controller directly.
-        // The simplistic approach is relying on onCommit to trigger the controller's logic.
     }
 }

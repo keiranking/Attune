@@ -5,23 +5,33 @@ final class OverlayWindow: NSWindow {
     // Allows the borderless window to receive keyboard input
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { true }
+
+    var hideAction: (() -> Void)?
+    override func cancelOperation(_ sender: Any?) {
+        hideAction?()
+    }
+    override func resignKey() {
+        super.resignKey()
+        hideAction?()
+    }
 }
 
 final class OverlayWindowController {
     private var window: OverlayWindow!
     private var hosting: NSHostingController<AnyView>! // Wrapped in AnyView to erase type complexity with EnvObjs
 
+    private let overlayState = OverlayState()
+
     var isShown: Bool { window.isVisible }
 
     init() {
-        // INJECTION HAPPENS HERE:
-        // We wrap the view and inject the shared objects
-        let rootView = OverlayView(onCommit: { text in
-            MusicTagger.shared.process(command: text)
-            // We need to capture 'self' carefully; relying on the closure to callback
-            // For simplicity, we can just hide via notification or closure,
-            // but here we just need to know the processing happened.
-        })
+        let rootView = OverlayView(
+            state: overlayState,
+            onCommit: { text in
+                MusicTagger.shared.process(command: text)
+                self.hide()
+            }
+        )
         .environmentObject(TagLibrary.shared)
         .environmentObject(AppSettings.shared)
 
@@ -36,6 +46,10 @@ final class OverlayWindowController {
             defer: false
         )
 
+        window.hideAction = { [weak self] in
+            self?.hide()
+        }
+
         window.contentViewController = hosting
         window.isOpaque = false
         window.backgroundColor = .clear
@@ -44,6 +58,8 @@ final class OverlayWindowController {
     }
 
     func show() {
+        overlayState.text = ""
+
         if let screenFrame = NSScreen.main?.visibleFrame {
             let windowWidth = window.frame.width
             let windowHeight = window.frame.height
@@ -60,17 +76,6 @@ final class OverlayWindowController {
         } else {
             window.center()
         }
-
-        NSApp.activate(ignoringOtherApps: true)
-        window.makeKeyAndOrderFront(nil)
-        focusInput()
-    }
-
-    func showBelow(rect: NSRect) {
-        let screenRect = NSScreen.main?.visibleFrame ?? NSScreen.main!.frame
-        let x = rect.midX - (window.frame.width / 2)
-        let y = screenRect.maxY - window.frame.height - 5
-        window.setFrameOrigin(NSPoint(x: x, y: y))
 
         NSApp.activate(ignoringOtherApps: true)
         window.makeKeyAndOrderFront(nil)
