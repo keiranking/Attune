@@ -44,8 +44,24 @@ final class OverlayWindowController {
     }
 
     func show() {
+        if let screenFrame = NSScreen.main?.visibleFrame {
+            let windowWidth = window.frame.width
+            let windowHeight = window.frame.height
+
+            let centerX = screenFrame.midX
+            let x = centerX - (windowWidth / 2)
+
+            let topPosition = screenFrame.maxY
+            let twentyFivePercentDown = screenFrame.height * 0.75
+
+            let y = topPosition - twentyFivePercentDown - windowHeight
+
+            window.setFrameOrigin(NSPoint(x: x, y: y))
+        } else {
+            window.center()
+        }
+
         NSApp.activate(ignoringOtherApps: true)
-        window.center()
         window.makeKeyAndOrderFront(nil)
         focusInput()
     }

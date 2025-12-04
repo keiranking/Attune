@@ -56,12 +56,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             popoverController.hide()
         } else {
             NSApp.activate(ignoringOtherApps: true)
-            if let button = statusItem.button {
-                 let buttonRect = button.window?.frame ?? NSRect.zero
-                 popoverController.showBelow(rect: buttonRect)
-            } else {
-                 popoverController.show()
-            }
+            popoverController.show()
         }
     }
 
