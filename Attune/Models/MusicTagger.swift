@@ -1,6 +1,24 @@
 import Foundation
 import AppKit
 
+// MARK: - Enums for UI State
+enum TaggingMode: String, CaseIterable {
+    case add = "Add to"
+    case remove = "Remove from"
+}
+
+enum TaggingScope: String, CaseIterable {
+    case current = "Current Track"
+    case selection = "Selection"
+}
+
+struct MusicContextState {
+    var currentTrackTitle: String
+    var currentTrackArtist: String
+    var selectionCount: Int
+    var isPlaying: Bool
+}
+
 final class MusicTagger {
     static let shared = MusicTagger()
     private init() {}
@@ -10,7 +28,6 @@ final class MusicTagger {
     var genreWhitelist: Set<String> { TagLibrary.shared.getWhitelist(for: .genre) }
     let ratingWhitelist: Set<String> = ["0","1","2","3","4","5"]
 
-    // Delimiters for reading/writing multiple fields/tracks via AppleScript
     private let fieldDelimiter = "|||"
     private let trackDelimiter = "&&&"
 
@@ -19,25 +36,46 @@ final class MusicTagger {
         return runningApps.contains { $0.bundleIdentifier == "com.apple.Music" }
     }
 
-    @discardableResult
-    private func runAppleScript(_ source: String) -> String {
+    // MARK: - Data Fetching for UI
+
+    func fetchContextState() -> MusicContextState {
         guard isMusicRunning else {
-            NSLog("Music is not running. Script aborted.")
-            return ""
+            return MusicContextState(currentTrackTitle: "Music not running", currentTrackArtist: "", selectionCount: 0, isPlaying: false)
         }
 
-        let robustSource = source.replacingOccurrences(of: "tell application \"Music\"", with: "tell application id \"com.apple.Music\"")
+        let script = """
+        tell application id "com.apple.Music"
+            set tTitle to ""
+            set tArtist to ""
+            set isPl to false
 
-        guard let script = NSAppleScript(source: robustSource) else { return "" }
+            if player state is playing or player state is paused then
+                set t to current track
+                set tTitle to name of t
+                set tArtist to artist of t
+                set isPl to true
+            end if
 
-        var err: NSDictionary?
-        let result = script.executeAndReturnError(&err)
-        if let e = err { NSLog("AppleScript runtime error: \(e)"); return "" }
+            set selCount to count of items of selection
 
-        return result.stringValue ?? ""
+            return tTitle & "\(fieldDelimiter)" & tArtist & "\(fieldDelimiter)" & (selCount as string) & "\(fieldDelimiter)" & (isPl as string)
+        end tell
+        """
+
+        let result = runAppleScript(script)
+        let parts = result.components(separatedBy: fieldDelimiter)
+
+        return MusicContextState(
+            currentTrackTitle: parts[safe: 0] ?? "No Track",
+            currentTrackArtist: parts[safe: 1] ?? "",
+            selectionCount: Int(parts[safe: 2] ?? "0") ?? 0,
+            isPlaying: (parts[safe: 3] ?? "false") == "true"
+        )
     }
 
-    func process(command: String) {
+    // MARK: - Processing
+
+    func process(command: String, scope: TaggingScope, mode: TaggingMode) {
         let tokens = command
             .replacingOccurrences(of: ",", with: " ")
             .split { $0.isWhitespace }
@@ -46,64 +84,55 @@ final class MusicTagger {
 
         guard !tokens.isEmpty else { return }
 
-        let selCodes = ["s"]
-        let delCodes = ["x"]
-        let delselCodes = ["xx"] // Retaining original "xx" for remove-from-selection
-        let head = tokens[0].lowercased()
-
-        if selCodes.contains(head) {
-            let subTokens = Array(tokens.dropFirst())
-
-            if let ratingValue = subTokens.first, ratingWhitelist.contains(ratingValue) {
-                if let ratingInt = Int(ratingValue) {
-                    setRatingAndBPM(value: ratingInt, forSelection: true)
-                }
-                return
-            }
-
-            applyToSelection(tokens: subTokens)
+        // Check for Rating (Ratings ignore Mode and just 'Set')
+        // We assume the first token being a number 0-5 implies a rating command
+        if let first = tokens.first, ratingWhitelist.contains(first), let ratingInt = Int(first) {
+            setRatingAndBPM(value: ratingInt, forSelection: (scope == .selection))
             return
         }
 
-        if delselCodes.contains(head) {
-            removeFromSelection(tokens: Array(tokens.dropFirst()))
-            return
+        // Tagging
+        switch (scope, mode) {
+        case (.current, .add):
+            addToCurrent(tokens: tokens)
+        case (.current, .remove):
+            removeFromCurrent(tokens: tokens)
+        case (.selection, .add):
+            applyToSelection(tokens: tokens)
+        case (.selection, .remove):
+            removeFromSelection(tokens: tokens)
         }
-
-        if ratingWhitelist.contains(head) {
-            if let ratingInt = Int(head) {
-                setRatingAndBPM(value: ratingInt, forSelection: false)
-            }
-            return
-        }
-
-        if delCodes.contains(head) {
-            removeFromCurrent(tokens: Array(tokens.dropFirst()))
-            return
-        }
-
-        addToCurrent(tokens: tokens)
     }
 
-    // MARK: - Actions
+    // MARK: - AppleScript Runner (Private)
+
+    @discardableResult
+    private func runAppleScript(_ source: String) -> String {
+        guard isMusicRunning else { return "" }
+        let robustSource = source.replacingOccurrences(of: "tell application \"Music\"", with: "tell application id \"com.apple.Music\"")
+        guard let script = NSAppleScript(source: robustSource) else { return "" }
+        var err: NSDictionary?
+        let result = script.executeAndReturnError(&err)
+        if let e = err { NSLog("AppleScript runtime error: \(e)"); return "" }
+        return result.stringValue ?? ""
+    }
+
+    // MARK: - Actions (Refactored)
 
     private func setRatingAndBPM(value: Int, forSelection: Bool) {
         let rating = value * 20
-
         let script: String
+
         if forSelection {
-            // Apply rating and BPM to selection
             script = """
             tell application id "com.apple.Music"
-                set sel to selection
-                repeat with t in sel
+                repeat with t in selection
                     set rating of t to \(rating)
                     set bpm of t to \(value)
                 end repeat
             end tell
             """
         } else {
-            // Apply rating and BPM to current track (only if playing/paused)
             script = """
             tell application id "com.apple.Music"
                 if player state is playing or player state is paused then
@@ -139,7 +168,6 @@ final class MusicTagger {
         if combined.isEmpty { return }
 
         let parts = combined.components(separatedBy: fieldDelimiter)
-
         let c = removeList(old: parts[safe: 0] ?? "", remove: tokens)
         let g = removeList(old: parts[safe: 1] ?? "", remove: tokens)
         let ge = removeList(old: parts[safe: 2] ?? "", remove: tokens)
@@ -174,93 +202,79 @@ final class MusicTagger {
 
     private func removeFromSelection(tokens: [String]) {
         guard !tokens.isEmpty else { return }
+        let escapedTokens = tokens.map{ escape($0) }.joined(separator: "\",\"")
 
-        let readScript = """
+        let script = """
         tell application id "com.apple.Music"
-            set trackDataList to {}
             set sel to selection
+            set tagsToRemoveList to {"\(escapedTokens)"}
+
             repeat with t in sel
-                -- Read comment, grouping, and genre, separated by \(fieldDelimiter)
-                set c to (comment of t as string)
-                set g to (grouping of t as string)
-                set ge to (genre of t as string)
+                set c to comment of t
+                set g to grouping of t
+                set ge to genre of t
 
-                -- Combine fields for one track
-                set trackRecord to c & "\(fieldDelimiter)" & g & "\(fieldDelimiter)" & ge
-                set end of trackDataList to trackRecord
+                set newC to joinList(removeList(c, tagsToRemoveList))
+                set newG to joinList(removeList(g, tagsToRemoveList))
+                set newGE to joinList(removeList(ge, tagsToRemoveList))
+
+                if newC is not c then set comment of t to newC
+                if newG is not g then set grouping of t to newG
+                if newGE is not ge then set genre of t to newGE
             end repeat
+        end tell
 
-            -- Combine all track records with \(trackDelimiter) separator
-            set AppleScript's text item delimiters to "\(trackDelimiter)"
-            set allData to trackDataList as string
+        on removeList(oldTags, tokensToRemove)
+            set newTags to {}
+            set AppleScript's text item delimiters to ", "
+            set oldTagList to text items of oldTags
             set AppleScript's text item delimiters to ""
 
-            return allData
-        end tell
+            repeat with t in oldTagList
+                set trimmedT to trim(t)
+                set lowerTokensToRemove to {}
+                repeat with token in tokensToRemove
+                    set end of lowerTokensToRemove to (trim(token) as string)
+                end repeat
+
+                if (trimmedT as string) is not in lowerTokensToRemove and trimmedT is not "" then
+                    set end of newTags to trimmedT
+                end if
+            end repeat
+            return newTags
+        end removeList
+
+        on joinList(aList)
+            set tid to text item delimiters
+            set text item delimiters to ", "
+            set t to aList as string
+            set text item delimiters to tid
+            return t
+        end joinList
+        
+        on trim(theText)
+            set AppleScript's text item delimiters to space
+            set wordList to text items of theText
+            set AppleScript's text item delimiters to ""
+            return wordList as string
+        end trim
         """
-        let allData = runAppleScript(readScript)
-        if allData.isEmpty { return }
-
-        let trackRecords = allData.components(separatedBy: trackDelimiter)
-        var newTrackData: [(c: String, g: String, ge: String)] = []
-
-        for record in trackRecords {
-            let parts = record.components(separatedBy: fieldDelimiter)
-
-            guard parts.count >= 3 else {
-                NSLog("Error: Track record did not have 3 fields: \(record)")
-                continue
-            }
-
-            let oldC = parts[safe: 0] ?? ""
-            let oldG = parts[safe: 1] ?? ""
-            let oldGE = parts[safe: 2] ?? ""
-
-            let newC = removeList(old: oldC, remove: tokens)
-            let newG = removeList(old: oldG, remove: tokens)
-            let newGE = removeList(old: oldGE, remove: tokens)
-
-            newTrackData.append((c: newC, g: newG, ge: newGE))
-        }
-
-        var writeScriptLines: [String] = []
-
-        writeScriptLines.append("tell application id \"com.apple.Music\"")
-        writeScriptLines.append("  set sel to selection")
-
-        for (i, data) in newTrackData.enumerated() {
-            let trackIndex = i + 1 // AppleScript index is 1-based, so use i + 1
-            let newC = escape(data.c)
-            let newG = escape(data.g)
-            let newGE = escape(data.ge)
-
-            writeScriptLines.append("  -- Track \(trackIndex)")
-            writeScriptLines.append("  set t to item \(trackIndex) of sel")
-            writeScriptLines.append("  set comment of t to \"\(newC)\"")
-            writeScriptLines.append("  set grouping of t to \"\(newG)\"")
-            writeScriptLines.append("  set genre of t to \"\(newGE)\"")
-        }
-
-        writeScriptLines.append("end tell")
-
-        runAppleScript(writeScriptLines.joined(separator: "\n"))
+        runAppleScript(script)
     }
 
     // MARK: - Utilities
     private func partition(tokens: [String]) -> ([String],[String],[String]) {
         var c:[String]=[], g:[String]=[], ge:[String]=[]
-
         let cList = commentWhitelist.map { $0.lowercased() }
         let gList = groupingWhitelist.map { $0.lowercased() }
         let geList = genreWhitelist.map { $0.lowercased() }
 
         for t in tokens {
             let lowerT = t.lowercased()
-
             if cList.contains(lowerT) { c.append(t) }
             else if gList.contains(lowerT) { g.append(t) }
             else if geList.contains(lowerT) { ge.append(t) }
-            else { c.append(t) } // fallback
+            else { c.append(t) }
         }
         return (c,g,ge)
     }
@@ -273,7 +287,6 @@ final class MusicTagger {
         if !grouping.isEmpty {
             lines.append(mergeFieldScript(obj: variable, prop: "grouping", newVal: grouping.joined(separator: ", ")))
         }
-
         if !genre.isEmpty {
             lines.append(mergeFieldScript(obj: variable, prop: "genre", newVal: genre.joined(separator: ", ")))
         }
@@ -287,13 +300,11 @@ final class MusicTagger {
         if curVal is "" then
             set \(prop) of \(obj) to "\(val)"
         else
-            -- Use AppleScript's built-in words parser, which separates by whitespace
             set tags to words of curVal
             set newTags to words of "\(val)"
             set changed to false
             repeat with newTag in newTags
                 if newTag is not in tags then
-                    -- Append new tag separated by a comma and space
                     set curVal to curVal & ", " & newTag
                     set changed to true
                 end if
@@ -319,14 +330,9 @@ final class MusicTagger {
     }
 
     private func removeList(old: String, remove: [String]) -> String {
-        var parts = old.split(separator: ",")
-            .map { $0.trimmingCharacters(in: .whitespaces) }
-            .filter { !$0.isEmpty }
-
+        var parts = old.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
         let lowerRemove = Set(remove.map { $0.lowercased() })
-
         parts.removeAll { lowerRemove.contains($0.lowercased()) }
-
         return parts.joined(separator: ", ")
     }
 
