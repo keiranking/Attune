@@ -8,6 +8,7 @@ final class OverlayWindow: NSWindow {
     var hideAction: (() -> Void)?
 
     var arrowKeyAction: (() -> Void)?
+//    var tabKeyAction: (() -> Void)?
 
     override func cancelOperation(_ sender: Any?) {
         hideAction?()
@@ -18,14 +19,25 @@ final class OverlayWindow: NSWindow {
         hideAction?()
     }
 
-    // Intercept Arrow Keys before they reach the TextField
-    override func keyDown(with event: NSEvent) {
-        if event.keyCode == 126 || event.keyCode == 125 { // Arrow Up or Arrow Down
-            arrowKeyAction?()
-            return
+    override func sendEvent(_ event: NSEvent) {
+        enum KeyCodes {
+            static let arrowUp = 126
+            static let arrowDown = 125
+//            static let tab = 48
         }
 
-        super.keyDown(with: event)
+        if event.type == .keyDown {
+            if event.keyCode == KeyCodes.arrowUp || event.keyCode == KeyCodes.arrowDown {
+                arrowKeyAction?()
+                return
+            }
+//            if event.keyCode == KeyCodes.tab {
+//                tabKeyAction?()
+//                return
+//            }
+        }
+
+        super.sendEvent(event)
     }
 }
 
@@ -70,7 +82,7 @@ final class OverlayWindowController {
         }
 
         window.arrowKeyAction = { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
 
             DispatchQueue.main.async {
                 withAnimation(.easeInOut(duration: 0.1)) {
@@ -78,6 +90,16 @@ final class OverlayWindowController {
                 }
             }
         }
+
+//        window.tabKeyAction = { [weak self] in
+//            guard let self else { return }
+//
+//            DispatchQueue.main.async {
+//                withAnimation(.easeInOut(duration: 0.1)) {
+//                    self.overlayState.toggleMode()
+//                }
+//            }
+//        }
 
         window.contentViewController = hosting
         window.isOpaque = false
