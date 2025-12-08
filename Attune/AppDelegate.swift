@@ -3,10 +3,9 @@ import SwiftUI
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem!
-    var popoverController: OverlayWindowController!
+    var overlayController: OverlayWindowController!
     var hotKeyManager: HotKeyManager!
 
-    // Window references to prevent deallocation
     var tagManagerWindow: NSWindow?
     var settingsWindow: NSWindow?
 
@@ -19,7 +18,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let menu = NSMenu()
         menu.addItem(NSMenuItem(title: "Toggle Attune",
-                                action: #selector(togglePopover(_:)), 
+                                action: #selector(toggleOverlay),
                                 keyEquivalent: "t"))
 
         menu.addItem(NSMenuItem.separator())
@@ -40,23 +39,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         statusItem.menu = menu
 
-        popoverController = OverlayWindowController()
+        overlayController = OverlayWindowController()
 
         hotKeyManager = HotKeyManager()
         // Default: Cmd+Shift+Space (49)
         hotKeyManager.register(hotKey: (cmd:true, shift:true, option:false, control:false, keyCode:49)) { [weak self] in
-            self?.togglePopover(nil)
+            self?.toggleOverlay(nil)
         }
     }
 
     // MARK: - Actions
 
-    @objc func togglePopover(_ sender: Any?) {
-        if popoverController.isShown {
-            popoverController.hide()
+    @objc func toggleOverlay(_ sender: Any?) {
+        if overlayController.isShown {
+            overlayController.hide()
         } else {
             NSApp.activate(ignoringOtherApps: true)
-            popoverController.show()
+            overlayController.show()
         }
     }
 

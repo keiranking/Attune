@@ -1,14 +1,32 @@
 import Cocoa
 import SwiftUI
 
+// MARK: - OverlayWindow (safe, AppKit-friendly)
 final class OverlayWindow: NSWindow {
-    override var canBecomeKey: Bool { true }
-    override var canBecomeMain: Bool { true }
-
     var hideAction: (() -> Void)?
-
     var arrowKeyAction: (() -> Void)?
-//    var tabKeyAction: (() -> Void)?
+
+    convenience init(contentViewController: NSViewController) {
+        self.init(
+            contentRect: NSRect(x: 0, y: 0, width: 700, height: 200),
+            styleMask: [.titled, .fullSizeContentView],
+            backing: .buffered,
+            defer: false
+        )
+
+        titleVisibility = .hidden
+        titlebarAppearsTransparent = true
+        isMovable = false
+        isOpaque = false
+        backgroundColor = .clear
+        hasShadow = true
+        level = .floating
+
+        self.contentViewController = contentViewController
+    }
+
+    override var canBecomeKey: Bool { true }
+    override var canBecomeMain: Bool { false }
 
     override func cancelOperation(_ sender: Any?) {
         hideAction?()
@@ -20,45 +38,42 @@ final class OverlayWindow: NSWindow {
     }
 
     override func sendEvent(_ event: NSEvent) {
-        enum KeyCodes {
-            static let arrowUp = 126
-            static let arrowDown = 125
-//            static let tab = 48
-        }
-
+        // Let AppKit handle appKitDefined/internal events
         if event.type == .keyDown {
-            if event.keyCode == KeyCodes.arrowUp || event.keyCode == KeyCodes.arrowDown {
+            switch event.keyCode {
+            case 126, 125: // up/down
                 arrowKeyAction?()
                 return
+            default:
+                break
             }
-//            if event.keyCode == KeyCodes.tab {
-//                tabKeyAction?()
-//                return
-//            }
         }
-
         super.sendEvent(event)
     }
 }
 
+// MARK: - OverlayWindowController (single source of truth)
 final class OverlayWindowController {
-    private var window: OverlayWindow!
-    private var hosting: NSHostingController<AnyView>!
-
-    private let overlayState = OverlayState()
+    private let state: OverlayState
+    private var hosting: NSHostingController<AnyView>
+    private var window: OverlayWindow
 
     var isShown: Bool { window.isVisible }
 
     init() {
-        let rootView = OverlayView(
-            state: overlayState,
+        self.state = OverlayState()
+        self.hosting = NSHostingController(rootView: AnyView(EmptyView()))
+        self.window = OverlayWindow(contentViewController: hosting)
+
+        let realView = OverlayView(
+            state: state,
             onCommit: { [weak self] text in
-                guard let self = self else { return }
+                guard let self else { return }
 
                 MusicTagger.shared.process(
                     command: text,
-                    scope: self.overlayState.scope,
-                    mode: self.overlayState.mode
+                    scope: self.state.scope,
+                    mode: self.state.mode
                 )
 
                 self.hide()
@@ -67,73 +82,40 @@ final class OverlayWindowController {
         .environmentObject(TagLibrary.shared)
         .environmentObject(AppSettings.shared)
 
-        hosting = NSHostingController(rootView: AnyView(rootView))
+        hosting.rootView = AnyView(realView)
 
-        // Adjusted height for new UI
-        window = OverlayWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 700, height: 200), // Taller window for list
-            styleMask: .borderless,
-            backing: .buffered,
-            defer: false
-        )
-
-        window.hideAction = { [weak self] in
-            self?.hide()
-        }
+        window.hideAction = { [weak self] in self?.hide() }
 
         window.arrowKeyAction = { [weak self] in
             guard let self else { return }
 
             DispatchQueue.main.async {
                 withAnimation(.easeInOut(duration: 0.1)) {
-                    self.overlayState.toggleScope()
+                    self.state.toggleScope()
                 }
             }
         }
-
-//        window.tabKeyAction = { [weak self] in
-//            guard let self else { return }
-//
-//            DispatchQueue.main.async {
-//                withAnimation(.easeInOut(duration: 0.1)) {
-//                    self.overlayState.toggleMode()
-//                }
-//            }
-//        }
-
-        window.contentViewController = hosting
-        window.isOpaque = false
-        window.backgroundColor = .clear
-        window.level = .statusBar
-        window.hasShadow = true
     }
 
     func show() {
-        // Reset State
-        overlayState.text = ""
-        overlayState.mode = .add
-        overlayState.scope = .current
+        state.text = ""
+        state.mode = .add
+        state.scope = .current
 
-        // Fetch Metadata
-        DispatchQueue.global(qos: .userInitiated).async {
+        Task {
             let context = MusicTagger.shared.fetchContextState()
-            DispatchQueue.main.async {
-                self.overlayState.currentTrackTitle = context.currentTrackTitle
-                self.overlayState.currentTrackArtist = context.currentTrackArtist
-                self.overlayState.isMusicPlaying = context.isPlaying
-                self.overlayState.selectionCount = context.selectionCount
+            await MainActor.run {
+                self.state.currentTrackTitle = context.currentTrackTitle
+                self.state.currentTrackArtist = context.currentTrackArtist
+                self.state.isMusicPlaying = context.isPlaying
+                self.state.selectionCount = context.selectionCount
             }
         }
 
-        // Position
+        // Position centered, 25% down from top
         if let screenFrame = NSScreen.main?.visibleFrame {
-            let windowWidth = window.frame.width
-            let windowHeight = window.frame.height
-            let centerX = screenFrame.midX
-            let x = centerX - (windowWidth / 2)
-            let topPosition = screenFrame.maxY
-            let twentyFivePercentDown = screenFrame.height * 0.25
-            let y = topPosition - twentyFivePercentDown - windowHeight
+            let x = screenFrame.midX - window.frame.width / 2
+            let y = screenFrame.maxY - screenFrame.height * 0.25 - window.frame.height
             window.setFrameOrigin(NSPoint(x: x, y: y))
         } else {
             window.center()
@@ -141,28 +123,23 @@ final class OverlayWindowController {
 
         NSApp.activate(ignoringOtherApps: true)
         window.makeKeyAndOrderFront(nil)
-        focusInput()
-    }
 
-    private func focusInput() {
         DispatchQueue.main.async { [weak self] in
-            guard let view = self?.hosting.view else { return }
-            if let tf = self?.findTextField(in: view) {
-                self?.window.makeFirstResponder(tf)
-            }
+            guard let textField = self?.hosting.view.firstTextField else { return }
+            self?.window.makeFirstResponder(textField)
         }
     }
 
     func hide() {
         window.orderOut(nil)
     }
+}
 
-    private func findTextField(in view: NSView) -> NSTextField? {
-        if let tf = view as? NSTextField { return tf }
-        for s in view.subviews {
-            if let found = findTextField(in: s) {
-                return found
-            }
+private extension NSView {
+    var firstTextField: NSTextField? {
+        if let textField = self as? NSTextField { return textField }
+        for subview in subviews {
+            if let found = subview.firstTextField { return found }
         }
         return nil
     }
