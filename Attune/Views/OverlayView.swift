@@ -6,10 +6,13 @@ final class OverlayState {
     var scope: TaggingScope = .current
     var mode: TaggingMode = .add
 
-    var currentTrackTitle: String = "Loading..."
-    var currentTrackArtist: String = ""
-    var isMusicPlaying: Bool = false
-    var selectionCount: Int = 0
+    var currentTrack: Track?
+    var selectedTracks: [Track] = []
+
+    var currentTrackTitle: String { currentTrack?.title ?? "No Track Playing" }
+    var currentTrackArtist: String { currentTrack?.artist ?? "" }
+    var isMusicPlaying: Bool { currentTrack != nil }
+    var selectionCount: Int { selectedTracks.count }
 
     func toggleScope() {
         scope = (scope == .current) ? .selection : .current

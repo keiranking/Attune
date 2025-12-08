@@ -42,6 +42,16 @@ final class TagLibrary: ObservableObject {
 
     // MARK: - Helpers
 
+    func category(for tagName: String) -> TagCategory? {
+        let normalized = tagName.trimmingCharacters(in: .whitespaces).lowercased()
+
+        if getWhitelist(for: .genre).contains(normalized) { return .genre }
+        if getWhitelist(for: .grouping).contains(normalized) { return .grouping }
+        if getWhitelist(for: .comment).contains(normalized) { return .comment }
+
+        return nil
+    }
+
     func getWhitelist(for category: TagCategory) -> Set<String> {
         let filtered = tags.filter { $0.category == category }
         return Set(filtered.map { $0.normalizedName })

@@ -70,13 +70,15 @@ final class OverlayWindowController {
             onCommit: { [weak self] text in
                 guard let self else { return }
 
-                MusicTagger.shared.process(
-                    command: text,
-                    scope: self.state.scope,
-                    mode: self.state.mode
-                )
+                Task {
+                    await MusicTagger.shared.process(
+                        command: text,
+                        scope: self.state.scope,
+                        mode: self.state.mode
+                    )
 
-                self.hide()
+                    await MainActor.run { self.hide() }
+                }
             }
         )
         .environmentObject(TagLibrary.shared)
@@ -103,12 +105,11 @@ final class OverlayWindowController {
         state.scope = .current
 
         Task {
-            let context = MusicTagger.shared.fetchContextState()
+            await MusicTagger.shared.refreshState()
+
             await MainActor.run {
-                self.state.currentTrackTitle = context.currentTrackTitle
-                self.state.currentTrackArtist = context.currentTrackArtist
-                self.state.isMusicPlaying = context.isPlaying
-                self.state.selectionCount = context.selectionCount
+                self.state.currentTrack = MusicTagger.shared.currentTrack
+                self.state.selectedTracks = MusicTagger.shared.selectedTracks
             }
         }
 
