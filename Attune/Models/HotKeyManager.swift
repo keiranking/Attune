@@ -19,7 +19,7 @@ final class HotKeyManager {
                 GetEventParameter(event, EventParamName(kEventParamDirectObject), EventParamType(typeEventHotKeyID), nil, MemoryLayout<EventHotKeyID>.size, nil, &hkID)
                 let id = hkID.id
 
-                guard let userData = userData else { return noErr }
+                guard let userData else { return noErr }
 
                 let mgr = Unmanaged<HotKeyManager>.fromOpaque(userData).takeUnretainedValue()
 

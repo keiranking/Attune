@@ -1,7 +1,6 @@
 import Cocoa
 import SwiftUI
 
-// MARK: - OverlayWindow (safe, AppKit-friendly)
 final class OverlayWindow: NSWindow {
     var hideAction: (() -> Void)?
     var arrowKeyAction: (() -> Void)?
@@ -38,7 +37,6 @@ final class OverlayWindow: NSWindow {
     }
 
     override func sendEvent(_ event: NSEvent) {
-        // Let AppKit handle appKitDefined/internal events
         if event.type == .keyDown {
             switch event.keyCode {
             case 126, 125: // up/down
@@ -102,7 +100,7 @@ final class OverlayWindowController {
     func show() {
         state.text = ""
         state.mode = .add
-        state.scope = .current
+        state.scope = nil
 
         Task {
             await MusicTagger.shared.refreshState()
@@ -110,6 +108,7 @@ final class OverlayWindowController {
             await MainActor.run {
                 self.state.currentTrack = MusicTagger.shared.currentTrack
                 self.state.selectedTracks = MusicTagger.shared.selectedTracks
+                self.state.chooseDefaultScope()
             }
         }
 

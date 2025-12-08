@@ -3,7 +3,7 @@ import SwiftUI
 @Observable
 final class OverlayState {
     var text: String = ""
-    var scope: TaggingScope = .current
+    var scope: TaggingScope?
     var mode: TaggingMode = .add
 
     var currentTrack: Track?
@@ -30,8 +30,21 @@ final class OverlayState {
     }
     var hasSelectedTracks: Bool { !selectedTracks.isEmpty }
 
+    func chooseDefaultScope() {
+        if hasCurrentTrack { scope = .current }
+        else if hasSelectedTracks { scope = .selection }
+        else { scope = nil }
+    }
+
     func toggleScope() {
-        scope = (scope == .current) ? .selection : .current
+        switch scope {
+        case .current:
+            hasSelectedTracks ? (scope = .selection) : ()
+        case .selection:
+            hasCurrentTrack ? (scope = .current) : ()
+        case nil:
+            break
+        }
     }
 
     func toggleMode() {
@@ -78,22 +91,24 @@ struct OverlayView: View {
 
             VStack(spacing: 4) {
                 ScopeRow(
-                    isActive: state.scope == .current,
+                    status: !state.hasCurrentTrack ? .disabled : (state.scope == .current ? .active : .inactive),
                     icon: state.hasCurrentTrack ? "waveform" : "waveform.slash",
                     title: state.currentTrackTitle,
                     subtitle: state.currentTrackSubtitle,
                     color: state.mode == .add ? .green : .red
                 )
                 .onTapGesture { state.scope = .current }
+                .disabled(!state.hasCurrentTrack)
 
                 ScopeRow(
-                    isActive: state.scope == .selection,
+                    status: !state.hasSelectedTracks ? .disabled : (state.scope == .selection ? .active : .inactive),
                     icon: "cursorarrow.rays",
                     title: state.selectedTrackTitle,
                     subtitle: state.selectedTrackSubtitle,
                     color: state.mode == .add ? .green : .red
                 )
                 .onTapGesture { state.scope = .selection }
+                .disabled(!state.hasSelectedTracks)
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 16)
@@ -111,28 +126,39 @@ struct OverlayView: View {
     }
 }
 
+extension ScopeRow {
+    enum Status {
+        case active
+        case inactive
+        case disabled
+    }
+}
+
 struct ScopeRow: View {
-    let isActive: Bool
+    let status: Status
     let icon: String
     let title: String
     let subtitle: String
     let color: Color
 
+    var isActive: Bool { status == .active }
+    var isDisabled: Bool { status == .disabled }
+
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.system(size: 20))
-                .foregroundColor(isActive ? .white : .secondary)
+                .foregroundColor(isDisabled ? .tertiary : (isActive ? .white : .secondary))
                 .frame(width: 30)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(isActive ? .white : .primary)
+                    .foregroundColor(isDisabled ? .tertiary : (isActive ? .white : .primary))
                 if !subtitle.isEmpty {
                     Text(subtitle)
                         .font(.system(size: 12))
-                        .foregroundColor(isActive ? .white.opacity(0.8) : .secondary)
+                        .foregroundColor(isDisabled ? .tertiary : (isActive ? .white.opacity(0.8) : .secondary))
                 }
             }
             Spacer()

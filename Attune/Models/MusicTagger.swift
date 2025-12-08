@@ -99,7 +99,7 @@ final class MusicTagger {
 
     // MARK: - Modification Logic
 
-    func process(command: String, scope: TaggingScope, mode: TaggingMode) async {
+    func process(command: String, scope: TaggingScope?, mode: TaggingMode) async {
         await refreshState()
 
         var tokens = command
@@ -136,7 +136,7 @@ final class MusicTagger {
         }
 
         if scope == .current { currentTrack = tracks.first }
-        else { selectedTracks = tracks }
+        else if scope == .selection { selectedTracks = tracks }
     }
 
     // MARK: - Writing (via AppleScript and Music) to music file
