@@ -9,10 +9,26 @@ final class OverlayState {
     var currentTrack: Track?
     var selectedTracks: [Track] = []
 
-    var currentTrackTitle: String { currentTrack?.title ?? "No Track Playing" }
-    var currentTrackArtist: String { currentTrack?.artist ?? "" }
-    var isMusicPlaying: Bool { currentTrack != nil }
-    var selectionCount: Int { selectedTracks.count }
+    var currentTrackTitle: String { currentTrack?.title ?? "No current track" }
+    var currentTrackSubtitle: String { currentTrack?.artist ?? "Play a track in the Music app" }
+    var hasCurrentTrack: Bool { currentTrack != nil }
+
+    var selectedTracksCount: Int { selectedTracks.count }
+    var selectedTrackTitle: String {
+        switch selectedTracks.count {
+        case 0:     "No selected tracks"
+        case 1:     selectedTracks.first?.title ?? "1 selected track"
+        default:    "\(selectedTracks.count) selected tracks"
+        }
+    }
+    var selectedTrackSubtitle: String {
+        switch selectedTracks.count {
+        case 0:     "Select a track in the Music app"
+        case 1:     selectedTracks.first?.artist ?? ""
+        default:    ""
+        }
+    }
+    var hasSelectedTracks: Bool { !selectedTracks.isEmpty }
 
     func toggleScope() {
         scope = (scope == .current) ? .selection : .current
@@ -63,9 +79,9 @@ struct OverlayView: View {
             VStack(spacing: 4) {
                 ScopeRow(
                     isActive: state.scope == .current,
-                    icon: state.isMusicPlaying ? "waveform" : "waveform.slash",
-                    title: "\(state.currentTrackTitle)",
-                    subtitle: state.currentTrackArtist,
+                    icon: state.hasCurrentTrack ? "waveform" : "waveform.slash",
+                    title: state.currentTrackTitle,
+                    subtitle: state.currentTrackSubtitle,
                     color: state.mode == .add ? .green : .red
                 )
                 .onTapGesture { state.scope = .current }
@@ -73,8 +89,8 @@ struct OverlayView: View {
                 ScopeRow(
                     isActive: state.scope == .selection,
                     icon: "cursorarrow.rays",
-                    title: "^[\(state.selectionCount) selected track](inflect: true)",
-                    subtitle: state.selectionCount > 0 ? "" : "Select a track in the Music app",
+                    title: state.selectedTrackTitle,
+                    subtitle: state.selectedTrackSubtitle,
                     color: state.mode == .add ? .green : .red
                 )
                 .onTapGesture { state.scope = .selection }
@@ -98,7 +114,7 @@ struct OverlayView: View {
 struct ScopeRow: View {
     let isActive: Bool
     let icon: String
-    let title: LocalizedStringKey
+    let title: String
     let subtitle: String
     let color: Color
 
