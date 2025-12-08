@@ -26,8 +26,6 @@ struct Track: Identifiable, Codable, Hashable {
             .sorted()
             .joined(separator: tagDelimiter)
     }
-    var bpm: Int { rating }
-    var starRating: Int { rating * 20 }
 
     mutating func add(tags: [Tag]) {
         self.tags.formUnion(tags)
@@ -41,21 +39,17 @@ struct Track: Identifiable, Codable, Hashable {
         self.rating = rating
     }
 
-    mutating func add(tagNames: [String]) {
-        for name in tagNames {
-            guard let category = TagLibrary.shared.category(for: name) else { break }
-            let tag = Tag(name: name, category: category)
+    mutating func add(tokens: [String]) {
+        for token in tokens {
+            guard let category = TagLibrary.shared.category(for: token) else { break }
+            let tag = Tag(name: token, category: category)
             tags.insert(tag)
         }
     }
 
-    mutating func remove(tagNames: [String]) {
-        let toRemove = tagNames.map { $0.lowercased() }
-        tags = tags.filter { !toRemove.contains($0.normalizedName) }
-    }
-
-    mutating func setRating(_ newRating: Int) {
-        self.rating = max(Track.minRating, min(Track.maxRating, newRating))
+    mutating func remove(tokens: [String]) {
+        let unwantedTokens = tokens.map { $0.lowercased() }
+        tags = tags.filter { !unwantedTokens.contains($0.normalizedName) }
     }
 
     static let minRating: Int = 0

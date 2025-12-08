@@ -102,7 +102,7 @@ final class MusicTagger {
     func process(command: String, scope: TaggingScope, mode: TaggingMode) async {
         await refreshState()
 
-        let tokens = command
+        var tokens = command
             .replacingOccurrences(of: ",", with: " ")
             .split { $0.isWhitespace }
             .map(String.init)
@@ -110,33 +110,36 @@ final class MusicTagger {
 
         guard !tokens.isEmpty else { return }
 
-        if let first = tokens.first, let ratingVal = Int(first), Track.ratingRange.contains(ratingVal) {
-            let tracksToRate = (scope == .current) ? (currentTrack != nil ? [currentTrack!] : []) : selectedTracks
-            applyRating(ratingVal, to: tracksToRate)
-            return
+        let ratings = tokens.subtract(where: { Track.ratingRange.contains(Int($0) ?? -1) })
+                            .map({ Int($0)! })
+
+        var tracks: [Track] = []
+        if scope == .current, let currentTrack { tracks = [currentTrack] }
+        else if scope == .selection { tracks = selectedTracks }
+
+        guard !tracks.isEmpty else { return }
+
+        if let rating = ratings.last {
+            applyRating(rating, to: tracks)
         }
 
-        var targets: [Track] = []
-        if scope == .current, let currentTrack { targets = [currentTrack] }
-        else if scope == .selection { targets = selectedTracks }
-
-        guard !targets.isEmpty else { return }
-
-        for i in 0..<targets.count {
-            if mode == .add {
-                targets[i].add(tagNames: tokens)
-            } else {
-                targets[i].remove(tagNames: tokens)
+        if !tokens.isEmpty {
+            for i in 0..<tracks.count {
+                if mode == .add {
+                    tracks[i].add(tokens: tokens)
+                } else {
+                    tracks[i].remove(tokens: tokens)
+                }
             }
+
+            writeBack(tracks: tracks)
         }
 
-        writeBack(tracks: targets)
-
-        if scope == .current { currentTrack = targets.first }
-        else { selectedTracks = targets }
+        if scope == .current { currentTrack = tracks.first }
+        else { selectedTracks = tracks }
     }
 
-    // MARK: - Writing (AppleScript Generation)
+    // MARK: - Writing (via AppleScript and Music) to music file
 
     private func applyRating(_ rating: Int, to tracks: [Track]) {
         guard !tracks.isEmpty else { return }
@@ -206,5 +209,3 @@ final class MusicTagger {
         s.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"")
     }
 }
-
-private extension Array { subscript(safe i: Int) -> Element? { indices.contains(i) ? self[i] : nil } }
