@@ -9,8 +9,28 @@ final class OverlayState {
     var currentTrack: Track?
     var selectedTracks: [Track] = []
 
+    var showSecondaryInfo: Bool = false
+
     var currentTrackTitle: String { currentTrack?.title ?? "No current track" }
-    var currentTrackSubtitle: String { currentTrack?.artist ?? "Play a track in the Music app" }
+    var currentTrackArtist: String? { currentTrack?.artist }
+    var currentTrackMetadata: String? {
+        guard let currentTrack else { return nil }
+        return [
+            "\(currentTrack.rating)",
+            currentTrack.genre,
+            currentTrack.comment,
+            currentTrack.grouping
+        ].joined(separator: " • ")
+    }
+    var currentTrackSubtitle: ScopeRowView.SubtitleContent {
+        return if hasCurrentTrack {
+            showSecondaryInfo
+            ? .text(currentTrackArtist ?? "")
+            : .label(text: currentTrackMetadata ?? "", icon: "star.fill")
+        } else {
+            .text("Play a track in the Music app")
+        }
+    }
     var hasCurrentTrack: Bool { currentTrack != nil }
 
     var selectedTracksCount: Int { selectedTracks.count }
@@ -21,11 +41,23 @@ final class OverlayState {
         default:    "\(selectedTracks.count) selected tracks"
         }
     }
-    var selectedTrackSubtitle: String {
+    var selectedTrackArtist: String? { selectedTracks.first?.artist }
+    var selectedTrackMetadata: String? {
+        guard let firstTrack = selectedTracks.first else { return nil }
+        return [
+            "\(firstTrack.rating)",
+            firstTrack.genre,
+            firstTrack.comment,
+            firstTrack.grouping
+        ].joined(separator: " • ")
+    }
+    var selectedTrackSubtitle: ScopeRowView.SubtitleContent {
         switch selectedTracks.count {
-        case 0:     "Select a track in the Music app"
-        case 1:     selectedTracks.first?.artist ?? ""
-        default:    ""
+        case 0:     .text("Select a track in the Music app")
+        case 1:     showSecondaryInfo
+                    ? .text(selectedTrackArtist ?? "")
+                    : .label(text: selectedTrackMetadata ?? "", icon: "star.fill")
+        default:    .none
         }
     }
     var hasSelectedTracks: Bool { !selectedTracks.isEmpty }

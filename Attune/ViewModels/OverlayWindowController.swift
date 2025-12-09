@@ -4,6 +4,7 @@ import SwiftUI
 final class OverlayWindow: NSWindow {
     var hideAction: (() -> Void)?
     var arrowKeyAction: (() -> Void)?
+    var optionKeyAction: ((Bool) -> Void)?
 
     convenience init(contentViewController: NSViewController) {
         self.init(
@@ -34,9 +35,13 @@ final class OverlayWindow: NSWindow {
     override func resignKey() {
         super.resignKey()
         hideAction?()
+        optionKeyAction?(false)
     }
 
     override func sendEvent(_ event: NSEvent) {
+        let isOptionDown = event.modifierFlags.contains(.option)
+        optionKeyAction?(isOptionDown)
+
         if event.type == .keyDown {
             switch event.keyCode {
             case 126, 125: // up/down
@@ -47,6 +52,12 @@ final class OverlayWindow: NSWindow {
             }
         }
         super.sendEvent(event)
+    }
+
+    override func keyUp(with event: NSEvent) {
+        let isOptionDown = event.modifierFlags.contains(.option)
+        optionKeyAction?(isOptionDown)
+        super.keyUp(with: event)
     }
 }
 
@@ -92,6 +103,16 @@ final class OverlayWindowController {
             DispatchQueue.main.async {
                 withAnimation(.easeInOut(duration: 0.1)) {
                     self.state.toggleScope()
+                }
+            }
+        }
+
+        window.optionKeyAction = { [weak self] isOptionDown in
+            guard let self else { return }
+
+            DispatchQueue.main.async {
+                withAnimation(.easeInOut(duration: 0.1)) {
+                    self.state.showSecondaryInfo = isOptionDown
                 }
             }
         }
