@@ -38,9 +38,13 @@ final class OverlayWindow: NSWindow {
         optionKeyAction?(false)
     }
 
+    private func isOnlyOptionKey(event: NSEvent) -> Bool {
+        event.type == .flagsChanged
+        && event.modifierFlags.intersection([.option, .command, .control, .shift]) == .option
+    }
+
     override func sendEvent(_ event: NSEvent) {
-        let isOptionDown = event.modifierFlags.contains(.option)
-        optionKeyAction?(isOptionDown)
+        optionKeyAction?(isOnlyOptionKey(event: event))
 
         if event.type == .keyDown {
             switch event.keyCode {
@@ -55,8 +59,7 @@ final class OverlayWindow: NSWindow {
     }
 
     override func keyUp(with event: NSEvent) {
-        let isOptionDown = event.modifierFlags.contains(.option)
-        optionKeyAction?(isOptionDown)
+        optionKeyAction?(isOnlyOptionKey(event: event))
         super.keyUp(with: event)
     }
 }
