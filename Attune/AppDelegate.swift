@@ -20,11 +20,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         overlayController = OverlayWindowController()
 
         hotKeyManager = HotKeyManager()
-        let hotKey = ( // Default: Cmd+Shift+Space (49)
+        let hotKey = ( // Default: Cmd+Opt+Ctrl+Space (49)
             cmd: true,
-            shift: true,
-            option: false,
-            control: false,
+            shift: false,
+            option: true,
+            control: true,
             keyCode: UInt32(49)
         )
         hotKeyManager.register(hotKey: hotKey) { [weak self] in
@@ -34,19 +34,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func createMenu() -> NSMenu {
         let menu = NSMenu()
-        menu.addItem(NSMenuItem(title: "Toggle Attune",
-                                action: #selector(toggleOverlay),
-                                keyEquivalent: "t"))
+        let overlayMenuItem = NSMenuItem(title: "Toggle Attune",
+                                         action: #selector(toggleOverlay),
+                                         keyEquivalent: " ")
+        overlayMenuItem.keyEquivalentModifierMask = [.command, .option, .control]
+        menu.addItem(overlayMenuItem)
 
         menu.addItem(NSMenuItem.separator())
 
         menu.addItem(NSMenuItem(title: "Manage Tags...",
                                 action: #selector(openTagManager),
-                                keyEquivalent: ","))
+                                keyEquivalent: ""))
 
         menu.addItem(NSMenuItem(title: "Preferences...",
                                 action: #selector(openSettings),
-                                keyEquivalent: ";"))
+                                keyEquivalent: ""))
 
         menu.addItem(NSMenuItem.separator())
 
@@ -59,12 +61,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Actions
 
     @objc func toggleOverlay(_ sender: Any?) {
-        if overlayController.isShown {
-            overlayController.hide()
-        } else {
-            NSApp.activate(ignoringOtherApps: true)
-            overlayController.show()
-        }
+        overlayController.isShown ? overlayController.hide() : overlayController.show()
     }
 
     @objc func openTagManager() {
