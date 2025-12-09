@@ -9,6 +9,8 @@ final class OverlayState {
     var currentTrack: Track?
     var selectedTracks: [Track] = []
 
+    var selectedTrackIsCurrent: Bool { selectedTracks == [currentTrack] }
+
     var showSecondaryInfo: Bool = false
 
     var currentTrackTitle: String { currentTrack?.title ?? "No current track" }
@@ -71,7 +73,7 @@ final class OverlayState {
     func toggleScope() {
         switch scope {
         case .current:
-            hasSelectedTracks ? (scope = .selection) : ()
+            hasSelectedTracks && !selectedTrackIsCurrent ? (scope = .selection) : ()
         case .selection:
             hasCurrentTrack ? (scope = .current) : ()
         case nil:
@@ -132,15 +134,17 @@ struct OverlayView: View {
                 .onTapGesture { state.scope = .current }
                 .disabled(!state.hasCurrentTrack)
 
-                ScopeRowView(
-                    status: !state.hasSelectedTracks ? .disabled : (state.scope == .selection ? .active : .inactive),
-                    icon: "cursorarrow.rays",
-                    title: state.selectedTrackTitle,
-                    subtitle: state.selectedTrackSubtitle,
-                    color: state.mode == .add ? .green : .red
-                )
-                .onTapGesture { state.scope = .selection }
-                .disabled(!state.hasSelectedTracks)
+                if !state.selectedTrackIsCurrent {
+                    ScopeRowView(
+                        status: !state.hasSelectedTracks ? .disabled : (state.scope == .selection ? .active : .inactive),
+                        icon: "cursorarrow.rays",
+                        title: state.selectedTrackTitle,
+                        subtitle: state.selectedTrackSubtitle,
+                        color: state.mode == .add ? .green : .red
+                    )
+                    .onTapGesture { state.scope = .selection }
+                    .disabled(!state.hasSelectedTracks)
+                }
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 16)

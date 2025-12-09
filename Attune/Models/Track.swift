@@ -57,6 +57,12 @@ struct Track: Identifiable, Codable, Hashable {
     static let ratingRange: ClosedRange<Int> = Track.minRating...Track.maxRating
 }
 
+extension Track: Equatable {
+    static func == (lhs: Track, rhs: Track) -> Bool {
+        return lhs.id == rhs.id
+    }
+}
+
 extension Track {
     init(id: String, title: String, artist: String, rating: Int, comment: String, grouping: String, genre: String) {
         self.id = id
