@@ -15,7 +15,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             button.image = NSImage(systemSymbolName: "tag",
                                    accessibilityDescription: "Attune")
         }
+        statusItem.menu = createMenu()
 
+        overlayController = OverlayWindowController()
+
+        hotKeyManager = HotKeyManager()
+        let hotKey = ( // Default: Cmd+Shift+Space (49)
+            cmd: true,
+            shift: true,
+            option: false,
+            control: false,
+            keyCode: UInt32(49)
+        )
+        hotKeyManager.register(hotKey: hotKey) { [weak self] in
+            self?.toggleOverlay(nil)
+        }
+    }
+
+    func createMenu() -> NSMenu {
         let menu = NSMenu()
         menu.addItem(NSMenuItem(title: "Toggle Attune",
                                 action: #selector(toggleOverlay),
@@ -36,16 +53,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(NSMenuItem(title: "Quit Attune",
                                 action: #selector(NSApp.terminate(_:)),
                                 keyEquivalent: "q"))
-
-        statusItem.menu = menu
-
-        overlayController = OverlayWindowController()
-
-        hotKeyManager = HotKeyManager()
-        // Default: Cmd+Shift+Space (49)
-        hotKeyManager.register(hotKey: (cmd:true, shift:true, option:false, control:false, keyCode:49)) { [weak self] in
-            self?.toggleOverlay(nil)
-        }
+        return menu
     }
 
     // MARK: - Actions

@@ -90,7 +90,7 @@ struct OverlayView: View {
             .padding(.bottom, 12)
 
             VStack(spacing: 4) {
-                ScopeRow(
+                ScopeRowView(
                     status: !state.hasCurrentTrack ? .disabled : (state.scope == .current ? .active : .inactive),
                     icon: state.hasCurrentTrack ? "waveform" : "waveform.slash",
                     title: state.currentTrackTitle,
@@ -100,7 +100,7 @@ struct OverlayView: View {
                 .onTapGesture { state.scope = .current }
                 .disabled(!state.hasCurrentTrack)
 
-                ScopeRow(
+                ScopeRowView(
                     status: !state.hasSelectedTracks ? .disabled : (state.scope == .selection ? .active : .inactive),
                     icon: "cursorarrow.rays",
                     title: state.selectedTrackTitle,
@@ -123,57 +123,5 @@ struct OverlayView: View {
         .task {
             isFocused = true
         }
-    }
-}
-
-extension ScopeRow {
-    enum Status {
-        case active
-        case inactive
-        case disabled
-    }
-}
-
-struct ScopeRow: View {
-    let status: Status
-    let icon: String
-    let title: String
-    let subtitle: String
-    let color: Color
-
-    var isActive: Bool { status == .active }
-    var isDisabled: Bool { status == .disabled }
-
-    var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 20))
-                .foregroundColor(isDisabled ? .tertiary : (isActive ? .white : .secondary))
-                .frame(width: 30)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(isDisabled ? .tertiary : (isActive ? .white : .primary))
-                if !subtitle.isEmpty {
-                    Text(subtitle)
-                        .font(.system(size: 12))
-                        .foregroundColor(isDisabled ? .tertiary : (isActive ? .white.opacity(0.8) : .secondary))
-                }
-            }
-            Spacer()
-
-            if isActive {
-                Image(systemName: "return")
-                    .foregroundColor(.white.opacity(0.6))
-            }
-        }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 12)
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(isActive ? color.opacity(0.8) : Color.clear)
-        )
-        .contentShape(Rectangle()) // Makes empty space tappable
     }
 }

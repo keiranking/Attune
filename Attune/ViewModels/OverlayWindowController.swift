@@ -112,10 +112,9 @@ final class OverlayWindowController {
             }
         }
 
-        // Position centered, 25% down from top
         if let screenFrame = NSScreen.main?.visibleFrame {
-            let x = screenFrame.midX - window.frame.width / 2
-            let y = screenFrame.maxY - screenFrame.height * 0.25 - window.frame.height
+            let x = screenFrame.midX - window.frame.width / 2 // horizontally centered
+            let y = screenFrame.maxY - screenFrame.height * 0.15 - window.frame.height // near top
             window.setFrameOrigin(NSPoint(x: x, y: y))
         } else {
             window.center()
