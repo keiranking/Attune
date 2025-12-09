@@ -15,6 +15,7 @@ final class OverlayState {
 
     var currentTrackTitle: String { currentTrack?.title ?? "No current track" }
     var currentTrackArtist: String? { currentTrack?.artist }
+    var currentTrackRating: Int? { currentTrack?.rating }
     var currentTrackMetadata: String? {
         guard let currentTrack else { return nil }
         return [
@@ -28,7 +29,8 @@ final class OverlayState {
         return if hasCurrentTrack {
             showSecondaryInfo
             ? .text(currentTrackArtist ?? "")
-            : .label(text: currentTrackMetadata ?? "", icon: "star.fill")
+            : .label(text: currentTrackMetadata ?? "",
+                     icon: currentTrackRating == 0 ? "star" : "star.fill")
         } else {
             .text("Play a track in the Music app")
         }
@@ -44,6 +46,7 @@ final class OverlayState {
         }
     }
     var selectedTrackArtist: String? { selectedTracks.first?.artist }
+    var selectedTrackRating: Int? { selectedTracks.first?.rating }
     var selectedTrackMetadata: String? {
         guard let firstTrack = selectedTracks.first else { return nil }
         return [
@@ -58,7 +61,8 @@ final class OverlayState {
         case 0:     .text("Select a track in the Music app")
         case 1:     showSecondaryInfo
                     ? .text(selectedTrackArtist ?? "")
-                    : .label(text: selectedTrackMetadata ?? "", icon: "star.fill")
+                    : .label(text: selectedTrackMetadata ?? "",
+                             icon: selectedTrackRating == 0 ? "star" : "star.fill")
         default:    .none
         }
     }
