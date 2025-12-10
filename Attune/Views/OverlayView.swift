@@ -173,14 +173,14 @@ struct PlayerControls: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            Button(action: { player.previousTrack() }) {
+            Button(action: { player.skipToPreviousTrack() }) {
                 Image(systemName: "backward.fill")
             }
             Button(action: { player.togglePlayPause() }) {
                 Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
                     .font(.system(size: 20))
             }
-            Button(action: { player.nextTrack() }) {
+            Button(action: { player.skipToNextTrack() }) {
                 Image(systemName: "forward.fill")
             }
         }

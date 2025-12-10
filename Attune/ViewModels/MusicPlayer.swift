@@ -8,7 +8,6 @@ final class MusicPlayer {
     static let shared = MusicPlayer()
 
     var isPlaying: Bool = false
-    private var currentSong: Song?
 
     var onSync: (() -> Void)?
 
@@ -16,18 +15,6 @@ final class MusicPlayer {
     private var cancellables: Set<AnyCancellable> = []
 
     private init() {
-        player.state.objectWillChange // playing, paused, etc
-            .sink { [weak self] _ in
-                self?.handleStateChange()
-            }
-            .store(in: &cancellables)
-
-        player.queue.objectWillChange // going from one track to the next
-            .sink { [weak self] _ in
-                self?.handleQueueChange()
-            }
-            .store(in: &cancellables)
-
         DistributedNotificationCenter.default().addObserver(
             self,
             selector: #selector(handleSystemNotification),
@@ -51,31 +38,6 @@ final class MusicPlayer {
 
     // MARK: - Observation Logic
 
-    private func handleStateChange() {
-        Task { @MainActor in
-            let newIsPlaying = (self.player.state.playbackStatus == .playing)
-            if self.isPlaying != newIsPlaying {
-                self.isPlaying = newIsPlaying
-                self.onSync?()
-            }
-        }
-    }
-
-    private func handleQueueChange() {
-        Task { @MainActor in
-            let newItem = self.player.queue.currentEntry?.item
-            if case let .song(song) = newItem {
-                if self.currentSong?.id != song.id {
-                    self.currentSong = song
-                    self.onSync?()
-                }
-            } else {
-                self.currentSong = nil
-                self.onSync?()
-            }
-        }
-    }
-
     @objc private func handleSystemNotification() {
         Task {
             await forceRefresh()
@@ -83,11 +45,10 @@ final class MusicPlayer {
     }
 
     private func forceRefresh() async {
+        try? await Task.sleep(nanoseconds: 20_000_000) // 20 ms-delay allows current track to register
+
         await MainActor.run {
             self.isPlaying = (self.player.state.playbackStatus == .playing)
-            if let item = self.player.queue.currentEntry?.item, case let .song(song) = item {
-                self.currentSong = song
-            }
             self.onSync?()
         }
     }
@@ -98,11 +59,11 @@ final class MusicPlayer {
         runAppleScript("tell application id \"com.apple.Music\" to playpause")
     }
 
-    func nextTrack() {
+    func skipToNextTrack() {
         runAppleScript("tell application id \"com.apple.Music\" to next track")
     }
 
-    func previousTrack() {
+    func skipToPreviousTrack() {
         runAppleScript("tell application id \"com.apple.Music\" to previous track")
     }
 
