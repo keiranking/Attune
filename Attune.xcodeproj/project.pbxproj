@@ -263,7 +263,8 @@
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "The app needs to communicate with Apple Music to edit music file metadata.";
+				INFOPLIST_KEY_NSAppleEventsUsageDescription = "The app needs to control Apple Music to tag tracks and update ratings.";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "The app needs to control Apple Music to play your local music library.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -306,7 +307,8 @@
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "The app needs to communicate with Apple Music to edit music file metadata.";
+				INFOPLIST_KEY_NSAppleEventsUsageDescription = "The app needs to control Apple Music to tag tracks and update ratings.";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "The app needs to control Apple Music to play your local music library.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

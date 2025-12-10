@@ -12,10 +12,11 @@
 	<string>1</string>
 	<key>LSUIElement</key>
 	<true/>
-
 	<key>NSAppleEventsUsageDescription</key>
-	<string>Attune needs to control Apple Music to tag tracks and update ratings.</string>
+	<string>The app needs to control Apple Music to tag tracks and update ratings.</string>
 	<key>NSAppleScriptEnabled</key>
 	<true/>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>The app needs to control Apple Music to play your local music library.</string>
 </dict>
 </plist>

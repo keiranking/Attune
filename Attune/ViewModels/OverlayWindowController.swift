@@ -95,6 +95,7 @@ final class OverlayWindowController {
         )
         .environmentObject(TagLibrary.shared)
         .environmentObject(AppSettings.shared)
+        .environment(MusicPlayer.shared)
 
         hosting.rootView = AnyView(realView)
 
@@ -119,6 +120,9 @@ final class OverlayWindowController {
                 }
             }
         }
+
+        MusicPlayer.shared.onSync = { [weak self] in self?.sync() }
+        MusicPlayer.shared.start()
     }
 
     private func sync() {

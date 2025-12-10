@@ -118,6 +118,8 @@ struct OverlayView: View {
             .padding(.top, 16)
             .padding(.bottom, 8)
 
+            PlayerControls()
+
             Picker("", selection: $state.mode) {
                 ForEach(TaggingMode.allCases, id: \.self) { mode in
                     Text(mode.rawValue).tag(mode)
@@ -163,5 +165,31 @@ struct OverlayView: View {
         .task {
             isFocused = true
         }
+    }
+}
+
+struct PlayerControls: View {
+    @Environment(MusicPlayer.self) var player
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Button(action: { player.previousTrack() }) {
+                Image(systemName: "backward.fill")
+            }
+            Button(action: { player.togglePlayPause() }) {
+                Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
+                    .font(.system(size: 20))
+            }
+            Button(action: { player.nextTrack() }) {
+                Image(systemName: "forward.fill")
+            }
+        }
+        .buttonStyle(.plain)
+        .font(.system(size: 16))
+        .foregroundColor(.white.opacity(0.8))
+        .padding(.horizontal, 8)
+        .padding(.vertical, 8)
+        .background(Color.black.opacity(0.2))
+        .cornerRadius(8)
     }
 }
