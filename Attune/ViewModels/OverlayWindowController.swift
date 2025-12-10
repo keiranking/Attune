@@ -121,20 +121,27 @@ final class OverlayWindowController {
         }
     }
 
-    func show() {
-        state.text = ""
-        state.mode = .add
-        state.scope = nil
-
+    private func sync() {
         Task {
             await MusicTagger.shared.refreshState()
 
             await MainActor.run {
                 self.state.currentTrack = MusicTagger.shared.currentTrack
                 self.state.selectedTracks = MusicTagger.shared.selectedTracks
-                self.state.chooseDefaultScope()
+
+                if self.state.scope == nil {
+                    self.state.chooseDefaultScope()
+                }
             }
         }
+    }
+
+    func show() {
+        state.text = ""
+        state.mode = .add
+        state.scope = nil
+
+        sync()
 
         if let screenFrame = NSScreen.main?.visibleFrame {
             let x = screenFrame.midX - window.frame.width / 2 // horizontally centered
