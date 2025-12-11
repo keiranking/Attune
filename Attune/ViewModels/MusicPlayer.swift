@@ -1,23 +1,34 @@
 import Foundation
-import MusicKit
 import Combine
 import AppKit
+
+extension MusicPlayer {
+    enum PlaybackState: String { // reimplement MediaPlayer.MPMusicPlaybackState
+        case playing = "Playing"
+        case paused = "Paused"
+        case stopped = "Stopped"
+        case interrupted = "Interrupted"
+        case seekingForward = "Seeking Forward"
+        case seekingBackward = "Seeking Backward"
+    }
+}
 
 @Observable
 final class MusicPlayer {
     static let shared = MusicPlayer()
 
-    var isPlaying: Bool = false
+    var playbackState: PlaybackState?
+    var isPlaying: Bool { playbackState == .playing }
+
+    var currentTrackId: String?
+    var lastPlayedTrackId: String?
 
     var onSync: (() -> Void)?
-
-    private let player = ApplicationMusicPlayer.shared
-    private var cancellables: Set<AnyCancellable> = []
 
     private init() {
         DistributedNotificationCenter.default().addObserver(
             self,
-            selector: #selector(handleSystemNotification),
+            selector: #selector(handleSystemMusicPlayerNotification),
             name: NSNotification.Name("com.apple.Music.playerInfo"),
             object: nil
         )
@@ -29,16 +40,20 @@ final class MusicPlayer {
 
     func start() {
         Task {
-            let status = await MusicAuthorization.request()
-            if status == .authorized {
-                await self.forceRefresh()
-            }
+            await self.forceRefresh()
         }
     }
 
     // MARK: - Observation Logic
 
-    @objc private func handleSystemNotification() {
+    @objc private func handleSystemMusicPlayerNotification(notification: Notification) {
+        guard let userInfo = notification.userInfo else { return }
+
+        let notificationPlaybackState = userInfo["Player State"] as? String ?? ""
+        let notificationCurrentTrackId = userInfo["PersistentID"] as? String ?? ""
+
+        playbackState = PlaybackState(rawValue: notificationPlaybackState)
+
         Task {
             await forceRefresh()
         }
@@ -47,10 +62,7 @@ final class MusicPlayer {
     private func forceRefresh() async {
         try? await Task.sleep(nanoseconds: 20_000_000) // 20 ms-delay allows current track to register
 
-        await MainActor.run {
-            self.isPlaying = (self.player.state.playbackStatus == .playing)
-            self.onSync?()
-        }
+        await MainActor.run { self.onSync?() }
     }
 
     // MARK: - Controls
