@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import AppKit
+import ScriptingBridge
 
 extension MusicPlayer {
     enum PlaybackState: String { // reimplement MediaPlayer.MPMusicPlaybackState
@@ -20,12 +21,19 @@ final class MusicPlayer {
     var playbackState: PlaybackState?
     var isPlaying: Bool { playbackState == .playing }
 
+    var musicApp: MusicApplication
+
     var currentTrackId: String?
     var lastPlayedTrackId: String?
 
     var onSync: (() -> Void)?
 
     private init() {
+        self.musicApp = unsafeBitCast(
+            SBApplication(bundleIdentifier: "com.apple.Music"),
+            to: MusicApplication.self
+        )
+
         DistributedNotificationCenter.default().addObserver(
             self,
             selector: #selector(handleSystemMusicPlayerNotification),
@@ -50,7 +58,7 @@ final class MusicPlayer {
         guard let userInfo = notification.userInfo else { return }
 
         let notificationPlaybackState = userInfo["Player State"] as? String ?? ""
-        let notificationCurrentTrackId = userInfo["PersistentID"] as? String ?? ""
+//        let notificationCurrentTrackId = userInfo["PersistentID"] as? String ?? ""
 
         playbackState = PlaybackState(rawValue: notificationPlaybackState)
 
@@ -67,24 +75,9 @@ final class MusicPlayer {
 
     // MARK: - Controls
 
-    func togglePlayPause() {
-        runAppleScript("tell application id \"com.apple.Music\" to playpause")
-    }
+    func playPauseTrack() { musicApp.playpause() }
 
-    func skipToNextTrack() {
-        runAppleScript("tell application id \"com.apple.Music\" to next track")
-    }
+    func skipToNextTrack() { musicApp.nextTrack() }
 
-    func skipToPreviousTrack() {
-        runAppleScript("tell application id \"com.apple.Music\" to previous track")
-    }
-
-    private func runAppleScript(_ source: String) {
-        guard let script = NSAppleScript(source: source) else { return }
-        var error: NSDictionary?
-        script.executeAndReturnError(&error)
-        if let error = error {
-            print("MusicPlayer Control Error: \(error)")
-        }
-    }
+    func skipToPreviousTrack() { musicApp.previousTrack() }
 }

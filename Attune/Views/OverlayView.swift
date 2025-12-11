@@ -176,7 +176,7 @@ struct PlayerControls: View {
             Button(action: { player.skipToPreviousTrack() }) {
                 Image(systemName: "backward.fill")
             }
-            Button(action: { player.togglePlayPause() }) {
+            Button(action: { player.playPauseTrack() }) {
                 Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
                     .font(.system(size: 20))
             }
