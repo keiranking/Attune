@@ -85,3 +85,31 @@ extension Track {
         return Set(names.map { Tag(name: $0, category: category) })
     }
 }
+
+extension Track {
+    init?(musicTrack: MusicTrack) {
+        guard
+            let id = musicTrack.persistentID,
+            let title = musicTrack.name,
+            let artist = musicTrack.artist
+        else {
+            return nil
+        }
+
+        let starRating = musicTrack.rating / 20
+
+        let comment = musicTrack.comment ?? ""
+        let grouping = musicTrack.grouping ?? ""
+        let genre = musicTrack.genre ?? ""
+
+        self.id = id
+        self.title = title
+        self.artist = artist
+        self.rating = starRating
+        self.tags = []
+
+        self.tags.formUnion(Track.parseTags(from: comment, category: .comment))
+        self.tags.formUnion(Track.parseTags(from: grouping, category: .grouping))
+        self.tags.formUnion(Track.parseTags(from: genre, category: .genre))
+    }
+}

@@ -184,6 +184,7 @@ struct PlayerControls: View {
                 Image(systemName: "forward.fill")
             }
         }
+        .disabled(player.isDisabled)
         .buttonStyle(.plain)
         .font(.system(size: 16))
         .foregroundColor(.white.opacity(0.8))
