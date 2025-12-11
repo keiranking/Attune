@@ -3,6 +3,40 @@ import Combine
 import AppKit
 import ScriptingBridge
 
+final class MusicApp {
+    static let shared = MusicApp()
+
+    private var proxy: MusicApplication?
+
+    private init() {}
+
+    var app: MusicApplication? {
+        validateProxy()
+        return proxy
+    }
+
+    private func validateProxy() {
+        if proxy == nil {
+            proxy = createProxy()
+            return
+        }
+
+        if proxy?.isRunning == false {
+            print("MusicApp: Detected stale proxy. Reconnecting.")
+            proxy = createProxy()
+        }
+    }
+
+    private func createProxy() -> MusicApplication? {
+        guard let base = SBApplication(bundleIdentifier: "com.apple.Music") else {
+            print("MusicApp: SBApplication returned nil.")
+            return nil
+        }
+
+        return unsafeBitCast(base, to: MusicApplication.self)
+    }
+}
+
 extension MusicPlayer {
     enum PlaybackState: String { // reimplement MediaPlayer.MPMusicPlaybackState
         case playing = "Playing"
@@ -21,7 +55,7 @@ final class MusicPlayer {
     var playbackState: PlaybackState?
     var isPlaying: Bool { playbackState == .playing }
 
-    var musicApp: MusicApplication
+    var musicApp = MusicApp.shared.app
 
     var currentTrackId: String?
     var lastPlayedTrackId: String?
@@ -29,11 +63,6 @@ final class MusicPlayer {
     var onSync: (() -> Void)?
 
     private init() {
-        self.musicApp = unsafeBitCast(
-            SBApplication(bundleIdentifier: "com.apple.Music"),
-            to: MusicApplication.self
-        )
-
         DistributedNotificationCenter.default().addObserver(
             self,
             selector: #selector(handleSystemMusicPlayerNotification),
@@ -75,9 +104,9 @@ final class MusicPlayer {
 
     // MARK: - Controls
 
-    func playPauseTrack() { musicApp.playpause() }
+    func playPauseTrack() { musicApp?.playpause() }
 
-    func skipToNextTrack() { musicApp.nextTrack() }
+    func skipToNextTrack() { musicApp?.nextTrack() }
 
-    func skipToPreviousTrack() { musicApp.previousTrack() }
+    func skipToPreviousTrack() { musicApp?.previousTrack() }
 }
