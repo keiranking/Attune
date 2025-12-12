@@ -118,15 +118,22 @@ struct OverlayView: View {
             .padding(.top, 16)
             .padding(.bottom, 8)
 
-            PlayerControls()
+            ZStack {
+                PlayerControls()
 
-            Picker("", selection: $state.mode) {
-                ForEach(TaggingMode.allCases, id: \.self) { mode in
-                    Text(mode.rawValue).tag(mode)
+                HStack {
+                    Picker("", selection: $state.mode) {
+                        ForEach(TaggingMode.allCases, id: \.self) { mode in
+                            Text(mode.rawValue).tag(mode)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(width: 150)
+
+                    Spacer()
                 }
             }
-            .pickerStyle(.segmented)
-            .padding(.horizontal, 60)
+            .padding(.horizontal, 16)
             .padding(.bottom, 12)
 
             VStack(spacing: 4) {
@@ -172,25 +179,28 @@ struct PlayerControls: View {
     @Environment(MusicPlayer.self) var player
 
     var body: some View {
-        HStack(spacing: 8) {
-            Button(action: { player.skipToPreviousTrack() }) {
-                Image(systemName: "backward.fill")
+        HStack(spacing: 20) {
+            Group {
+                Button(action: { player.skipToPreviousTrack() }) {
+                    Label("Previous Track", systemImage: "backward.fill")
+                }
+                Button(action: { player.playPauseTrack() }) {
+                    Label("Play/Pause", systemImage: player.isPlaying ? "pause.fill" : "play.fill")
+                        .font(.system(size: 24))
+                }
+                Button(action: { player.skipToNextTrack() }) {
+                    Label("Next Track", systemImage: "forward.fill")
+                }
             }
-            Button(action: { player.playPauseTrack() }) {
-                Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
-                    .font(.system(size: 20))
-            }
-            Button(action: { player.skipToNextTrack() }) {
-                Image(systemName: "forward.fill")
-            }
+            .background(Color.black.opacity(0.2))
+            .cornerRadius(8)
+            .disabled(player.isDisabled)
+            .labelStyle(.iconOnly)
+            .buttonStyle(.plain)
+            .font(.system(size: 16))
+            .foregroundColor(.white.opacity(0.8))
         }
-        .disabled(player.isDisabled)
-        .buttonStyle(.plain)
-        .font(.system(size: 16))
-        .foregroundColor(.white.opacity(0.8))
         .padding(.horizontal, 8)
         .padding(.vertical, 8)
-        .background(Color.black.opacity(0.2))
-        .cornerRadius(8)
     }
 }
