@@ -22,11 +22,11 @@ final class MusicTagger {
     private let lineDelimiter = "&&&"
 
     private var isMusicRunning: Bool {
-        let runningApps = NSWorkspace.shared.runningApplications
-        return runningApps.contains { $0.bundleIdentifier == "com.apple.Music" }
+        NSWorkspace.shared.runningApplications
+            .contains { $0.bundleIdentifier == "com.apple.Music" }
     }
 
-    // MARK: - Fetching
+    // MARK: - Public API
 
     func refreshState() async {
         guard isMusicRunning else {
@@ -35,69 +35,65 @@ final class MusicTagger {
             return
         }
 
-        // Fetch once to minimize overhead
-        let script = """
-        tell application id "com.apple.Music"
-            set resultString to ""
-
-            -- 1. Get Current Track
-            if player state is playing or player state is paused then
-                set t to current track
-                set resultString to resultString & (persistent id of t) & "\(fieldDelimiter)" & (name of t) & "\(fieldDelimiter)" & (artist of t) & "\(fieldDelimiter)" & (rating of t) & "\(fieldDelimiter)" & (comment of t) & "\(fieldDelimiter)" & (grouping of t) & "\(fieldDelimiter)" & (genre of t)
-            else
-                set resultString to resultString & "missing"
-            end if
-
-            set resultString to resultString & "\(lineDelimiter)"
-
-            -- 2. Get Selection (Limit to 500 to prevent timeout)
-            set sel to selection
-            set selCount to count of sel
-            if selCount > 500 then set selCount to 500
-
-            repeat with i from 1 to selCount
-                set t to item i of sel
-                set resultString to resultString & (persistent id of t) & "\(fieldDelimiter)" & (name of t) & "\(fieldDelimiter)" & (artist of t) & "\(fieldDelimiter)" & (rating of t) & "\(fieldDelimiter)" & (comment of t) & "\(fieldDelimiter)" & (grouping of t) & "\(fieldDelimiter)" & (genre of t) & "\(lineDelimiter)"
-            end repeat
-
-            return resultString
-        end tell
-        """
-
-        let result = runAppleScript(script)
-        parseScriptResult(result)
+        readCurrentTrack()
+        readSelection()
     }
 
-    private func parseScriptResult(_ result: String) {
-        let lines = result.components(separatedBy: lineDelimiter).filter { !$0.isEmpty }
-        guard !lines.isEmpty else { return }
+    // MARK: - Current Track (ScriptingBridge)
 
-        if let firstLine = lines.first, firstLine != "missing" {
-            currentTrack = trackFromLine(firstLine)
+    private func readCurrentTrack() {
+        if let app = MusicApp.shared.app,
+           let track = Track(musicTrack: app.currentTrack) {
+            currentTrack = track
         } else {
             currentTrack = nil
         }
-
-        let selectionLines = lines.dropFirst()
-        selectedTracks = selectionLines.compactMap { trackFromLine($0) }
     }
 
-    private func trackFromLine(_ line: String) -> Track? {
+    // MARK: - Selection (AppleScript)
+
+    private func readSelection() {
+        let result = fetchSelectionScript()
+        selectedTracks = parseSelection(result)
+    }
+
+    private func fetchSelectionScript() -> String {
+        let script = """
+        tell application id "com.apple.Music"
+            set out to ""
+            set sel to selection
+            repeat with t in sel
+                set out to out & (persistent id of t) & "\(fieldDelimiter)" & (name of t) & "\(fieldDelimiter)" & (artist of t) & "\(fieldDelimiter)" & (rating of t) & "\(fieldDelimiter)" & (comment of t) & "\(fieldDelimiter)" & (grouping of t) & "\(fieldDelimiter)" & (genre of t) & "\(lineDelimiter)"
+            end repeat
+            return out
+        end tell
+        """
+        return run(script)
+    }
+
+    private func parseSelection(_ result: String) -> [Track] {
+        result
+            .components(separatedBy: lineDelimiter)
+            .filter { !$0.isEmpty }
+            .compactMap(parseTrackLine(_:))
+    }
+
+    private func parseTrackLine(_ line: String) -> Track? {
         let parts = line.components(separatedBy: fieldDelimiter)
-        guard parts.count >= 7 else { return nil }
+        guard parts.count == 7 else { return nil }
 
         return Track(
-            id: parts[0],
-            title: parts[1],
-            artist: parts[2],
-            rating: Int(parts[3]) ?? 0,
-            comment: parts[4],
+            id:       parts[0],
+            title:    parts[1],
+            artist:   parts[2],
+            rating:   Int(parts[3]) ?? 0,
+            comment:  parts[4],
             grouping: parts[5],
-            genre: parts[6]
+            genre:    parts[6]
         )
     }
 
-    // MARK: - Modification Logic
+    // MARK: - Modify Tracks
 
     func process(command: String, scope: TaggingScope?, mode: TaggingMode) async {
         await refreshState()
@@ -132,19 +128,18 @@ final class MusicTagger {
                 }
             }
 
-            writeBack(tracks: tracks)
+            writeMetadata(tracks: tracks)
         }
 
         if scope == .current { currentTrack = tracks.first }
         else if scope == .selection { selectedTracks = tracks }
     }
 
-    // MARK: - Writing (via AppleScript and Music) to music file
+    // MARK: - Write to Music via AppleScript
 
     private func applyRating(_ rating: Int, to tracks: [Track]) {
         guard !tracks.isEmpty else { return }
 
-        // Write by Database ID for safety
         let scriptItems = tracks.map { "(\"\($0.id)\")" }.joined(separator: ", ")
 
         let script = """
@@ -156,10 +151,9 @@ final class MusicTagger {
             end repeat
         end tell
         """
-        runAppleScript(script)
+        run(script)
     }
-
-    private func writeBack(tracks: [Track]) {
+    private func writeMetadata(tracks: [Track]) {
         guard !tracks.isEmpty else { return }
 
         // Generate a list of lists: {{id, comment, grouping, genre}, {id, ...}}
@@ -191,21 +185,23 @@ final class MusicTagger {
         end tell
         """
 
-        runAppleScript(script)
+        run(script)
     }
+
 
     // MARK: - Helpers
 
     @discardableResult
-    private func runAppleScript(_ source: String) -> String {
+    private func run(_ source: String) -> String {
         guard let script = NSAppleScript(source: source) else { return "" }
         var err: NSDictionary?
         let result = script.executeAndReturnError(&err)
-        if let e = err { NSLog("AppleScript Error: \(e)"); return "" }
+        if let e = err { NSLog("AppleScript error: \(e)"); return "" }
         return result.stringValue ?? ""
     }
 
     private func escape(_ s: String) -> String {
-        s.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"")
+        s.replacingOccurrences(of: "\\", with: "\\\\")
+         .replacingOccurrences(of: "\"", with: "\\\"")
     }
 }
