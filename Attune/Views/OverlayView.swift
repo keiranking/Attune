@@ -124,7 +124,7 @@ struct OverlayView: View {
                 HStack {
                     Picker("", selection: $state.mode) {
                         ForEach(TaggingMode.allCases, id: \.self) { mode in
-                            Text(mode.rawValue).tag(mode)
+                            Image(systemName: mode.systemImage).tag(mode)
                         }
                     }
                     .pickerStyle(.segmented)

@@ -4,6 +4,13 @@ import AppKit
 enum TaggingMode: String, CaseIterable {
     case add = "Add to"
     case remove = "Remove from"
+
+    var systemImage: String {
+        switch self {
+        case .add:      "plus"
+        case .remove:   "minus"
+        }
+    }
 }
 
 enum TaggingScope: String, CaseIterable {
