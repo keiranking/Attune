@@ -2,8 +2,8 @@ import Foundation
 import AppKit
 
 enum TaggingMode: String, CaseIterable {
-    case add = "Add to"
     case remove = "Remove from"
+    case add = "Add to"
 
     var systemImage: String {
         switch self {

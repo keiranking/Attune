@@ -169,9 +169,19 @@ struct OverlayView: View {
         )
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 10)
-        .task {
-            isFocused = true
+        .task { isFocused = true }
+        .overlay { keyboardShortcuts }
+    }
+
+    var keyboardShortcuts: some View {
+        HStack {
+            Button("Add to") { state.mode = .add }
+            .keyboardShortcut("+", modifiers: [.command])
+
+            Button("Remove from") { state.mode = .remove }
+            .keyboardShortcut("-", modifiers: [.command])
         }
+        .hidden()
     }
 }
 
