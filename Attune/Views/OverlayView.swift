@@ -144,7 +144,6 @@ struct OverlayView: View {
         .frame(width: 600)
         .background { background }
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 10)
         .task { isFocused = true }
         .overlay { keyboardShortcuts }
     }
