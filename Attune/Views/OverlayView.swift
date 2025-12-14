@@ -13,6 +13,10 @@ final class OverlayState {
 
     var showSecondaryInfo: Bool = false
 
+    var textPlaceholder: String {
+        TagLibrary.shared.tags.count < 5 ? "Enter space-separated tags" : ""
+    }
+
     var currentTrackTitle: String { currentTrack?.title ?? "No current track" }
     var currentTrackArtist: String? { currentTrack?.artist }
     var currentTrackRating: Int? { currentTrack?.rating }
@@ -147,7 +151,8 @@ struct OverlayView: View {
 
     var omniBar: some View {
         HStack {
-            TextField("", text: $state.text) {
+            TextField("", text: $state.text, prompt: Text(state.textPlaceholder))
+            .onSubmit {
                 onCommit(state.text)
             }
             .onChange(of: state.text) {
