@@ -88,6 +88,22 @@ final class OverlayState {
     func toggleMode() {
         mode = (mode == .add) ? .remove : .add
     }
+
+    func processInlineCommands() {
+        let trimmed = text.trimmingCharacters(in: .whitespaces)
+
+        if trimmed.hasPrefix("x ") {
+            mode = .remove
+            text = String(trimmed.dropFirst(2))
+            return
+        }
+
+        if trimmed.hasPrefix("s ") {
+            scope = .selection
+            text = String(trimmed.dropFirst(2))
+            return
+        }
+    }
 }
 
 struct OverlayView: View {
@@ -133,6 +149,9 @@ struct OverlayView: View {
         HStack {
             TextField("", text: $state.text) {
                 onCommit(state.text)
+            }
+            .onChange(of: state.text) {
+                state.processInlineCommands()
             }
             .font(.system(size: 24))
             .textFieldStyle(.plain)
