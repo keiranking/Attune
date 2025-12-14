@@ -93,93 +93,107 @@ final class OverlayState {
 struct OverlayView: View {
     @Bindable var state: OverlayState
     @EnvironmentObject var library: TagLibrary
+
     var onCommit: (String) -> Void
 
     @FocusState private var isFocused: Bool
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                TextField("", text: $state.text) {
-                    onCommit(state.text)
-                }
-                .font(.system(size: 24))
-                .textFieldStyle(.plain)
-                .padding(12)
-                .background(Color.black.opacity(0.2))
-                .cornerRadius(8)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
-                )
-                .focused($isFocused)
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 16)
-            .padding(.bottom, 8)
+            omniBar
+                .padding(.bottom, 8)
 
             ZStack {
-                PlayerControls()
+                playerControls
 
                 HStack {
-                    Picker("", selection: $state.mode) {
-                        ForEach(TaggingMode.allCases, id: \.self) { mode in
-                            Image(systemName: mode.systemImage).tag(mode)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .frame(width: 150)
+                    modeControls
+                        .frame(width: 150)
 
                     Spacer()
                 }
             }
-            .padding(.horizontal, 16)
             .padding(.bottom, 12)
 
             VStack(spacing: 4) {
-                ScopeRowView(
-                    status: !state.hasCurrentTrack ? .disabled : (state.scope == .current ? .active : .inactive),
-                    icon: state.hasCurrentTrack ? "waveform" : "waveform.slash",
-                    title: state.currentTrackTitle,
-                    subtitle: state.currentTrackSubtitle,
-                    color: state.mode == .add ? .green : .red
-                )
-                .onTapGesture { state.scope = .current }
-                .disabled(!state.hasCurrentTrack)
-
-                if !state.selectedTrackIsCurrent {
-                    ScopeRowView(
-                        status: !state.hasSelectedTracks ? .disabled : (state.scope == .selection ? .active : .inactive),
-                        icon: "cursorarrow.rays",
-                        title: state.selectedTrackTitle,
-                        subtitle: state.selectedTrackSubtitle,
-                        color: state.mode == .add ? .green : .red
-                    )
-                    .onTapGesture { state.scope = .selection }
-                    .disabled(!state.hasSelectedTracks)
-                }
+                currentRow
+                if !state.selectedTrackIsCurrent { selectedRow }
             }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 16)
         }
+        .padding(16)
         .frame(width: 600)
-        .background(
-            VisualEffectView(material: .hudWindow, blendingMode: .behindWindow)
-                .cornerRadius(12)
-        )
+        .background { background }
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 10)
         .task { isFocused = true }
         .overlay { keyboardShortcuts }
     }
 
+    var omniBar: some View {
+        HStack {
+            TextField("", text: $state.text) {
+                onCommit(state.text)
+            }
+            .font(.system(size: 24))
+            .textFieldStyle(.plain)
+            .padding(12)
+            .background(Color.black.opacity(0.2))
+            .cornerRadius(8)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
+            )
+            .focused($isFocused)
+        }
+    }
+
+    var playerControls: some View { PlayerControls() }
+
+    var modeControls: some View {
+        Picker("", selection: $state.mode) {
+            ForEach(TaggingMode.allCases, id: \.self) { mode in
+                Image(systemName: mode.systemImage).tag(mode)
+            }
+        }
+        .pickerStyle(.segmented)
+    }
+
+    var currentRow: some View {
+        ScopeRowView(
+            status: !state.hasCurrentTrack ? .disabled : (state.scope == .current ? .active : .inactive),
+            icon: state.hasCurrentTrack ? "waveform" : "waveform.slash",
+            title: state.currentTrackTitle,
+            subtitle: state.currentTrackSubtitle,
+            color: state.mode == .add ? .green : .red
+        )
+        .onTapGesture { state.scope = .current }
+        .disabled(!state.hasCurrentTrack)
+    }
+
+    var selectedRow: some View {
+        ScopeRowView(
+            status: !state.hasSelectedTracks ? .disabled : (state.scope == .selection ? .active : .inactive),
+            icon: "cursorarrow.rays",
+            title: state.selectedTrackTitle,
+            subtitle: state.selectedTrackSubtitle,
+            color: state.mode == .add ? .green : .red
+        )
+        .onTapGesture { state.scope = .selection }
+        .disabled(!state.hasSelectedTracks)
+    }
+
+    var background: some View {
+        VisualEffectView(material: .hudWindow, blendingMode: .behindWindow)
+            .cornerRadius(12)
+    }
+
     var keyboardShortcuts: some View {
         HStack {
             Button("Add to") { state.mode = .add }
-            .keyboardShortcut("+", modifiers: [.command])
+                .keyboardShortcut("+", modifiers: [.command])
 
             Button("Remove from") { state.mode = .remove }
-            .keyboardShortcut("-", modifiers: [.command])
+                .keyboardShortcut("-", modifiers: [.command])
         }
         .hidden()
     }
