@@ -28,6 +28,7 @@ struct ScopeRowView: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
+                .contentTransition(.symbolEffect(.replace, options: .speed(2)))
                 .font(.system(size: 20))
                 .foregroundColor(isDisabled ? .tertiary : (isActive ? .white : .secondary))
                 .frame(width: 30)

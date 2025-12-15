@@ -113,6 +113,7 @@ final class OverlayState {
 struct OverlayView: View {
     @Bindable var state: OverlayState
     @EnvironmentObject var library: TagLibrary
+    @Environment(MusicPlayer.self) var player
 
     var onCommit: (String) -> Void
 
@@ -184,7 +185,9 @@ struct OverlayView: View {
     var currentRow: some View {
         ScopeRowView(
             status: !state.hasCurrentTrack ? .disabled : (state.scope == .current ? .active : .inactive),
-            icon: state.hasCurrentTrack ? "waveform" : "waveform.slash",
+            icon: state.hasCurrentTrack
+                  ? (player.isPlaying ? "speaker.wave.2.fill" : "speaker.fill")
+                  : "speaker.slash.fill",
             title: state.currentTrackTitle,
             subtitle: state.currentTrackSubtitle,
             color: state.mode == .add ? .green : .red
