@@ -226,28 +226,22 @@ struct PlayerControls: View {
     @Environment(MusicPlayer.self) var player
 
     var body: some View {
-        HStack(spacing: 20) {
-            Group {
-                Button(action: { player.skipToPreviousTrack() }) {
-                    Label("Previous Track", systemImage: "backward.fill")
-                }
-                Button(action: { player.playPauseTrack() }) {
-                    Label("Play/Pause", systemImage: player.isPlaying ? "pause.fill" : "play.fill")
-                        .font(.system(size: 24))
-                }
-                Button(action: { player.skipToNextTrack() }) {
-                    Label("Next Track", systemImage: "forward.fill")
-                }
+        HStack(spacing: 0) {
+            Button(action: { player.skipToPreviousTrack() }) {
+                Label("Previous Track", systemImage: "backward.fill")
             }
-            .background(Color.black.opacity(0.2))
-            .cornerRadius(8)
-            .disabled(player.isDisabled)
-            .labelStyle(.iconOnly)
-            .buttonStyle(.plain)
-            .font(.system(size: 16))
-            .foregroundColor(.white.opacity(0.8))
+
+            Button(action: { player.playPauseTrack() }) {
+                Label("Play/Pause", systemImage: player.isPlaying ? "pause.fill" : "play.fill")
+                    .font(.system(size: 24))
+            }
+
+            Button(action: { player.skipToNextTrack() }) {
+                Label("Next Track", systemImage: "forward.fill")
+            }
         }
+        .disabled(player.isDisabled)
+        .buttonStyle(.playerButton)
         .padding(.horizontal, 8)
-        .padding(.vertical, 8)
     }
 }
