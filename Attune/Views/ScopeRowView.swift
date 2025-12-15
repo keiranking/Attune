@@ -51,6 +51,8 @@ struct ScopeRowView: View {
                 .font(.system(size: 12))
                 .foregroundColor(isDisabled ? .tertiary : (isActive ? .white.opacity(0.8) : .secondary))
             }
+            .lineLimit(1)
+            .truncationMode(.tail)
             .frame(height: 38)
 
             Spacer()
