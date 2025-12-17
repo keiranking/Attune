@@ -93,6 +93,18 @@ final class OverlayWindowController {
 
                     await MainActor.run { self.hide() }
                 }
+            },
+            onApply: { [weak self] text in
+                guard let self else { return }
+                Task {
+                    await self.music.tagger.process(
+                        command: text,
+                        scope: self.state.scope,
+                        mode: self.state.mode
+                    )
+
+                    await MainActor.run { self.sync() }
+                }
             }
         )
         .environmentObject(TagLibrary.shared)

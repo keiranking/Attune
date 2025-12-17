@@ -116,6 +116,7 @@ struct OverlayView: View {
     @Environment(Music.self) var app
 
     var onCommit: (String) -> Void
+    var onApply: (String) -> Void
 
     @FocusState private var isFocused: Bool
 
@@ -220,6 +221,13 @@ struct OverlayView: View {
 
             Button("Remove from") { state.mode = .remove }
                 .keyboardShortcut("-", modifiers: [.command])
+
+            Button("Apply") {
+                let text = state.text
+                onApply(text)
+                state.text = ""
+            }
+            .keyboardShortcut(.return, modifiers: [.command])
         }
         .hidden()
     }
