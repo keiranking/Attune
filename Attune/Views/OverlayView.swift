@@ -113,7 +113,7 @@ final class OverlayState {
 struct OverlayView: View {
     @Bindable var state: OverlayState
     @EnvironmentObject var library: TagLibrary
-    @Environment(MusicPlayer.self) var player
+    @Environment(Music.self) var app
 
     var onCommit: (String) -> Void
 
@@ -186,7 +186,7 @@ struct OverlayView: View {
         ScopeRowView(
             status: !state.hasCurrentTrack ? .disabled : (state.scope == .current ? .active : .inactive),
             icon: state.hasCurrentTrack
-                  ? (player.isPlaying ? "speaker.wave.2.fill" : "speaker.fill")
+            ? (app.player.isPlaying ? "speaker.wave.2.fill" : "speaker.fill")
                   : "speaker.slash.fill",
             title: state.currentTrackTitle,
             subtitle: state.currentTrackSubtitle,
@@ -226,24 +226,24 @@ struct OverlayView: View {
 }
 
 struct PlayerControls: View {
-    @Environment(MusicPlayer.self) var player
+    @Environment(Music.self) var app
 
     var body: some View {
         HStack(spacing: 0) {
-            Button(action: { player.skipToPreviousTrack() }) {
+            Button(action: { app.player.previous() }) {
                 Label("Previous Track", systemImage: "backward.fill")
             }
 
-            Button(action: { player.playPauseTrack() }) {
-                Label("Play/Pause", systemImage: player.isPlaying ? "pause.fill" : "play.fill")
+            Button(action: { app.player.playPause() }) {
+                Label("Play/Pause", systemImage: app.player.isPlaying ? "pause.fill" : "play.fill")
                     .font(.system(size: 24))
             }
 
-            Button(action: { player.skipToNextTrack() }) {
+            Button(action: { app.player.next() }) {
                 Label("Next Track", systemImage: "forward.fill")
             }
         }
-        .disabled(player.isDisabled)
+        .disabled(app.player.isDisabled)
         .buttonStyle(.playerButton)
         .padding(.horizontal, 8)
     }

@@ -70,6 +70,8 @@ final class OverlayWindowController {
     private var hosting: NSHostingController<AnyView>
     private var window: OverlayWindow
 
+    private let music = Music.shared
+
     var isShown: Bool { window.isVisible }
 
     init() {
@@ -83,7 +85,7 @@ final class OverlayWindowController {
                 guard let self else { return }
 
                 Task {
-                    await MusicTagger.shared.process(
+                    await self.music.tagger.process(
                         command: text,
                         scope: self.state.scope,
                         mode: self.state.mode
@@ -95,7 +97,7 @@ final class OverlayWindowController {
         )
         .environmentObject(TagLibrary.shared)
         .environmentObject(AppSettings.shared)
-        .environment(MusicPlayer.shared)
+        .environment(music)
 
         hosting.rootView = AnyView(realView)
 
@@ -121,22 +123,17 @@ final class OverlayWindowController {
             }
         }
 
-        MusicPlayer.shared.onSync = { [weak self] in self?.sync() }
-        MusicPlayer.shared.start()
+        music.onChange = { [weak self] in self?.sync() }
     }
 
     private func sync() {
-        Task {
-            await MusicTagger.shared.refreshState()
+        music.refresh()
 
-            await MainActor.run {
-                self.state.currentTrack = MusicTagger.shared.currentTrack
-                self.state.selectedTracks = MusicTagger.shared.selectedTracks
+        state.currentTrack = music.currentTrack
+        state.selectedTracks = music.selectedTracks
 
-                if self.state.scope == nil {
-                    self.state.chooseDefaultScope()
-                }
-            }
+        if state.scope == nil {
+            state.chooseDefaultScope()
         }
     }
 
