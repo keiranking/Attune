@@ -5,6 +5,7 @@ final class OverlayViewModel {
     var text: String = ""
     var scope: TaggingScope?
     var mode: TaggingMode = .add
+    var state: TaggingState = .ready
 
     var currentTrack: Track?
     var selectedTracks: [Track] = []

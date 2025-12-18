@@ -87,28 +87,47 @@ final class OverlayWindowController {
                 guard let self else { return }
 
                 Task {
-                    await self.music.tagger.process(
+                    let result = await self.music.tagger.process(
                         command: text,
                         scope: self.viewModel.scope,
                         mode: self.viewModel.mode
                     )
 
-                    await MainActor.run { self.hide() }
+                    await MainActor.run {
+                        switch result {
+                        case .success:
+                            print("Rating/tags processed successfully.")
+                        case .failure(let error):
+                            self.viewModel.state = .failed(String(describing: error))
+                        }
+                        self.hide()
+                    }
                 }
             },
             onApply: { [weak self] text in
                 guard let self else { return }
 
                 Task {
-                    self.pendingApplyRefresh = true
+                    await MainActor.run {
+                        self.viewModel.state = .writing
+                    }
 
-                    await self.music.tagger.process(
+                    let result = await self.music.tagger.process(
                         command: text,
                         scope: self.viewModel.scope,
                         mode: self.viewModel.mode
                     )
 
-                    await MainActor.run { self.sync() }
+                    await MainActor.run {
+                        switch result {
+                        case .success:
+                            self.viewModel.text = ""
+                            self.viewModel.state = .ready
+                            self.sync()
+                        case .failure(let error):
+                            self.viewModel.state = .failed(String(describing: error))
+                        }
+                    }
                 }
             }
         )

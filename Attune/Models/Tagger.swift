@@ -19,7 +19,12 @@ extension Music {
             return parseSelection(Music.shared.run(script))
         }
 
-        func process(command: String, scope: TaggingScope?, mode: TaggingMode) async {
+        func process(
+            command: String,
+            scope: TaggingScope?,
+            mode: TaggingMode
+        ) async -> Result<Void, Tagger.Error> {
+
             Music.shared.refresh()
 
             var tokens = command
@@ -32,13 +37,13 @@ extension Music {
                 .map({ Int($0)! })
 
             let tracks: [Track] =
-                switch scope {
-                case .current:      Music.shared.currentTrack.map { [$0] } ?? []
-                case .selection:    Music.shared.selectedTracks
-                default:            []
-                }
+            switch scope {
+            case .current:      Music.shared.currentTrack.map { [$0] } ?? []
+            case .selection:    Music.shared.selectedTracks
+            default:            []
+            }
 
-            guard !tracks.isEmpty else { return }
+            guard !tracks.isEmpty else { return .failure(.noTarget) }
 
             var mutated = tracks
 
@@ -47,14 +52,16 @@ extension Music {
                 writeRating(mutated)
             }
 
-            guard !tokens.isEmpty else { return }
-
-            for i in mutated.indices {
-                mode == .add
-                ? mutated[i].add(tokens: tokens)
-                : mutated[i].remove(tokens: tokens)
+            if !tokens.isEmpty {
+                for i in mutated.indices {
+                    mode == .add
+                    ? mutated[i].add(tokens: tokens)
+                    : mutated[i].remove(tokens: tokens)
+                }
+                writeMetadata(mutated)
             }
-            writeMetadata(mutated)
+
+            return await verify(expected: mutated, scope: scope)
         }
 
         // MARK: - Private
@@ -113,7 +120,49 @@ extension Music {
 
         private func escape(_ s: String) -> String {
             s.replacingOccurrences(of: "\\", with: "\\\\")
-             .replacingOccurrences(of: "\"", with: "\\\"")
+                .replacingOccurrences(of: "\"", with: "\\\"")
+        }
+
+        private func verify(
+            expected: [Track],
+            scope: TaggingScope?
+        ) async -> Result<Void, Tagger.Error> {
+
+            let expectedByID = Dictionary(
+                uniqueKeysWithValues: expected.map { ($0.id, $0) }
+            )
+
+            let sleepTime: Duration = .milliseconds(100)
+            let timeOutTime: Duration = .milliseconds(1000)
+            let deadline = ContinuousClock.now + timeOutTime
+
+            while ContinuousClock.now < deadline {
+                Music.shared.refresh()
+
+                let actual: [Track] =
+                    switch scope {
+                    case .current:      Music.shared.currentTrack.map { [$0] } ?? []
+                    case .selection:    Music.shared.selectedTracks
+                    default :           []
+                    }
+
+                guard actual.count == expectedByID.count else {
+                    try? await Task.sleep(for: sleepTime)
+                    continue
+                }
+
+                let matches = actual.allSatisfy { expectedByID[$0.id] == $0 }
+                if matches { return .success(()) }
+
+                try? await Task.sleep(for: sleepTime)
+            }
+
+            return .failure(.timedOut)
+        }
+
+        enum Error: Swift.Error {
+            case noTarget
+            case timedOut
         }
     }
 }
