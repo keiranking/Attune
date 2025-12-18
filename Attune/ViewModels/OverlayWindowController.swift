@@ -74,8 +74,6 @@ final class OverlayWindowController {
 
     var isShown: Bool { window.isVisible }
 
-    private var pendingApplyRefresh = false
-
     init() {
         self.viewModel = OverlayViewModel()
         self.hosting = NSHostingController(rootView: AnyView(EmptyView()))
@@ -113,17 +111,7 @@ final class OverlayWindowController {
             }
         }
 
-        music.onChange = { [weak self] in
-            guard let self else { return }
-
-            DispatchQueue.main.async {
-                self.sync()
-
-                if self.pendingApplyRefresh {
-                    self.pendingApplyRefresh = false
-                }
-            }
-        }
+        music.onChange = { [weak self] in self?.sync() }
     }
 
     private func submit(_ text: String, _ dismiss: Bool = true) {
