@@ -74,6 +74,8 @@ final class OverlayWindowController {
 
     var isShown: Bool { window.isVisible }
 
+    private var pendingApplyRefresh = false
+
     init() {
         self.state = OverlayState()
         self.hosting = NSHostingController(rootView: AnyView(EmptyView()))
@@ -96,7 +98,10 @@ final class OverlayWindowController {
             },
             onApply: { [weak self] text in
                 guard let self else { return }
+
                 Task {
+                    self.pendingApplyRefresh = true
+
                     await self.music.tagger.process(
                         command: text,
                         scope: self.state.scope,
@@ -135,7 +140,17 @@ final class OverlayWindowController {
             }
         }
 
-        music.onChange = { [weak self] in self?.sync() }
+        music.onChange = { [weak self] in
+            guard let self else { return }
+
+            DispatchQueue.main.async {
+                self.sync()
+
+                if self.pendingApplyRefresh {
+                    self.pendingApplyRefresh = false
+                }
+            }
+        }
     }
 
     private func sync() {
