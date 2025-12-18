@@ -72,6 +72,8 @@ final class OverlayWindowController {
 
     private let music = Music.shared
 
+    private var priorApplication: NSRunningApplication?
+
     var isShown: Bool { window.isVisible }
 
     init() {
@@ -169,7 +171,8 @@ final class OverlayWindowController {
             window.center()
         }
 
-        NSApp.activate(ignoringOtherApps: true)
+        priorApplication = NSWorkspace.shared.frontmostApplication
+        NSApp.activate()
         window.makeKeyAndOrderFront(nil)
 
         DispatchQueue.main.async { [weak self] in
@@ -180,6 +183,13 @@ final class OverlayWindowController {
 
     func hide() {
         window.orderOut(nil)
+
+        if let priorApplication {
+            priorApplication.activate()
+            self.priorApplication = nil
+        } else {
+            NSApp.deactivate()
+        }
     }
 }
 

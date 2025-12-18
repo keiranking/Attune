@@ -81,7 +81,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             tagManagerWindow = window
         }
 
-        NSApp.activate(ignoringOtherApps: true)
+        NSApp.activate()
         tagManagerWindow?.makeKeyAndOrderFront(nil)
     }
 
@@ -102,7 +102,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             settingsWindow = window
         }
 
-        NSApp.activate(ignoringOtherApps: true)
+        NSApp.activate()
         settingsWindow?.makeKeyAndOrderFront(nil)
     }
 
