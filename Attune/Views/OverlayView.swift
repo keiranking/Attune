@@ -22,13 +22,13 @@ final class OverlayViewModel {
 
     var currentTrackIcon: String {
         let base = hasCurrentTrack
-            ? (Music.shared.player.isPlaying ? "speaker.wave.2.fill" : "speaker.fill")
-            : "speaker.slash.fill"
+        ? (Music.shared.player.isPlaying ? Icon.currentPlaying : Icon.currentPaused)
+        : Icon.currentDisabled
         guard scope == .current else { return base }
 
         return switch state {
-        case .failed:   "xmark"
-        case .updating: "rays"
+        case .failed:   Icon.failure
+        case .updating: Icon.updating
         default:        base
         }
     }
@@ -53,7 +53,7 @@ final class OverlayViewModel {
             showSecondaryInfo
             ? .text(currentTrackArtist ?? "")
             : .label(text: currentTrackMetadata ?? "",
-                     icon: currentTrackRating == 0 ? "star" : "star.fill")
+                     icon: currentTrackRating == 0 ? Icon.unrated : Icon.rated)
         } else {
             .text("Play a track in the Music app")
         }
@@ -65,12 +65,12 @@ final class OverlayViewModel {
     private var selectedTracksCount: Int { selectedTracks.count }
 
     var selectedTrackIcon: String {
-        let base = "rectangle.and.hand.point.up.left.fill"
+        let base = Icon.selected
         guard scope == .selection else { return base }
 
         return switch state {
-        case .failed:   "xmark"
-        case .updating: "rays"
+        case .failed:   Icon.failure
+        case .updating: Icon.updating
         default:        base
         }
     }
@@ -102,7 +102,7 @@ final class OverlayViewModel {
         case 1:     showSecondaryInfo
                     ? .text(selectedTrackArtist ?? "")
                     : .label(text: selectedTrackMetadata ?? "",
-                             icon: selectedTrackRating == 0 ? "star" : "star.fill")
+                             icon: selectedTrackRating == 0 ? Icon.unrated : Icon.rated)
         default:    .none
         }
     }
@@ -278,20 +278,43 @@ struct PlayerControls: View {
     var body: some View {
         HStack(spacing: 0) {
             Button(action: { music.player.previous() }) {
-                Label("Previous Track", systemImage: "backward.fill")
+                Label("Previous Track", systemImage: Icon.previous)
             }
 
             Button(action: { music.player.playPause() }) {
-                Label("Play/Pause", systemImage: music.player.isPlaying ? "pause.fill" : "play.fill")
-                    .font(.system(size: 24))
+                Label(
+                    "Play/Pause",
+                    systemImage: music.player.isPlaying ? Icon.pause : Icon.play
+                )
+                .font(.system(size: 24))
             }
 
             Button(action: { music.player.next() }) {
-                Label("Next Track", systemImage: "forward.fill")
+                Label("Next Track", systemImage: Icon.next)
             }
         }
         .disabled(music.player.isDisabled)
         .buttonStyle(.playerButton)
         .padding(.horizontal, 8)
     }
+}
+
+struct Icon {
+    static let success = "checkmark"
+    static let failure = "xmark"
+
+    static let currentPlaying = "speaker.wave.2.fill"
+    static let currentPaused = "speaker.fill"
+    static let currentDisabled = "speaker.slash.fill"
+    static let selected = "rectangle.and.hand.point.up.left.fill"
+
+    static let updating = "rays"
+
+    static let pause = "pause.fill"
+    static let play = "play.fill"
+    static let previous = "backward.fill"
+    static let next = "forward.fill"
+
+    static let rated = "star.fill"
+    static let unrated = "star"
 }
