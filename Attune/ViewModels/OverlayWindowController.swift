@@ -119,28 +119,32 @@ final class OverlayWindowController {
     private func submit(_ text: String, _ dismiss: Bool = true) {
         Task {
             await MainActor.run {
-                self.viewModel.state = .updating
+                viewModel.state = .updating
+                viewModel.outcome = nil
             }
 
-            let result = await self.music.tagger.process(
+            let result = await music.tagger.process(
                 command: text,
-                scope: self.viewModel.scope,
-                mode: self.viewModel.mode
+                scope: viewModel.scope,
+                mode: viewModel.mode
             )
 
             await MainActor.run {
-                switch result {
-                case .success:
-                    if !dismiss {
-                        self.viewModel.text = ""
-                        self.viewModel.state = .ready
-                        self.sync()
-                    }
-                case .failure(let error):
-                    self.viewModel.state = .failed(String(describing: error))
-                }
+                viewModel.state = .ready
+                viewModel.outcome = result.isSuccess ? .success : .failure
+            }
 
-                if dismiss { self.hide() }
+            try? await Task.sleep(for: .milliseconds(750))
+
+            await MainActor.run {
+                let lastOutcome = viewModel.outcome
+                viewModel.outcome = nil
+
+                if dismiss { hide() }
+                else {
+                    if lastOutcome == .success { viewModel.text = "" }
+                    sync()
+                }
             }
         }
     }

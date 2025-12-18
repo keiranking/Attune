@@ -6,6 +6,7 @@ final class OverlayViewModel {
     var scope: TaggingScope?
     var mode: TaggingMode = .add
     var state: TaggingState = .ready
+    var outcome: TaggingOutcome? = nil
 
     var currentTrack: Track?
     var selectedTracks: [Track] = []
@@ -21,16 +22,17 @@ final class OverlayViewModel {
     // MARK: Current track, derived properties
 
     var currentTrackIcon: String {
+        if scope == .current, let outcome {
+            return outcome == .success ? Icon.success : Icon.failure
+        }
+
         let base = hasCurrentTrack
-        ? (Music.shared.player.isPlaying ? Icon.currentPlaying : Icon.currentPaused)
-        : Icon.currentDisabled
+            ? (Music.shared.player.isPlaying ? Icon.currentPlaying : Icon.currentPaused)
+            : Icon.currentDisabled
+
         guard scope == .current else { return base }
 
-        return switch state {
-        case .failed:   Icon.failure
-        case .updating: Icon.updating
-        default:        base
-        }
+        return state == .updating ? Icon.updating : base
     }
 
     var currentTrackTitle: String { currentTrack?.title ?? "No current track" }
@@ -65,14 +67,15 @@ final class OverlayViewModel {
     private var selectedTracksCount: Int { selectedTracks.count }
 
     var selectedTrackIcon: String {
+        if scope == .selection, let outcome {
+            return outcome == .success ? Icon.success : Icon.failure
+        }
+
         let base = Icon.selected
+
         guard scope == .selection else { return base }
 
-        return switch state {
-        case .failed:   Icon.failure
-        case .updating: Icon.updating
-        default:        base
-        }
+        return state == .updating ? Icon.updating : base
     }
 
     var selectedTrackTitle: String {
@@ -222,7 +225,9 @@ struct OverlayView: View {
 
     var currentRow: some View {
         ScopeRowView(
-            status: !viewModel.hasCurrentTrack ? .disabled : (viewModel.scope == .current ? .active : .inactive),
+            status: !viewModel.hasCurrentTrack
+                    ? .disabled
+                    : (viewModel.scope == .current ? .active : .inactive),
             icon: viewModel.currentTrackIcon,
             title: viewModel.currentTrackTitle,
             subtitle: viewModel.currentTrackSubtitle,
@@ -237,7 +242,9 @@ struct OverlayView: View {
 
     var selectedRow: some View {
         ScopeRowView(
-            status: !viewModel.hasSelectedTracks ? .disabled : (viewModel.scope == .selection ? .active : .inactive),
+            status: !viewModel.hasSelectedTracks
+                    ? .disabled
+                    : (viewModel.scope == .selection ? .active : .inactive),
             icon: viewModel.selectedTrackIcon,
             title: viewModel.selectedTrackTitle,
             subtitle: viewModel.selectedTrackSubtitle,
