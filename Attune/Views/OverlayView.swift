@@ -1,7 +1,7 @@
 import SwiftUI
 
 @Observable
-final class OverlayState {
+final class OverlayViewModel {
     var text: String = ""
     var scope: TaggingScope?
     var mode: TaggingMode = .add
@@ -111,9 +111,9 @@ final class OverlayState {
 }
 
 struct OverlayView: View {
-    @Bindable var state: OverlayState
+    @Bindable var viewModel: OverlayViewModel
     @EnvironmentObject var library: TagLibrary
-    @Environment(Music.self) var app
+    @Environment(Music.self) var music
 
     var onCommit: (String) -> Void
     var onApply: (String) -> Void
@@ -139,7 +139,7 @@ struct OverlayView: View {
 
             VStack(spacing: 4) {
                 currentRow
-                if !state.selectedTrackIsCurrent { selectedRow }
+                if !viewModel.selectedTrackIsCurrent { selectedRow }
             }
         }
         .padding(16)
@@ -152,12 +152,12 @@ struct OverlayView: View {
 
     var omniBar: some View {
         HStack {
-            TextField("", text: $state.text, prompt: Text(state.textPlaceholder))
+            TextField("", text: $viewModel.text, prompt: Text(viewModel.textPlaceholder))
             .onSubmit {
-                onCommit(state.text)
+                onCommit(viewModel.text)
             }
-            .onChange(of: state.text) {
-                state.processInlineCommands()
+            .onChange(of: viewModel.text) {
+                viewModel.processInlineCommands()
             }
             .font(.system(size: 24))
             .textFieldStyle(.plain)
@@ -175,7 +175,7 @@ struct OverlayView: View {
     var playerControls: some View { PlayerControls() }
 
     var modeControls: some View {
-        Picker("", selection: $state.mode) {
+        Picker("", selection: $viewModel.mode) {
             ForEach(TaggingMode.allCases, id: \.self) { mode in
                 Image(systemName: mode.systemImage).tag(mode)
             }
@@ -185,28 +185,28 @@ struct OverlayView: View {
 
     var currentRow: some View {
         ScopeRowView(
-            status: !state.hasCurrentTrack ? .disabled : (state.scope == .current ? .active : .inactive),
-            icon: state.hasCurrentTrack
-            ? (app.player.isPlaying ? "speaker.wave.2.fill" : "speaker.fill")
+            status: !viewModel.hasCurrentTrack ? .disabled : (viewModel.scope == .current ? .active : .inactive),
+            icon: viewModel.hasCurrentTrack
+            ? (music.player.isPlaying ? "speaker.wave.2.fill" : "speaker.fill")
                   : "speaker.slash.fill",
-            title: state.currentTrackTitle,
-            subtitle: state.currentTrackSubtitle,
-            color: state.mode == .add ? .green : .red
+            title: viewModel.currentTrackTitle,
+            subtitle: viewModel.currentTrackSubtitle,
+            color: viewModel.mode == .add ? .green : .red
         )
-        .onTapGesture { state.scope = .current }
-        .disabled(!state.hasCurrentTrack)
+        .onTapGesture { viewModel.scope = .current }
+        .disabled(!viewModel.hasCurrentTrack)
     }
 
     var selectedRow: some View {
         ScopeRowView(
-            status: !state.hasSelectedTracks ? .disabled : (state.scope == .selection ? .active : .inactive),
+            status: !viewModel.hasSelectedTracks ? .disabled : (viewModel.scope == .selection ? .active : .inactive),
             icon: "cursorarrow.rays",
-            title: state.selectedTrackTitle,
-            subtitle: state.selectedTrackSubtitle,
-            color: state.mode == .add ? .green : .red
+            title: viewModel.selectedTrackTitle,
+            subtitle: viewModel.selectedTrackSubtitle,
+            color: viewModel.mode == .add ? .green : .red
         )
-        .onTapGesture { state.scope = .selection }
-        .disabled(!state.hasSelectedTracks)
+        .onTapGesture { viewModel.scope = .selection }
+        .disabled(!viewModel.hasSelectedTracks)
     }
 
     var background: some View {
@@ -216,16 +216,16 @@ struct OverlayView: View {
 
     var keyboardShortcuts: some View {
         HStack {
-            Button("Add to") { state.mode = .add }
+            Button("Add to") { viewModel.mode = .add }
                 .keyboardShortcut("+", modifiers: [.command])
 
-            Button("Remove from") { state.mode = .remove }
+            Button("Remove from") { viewModel.mode = .remove }
                 .keyboardShortcut("-", modifiers: [.command])
 
             Button("Apply") {
-                let text = state.text
+                let text = viewModel.text
                 onApply(text)
-                state.text = ""
+                viewModel.text = ""
             }
             .keyboardShortcut(.return, modifiers: [.command])
         }
@@ -234,24 +234,24 @@ struct OverlayView: View {
 }
 
 struct PlayerControls: View {
-    @Environment(Music.self) var app
+    @Environment(Music.self) var music
 
     var body: some View {
         HStack(spacing: 0) {
-            Button(action: { app.player.previous() }) {
+            Button(action: { music.player.previous() }) {
                 Label("Previous Track", systemImage: "backward.fill")
             }
 
-            Button(action: { app.player.playPause() }) {
-                Label("Play/Pause", systemImage: app.player.isPlaying ? "pause.fill" : "play.fill")
+            Button(action: { music.player.playPause() }) {
+                Label("Play/Pause", systemImage: music.player.isPlaying ? "pause.fill" : "play.fill")
                     .font(.system(size: 24))
             }
 
-            Button(action: { app.player.next() }) {
+            Button(action: { music.player.next() }) {
                 Label("Next Track", systemImage: "forward.fill")
             }
         }
-        .disabled(app.player.isDisabled)
+        .disabled(music.player.isDisabled)
         .buttonStyle(.playerButton)
         .padding(.horizontal, 8)
     }

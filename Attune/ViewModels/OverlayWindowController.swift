@@ -66,7 +66,7 @@ final class OverlayWindow: NSWindow {
 
 // MARK: - OverlayWindowController (single source of truth)
 final class OverlayWindowController {
-    private let state: OverlayState
+    private let viewModel: OverlayViewModel
     private var hosting: NSHostingController<AnyView>
     private var window: OverlayWindow
 
@@ -77,20 +77,20 @@ final class OverlayWindowController {
     private var pendingApplyRefresh = false
 
     init() {
-        self.state = OverlayState()
+        self.viewModel = OverlayViewModel()
         self.hosting = NSHostingController(rootView: AnyView(EmptyView()))
         self.window = OverlayWindow(contentViewController: hosting)
 
-        let realView = OverlayView(
-            state: state,
+        let overlayView = OverlayView(
+            viewModel: viewModel,
             onCommit: { [weak self] text in
                 guard let self else { return }
 
                 Task {
                     await self.music.tagger.process(
                         command: text,
-                        scope: self.state.scope,
-                        mode: self.state.mode
+                        scope: self.viewModel.scope,
+                        mode: self.viewModel.mode
                     )
 
                     await MainActor.run { self.hide() }
@@ -104,8 +104,8 @@ final class OverlayWindowController {
 
                     await self.music.tagger.process(
                         command: text,
-                        scope: self.state.scope,
-                        mode: self.state.mode
+                        scope: self.viewModel.scope,
+                        mode: self.viewModel.mode
                     )
 
                     await MainActor.run { self.sync() }
@@ -116,7 +116,7 @@ final class OverlayWindowController {
         .environmentObject(AppSettings.shared)
         .environment(music)
 
-        hosting.rootView = AnyView(realView)
+        hosting.rootView = AnyView(overlayView)
 
         window.hideAction = { [weak self] in self?.hide() }
 
@@ -125,7 +125,7 @@ final class OverlayWindowController {
 
             DispatchQueue.main.async {
                 withAnimation(.easeInOut(duration: 0.1)) {
-                    self.state.toggleScope()
+                    self.viewModel.toggleScope()
                 }
             }
         }
@@ -135,7 +135,7 @@ final class OverlayWindowController {
 
             DispatchQueue.main.async {
                 withAnimation(.easeInOut(duration: 0.1)) {
-                    self.state.showSecondaryInfo = isOptionDown
+                    self.viewModel.showSecondaryInfo = isOptionDown
                 }
             }
         }
@@ -156,18 +156,18 @@ final class OverlayWindowController {
     private func sync() {
         music.refresh()
 
-        state.currentTrack = music.currentTrack
-        state.selectedTracks = music.selectedTracks
+        viewModel.currentTrack = music.currentTrack
+        viewModel.selectedTracks = music.selectedTracks
 
-        if state.scope == nil {
-            state.chooseDefaultScope()
+        if viewModel.scope == nil {
+            viewModel.chooseDefaultScope()
         }
     }
 
     func show() {
-        state.text = ""
-        state.mode = .add
-        state.scope = nil
+        viewModel.text = ""
+        viewModel.mode = .add
+        viewModel.scope = nil
 
         sync()
 

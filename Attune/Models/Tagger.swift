@@ -92,18 +92,23 @@ extension Music {
             Music.shared.run(script)
         }
 
-        private func parseSelection(_ s: String) -> [Track] {
-            s.components(separatedBy: lineDelimiter)
-             .filter { !$0.isEmpty }
-             .compactMap {
-                 let p = $0.components(separatedBy: fieldDelimiter)
-                 guard p.count == 7 else { return nil }
-                 return Track(
-                     id: p[0], title: p[1], artist: p[2],
-                     rating: Int(p[3]) ?? 0,
-                     comment: p[4], grouping: p[5], genre: p[6]
-                 )
-             }
+        private func parseSelection(_ string: String) -> [Track] {
+            string
+                .components(separatedBy: lineDelimiter)
+                .filter { !$0.isEmpty }
+                .compactMap {
+                    let p = $0.components(separatedBy: fieldDelimiter)
+                    guard p.count == 7 else { return nil }
+                    return Track(
+                        id:         p[0],
+                        title:      p[1],
+                        artist:     p[2],
+                        rating:     Int(p[3]) ?? 0,
+                        comment:    p[4],
+                        grouping:   p[5],
+                        genre:      p[6]
+                    )
+                }
         }
 
         private func escape(_ s: String) -> String {
