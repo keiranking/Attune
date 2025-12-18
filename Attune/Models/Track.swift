@@ -59,7 +59,9 @@ struct Track: Identifiable, Codable, Hashable {
 
 extension Track: Equatable {
     static func == (lhs: Track, rhs: Track) -> Bool {
-        return lhs.id == rhs.id
+        lhs.id == rhs.id
+        && lhs.rating == rhs.rating
+        && lhs.tags == rhs.tags
     }
 }
 

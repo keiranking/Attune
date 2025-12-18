@@ -32,18 +32,23 @@ extension Music {
                 .map({ Int($0)! })
 
             let tracks: [Track] =
-                scope == .current ? Music.shared.currentTrack.map { [$0] } ?? [] :
-                scope == .selection ? Music.shared.selectedTracks : []
+                switch scope {
+                case .current:      Music.shared.currentTrack.map { [$0] } ?? []
+                case .selection:    Music.shared.selectedTracks
+                default:            []
+                }
 
             guard !tracks.isEmpty else { return }
 
+            var mutated = tracks
+
             if let rating = ratings.last {
-                applyRating(rating, to: tracks)
+                for i in mutated.indices { mutated[i].rating = rating }
+                writeRating(mutated)
             }
 
             guard !tokens.isEmpty else { return }
 
-            var mutated = tracks
             for i in mutated.indices {
                 mode == .add
                 ? mutated[i].add(tokens: tokens)
@@ -54,7 +59,9 @@ extension Music {
 
         // MARK: - Private
 
-        private func applyRating(_ rating: Int, to tracks: [Track]) {
+        private func writeRating(_ tracks: [Track]) {
+            guard let rating = tracks.first?.rating else { return }
+
             let ids = tracks.map { "\"\($0.id)\"" }.joined(separator: ",")
             let script = """
             tell application id "com.apple.Music"
