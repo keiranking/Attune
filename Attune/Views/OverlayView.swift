@@ -116,8 +116,7 @@ struct OverlayView: View {
     @EnvironmentObject var library: TagLibrary
     @Environment(Music.self) var music
 
-    var onCommit: (String) -> Void
-    var onApply: (String) -> Void
+    var onSubmit: (_ text: String, _ dismiss: Bool) -> Void
 
     @FocusState private var isFocused: Bool
 
@@ -155,7 +154,7 @@ struct OverlayView: View {
         HStack {
             TextField("", text: $viewModel.text, prompt: Text(viewModel.textPlaceholder))
             .onSubmit {
-                onCommit(viewModel.text)
+                onSubmit(viewModel.text, true)
             }
             .onChange(of: viewModel.text) {
                 viewModel.processInlineCommands()
@@ -223,10 +222,9 @@ struct OverlayView: View {
             Button("Remove from") { viewModel.mode = .remove }
                 .keyboardShortcut("-", modifiers: [.command])
 
-            Button("Apply") {
+            Button("Submit and Continue") {
                 let text = viewModel.text
-                onApply(text)
-                viewModel.text = ""
+                onSubmit(text, false)
             }
             .keyboardShortcut(.return, modifiers: [.command])
         }
