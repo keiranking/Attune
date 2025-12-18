@@ -168,11 +168,11 @@ struct OverlayView: View {
             .font(.system(size: 24))
             .textFieldStyle(.plain)
             .padding(12)
-            .background(Color.black.opacity(0.2))
+            .background(Color.antiprimary.opacity(0.2))
             .cornerRadius(8)
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                    .stroke(Color.primary.opacity(0.1), lineWidth: 1)
             )
             .focused($isFocused)
         }

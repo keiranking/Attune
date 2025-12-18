@@ -25,18 +25,28 @@ struct ScopeRowView: View {
     var isActive: Bool { status == .active }
     var isDisabled: Bool { status == .disabled }
 
+    var iconColor: Color {
+        isDisabled ? .tertiary : (isActive ? .primary : .secondary)
+    }
+    var titleColor: Color {
+        isDisabled ? .tertiary : (isActive ? .primary : .secondary)
+    }
+    var subtitleColor: Color {
+        isDisabled ? .tertiary : (isActive ? .primary.opacity(0.8) : .secondary)
+    }
+
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .contentTransition(.symbolEffect(.replace, options: .speed(2)))
                 .font(.system(size: 20))
-                .foregroundColor(isDisabled ? .tertiary : (isActive ? .white : .secondary))
+                .foregroundStyle(iconColor)
                 .frame(width: 30)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(isDisabled ? .tertiary : (isActive ? .white : .primary))
+                    .foregroundStyle(titleColor)
 
                 Group {
                     if case let .text(text) = subtitle, !text.isEmpty {
@@ -49,7 +59,7 @@ struct ScopeRowView: View {
                     }
                 }
                 .font(.system(size: 12))
-                .foregroundColor(isDisabled ? .tertiary : (isActive ? .white.opacity(0.8) : .secondary))
+                .foregroundStyle(subtitleColor)
             }
             .lineLimit(1)
             .truncationMode(.tail)
@@ -59,7 +69,7 @@ struct ScopeRowView: View {
 
             if isActive {
                 Image(systemName: "return")
-                    .foregroundColor(.white.opacity(0.6))
+                    .foregroundColor(.primary.opacity(0.6))
             }
         }
         .padding(.vertical, 8)
