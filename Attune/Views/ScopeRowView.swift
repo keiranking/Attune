@@ -21,6 +21,7 @@ struct ScopeRowView: View {
     let title: String
     let subtitle: SubtitleContent
     let color: Color
+    let isAnimated: Bool
 
     var isActive: Bool { status == .active }
     var isDisabled: Bool { status == .disabled }
@@ -39,6 +40,9 @@ struct ScopeRowView: View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .contentTransition(.symbolEffect(.replace, options: .speed(2)))
+                .if(isAnimated) {
+                    $0.symbolEffect(.variableColor.iterative.hideInactiveLayers)
+                }
                 .font(.system(size: 20))
                 .foregroundStyle(iconColor)
                 .frame(width: 30)
@@ -79,5 +83,21 @@ struct ScopeRowView: View {
                 .fill(isActive ? color.opacity(0.8) : Color.clear)
         )
         .contentShape(Rectangle()) // Makes empty space tappable
+    }
+
+    init(
+        status: Status,
+        icon: String,
+        title: String,
+        subtitle: SubtitleContent,
+        color: Color,
+        isAnimated: Bool = false
+    ) {
+        self.status = status
+        self.icon = icon
+        self.title = title
+        self.subtitle = subtitle
+        self.color = color
+        self.isAnimated = isAnimated
     }
 }

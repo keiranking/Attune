@@ -18,10 +18,25 @@ final class OverlayViewModel {
         TagLibrary.shared.tags.count < 5 ? "Enter space-separated tags" : ""
     }
 
+    // MARK: Current track, derived properties
+
+    var currentTrackIcon: String {
+        let base = hasCurrentTrack
+            ? (Music.shared.player.isPlaying ? "speaker.wave.2.fill" : "speaker.fill")
+            : "speaker.slash.fill"
+        guard scope == .current else { return base }
+
+        return switch state {
+        case .failed:   "xmark"
+        case .updating: "rays"
+        default:        base
+        }
+    }
+
     var currentTrackTitle: String { currentTrack?.title ?? "No current track" }
-    var currentTrackArtist: String? { currentTrack?.artist }
-    var currentTrackRating: Int? { currentTrack?.rating }
-    var currentTrackMetadata: String? {
+    private var currentTrackArtist: String? { currentTrack?.artist }
+    private var currentTrackRating: Int? { currentTrack?.rating }
+    private var currentTrackMetadata: String? {
         guard let currentTrack else { return nil }
         return [
             "\(currentTrack.rating)",
@@ -45,7 +60,21 @@ final class OverlayViewModel {
     }
     var hasCurrentTrack: Bool { currentTrack != nil }
 
-    var selectedTracksCount: Int { selectedTracks.count }
+    // MARK: Selected track, derived properties
+
+    private var selectedTracksCount: Int { selectedTracks.count }
+
+    var selectedTrackIcon: String {
+        let base = "rectangle.and.hand.point.up.left.fill"
+        guard scope == .selection else { return base }
+
+        return switch state {
+        case .failed:   "xmark"
+        case .updating: "rays"
+        default:        base
+        }
+    }
+
     var selectedTrackTitle: String {
         switch selectedTracks.count {
         case 0:     "No selected tracks"
@@ -53,9 +82,9 @@ final class OverlayViewModel {
         default:    "\(selectedTracks.count) selected tracks"
         }
     }
-    var selectedTrackArtist: String? { selectedTracks.first?.artist }
-    var selectedTrackRating: Int? { selectedTracks.first?.rating }
-    var selectedTrackMetadata: String? {
+    private var selectedTrackArtist: String? { selectedTracks.first?.artist }
+    private var selectedTrackRating: Int? { selectedTracks.first?.rating }
+    private var selectedTrackMetadata: String? {
         guard let firstTrack = selectedTracks.first else { return nil }
         return [
             "\(firstTrack.rating)",
@@ -78,6 +107,8 @@ final class OverlayViewModel {
         }
     }
     var hasSelectedTracks: Bool { !selectedTracks.isEmpty }
+
+    // MARK: Functions
 
     func chooseDefaultScope() {
         if hasCurrentTrack { scope = .current }
@@ -192,12 +223,13 @@ struct OverlayView: View {
     var currentRow: some View {
         ScopeRowView(
             status: !viewModel.hasCurrentTrack ? .disabled : (viewModel.scope == .current ? .active : .inactive),
-            icon: viewModel.hasCurrentTrack
-            ? (music.player.isPlaying ? "speaker.wave.2.fill" : "speaker.fill")
-                  : "speaker.slash.fill",
+            icon: viewModel.currentTrackIcon,
             title: viewModel.currentTrackTitle,
             subtitle: viewModel.currentTrackSubtitle,
-            color: viewModel.mode == .add ? .green : .red
+            color: viewModel.mode == .add ? .green : .red,
+            isAnimated:
+                music.player.isPlaying
+                || (viewModel.scope == .current && viewModel.state == .updating)
         )
         .onTapGesture { viewModel.scope = .current }
         .disabled(!viewModel.hasCurrentTrack)
@@ -206,10 +238,12 @@ struct OverlayView: View {
     var selectedRow: some View {
         ScopeRowView(
             status: !viewModel.hasSelectedTracks ? .disabled : (viewModel.scope == .selection ? .active : .inactive),
-            icon: "cursorarrow.rays",
+            icon: viewModel.selectedTrackIcon,
             title: viewModel.selectedTrackTitle,
             subtitle: viewModel.selectedTrackSubtitle,
-            color: viewModel.mode == .add ? .green : .red
+            color: viewModel.mode == .add ? .green : .red,
+            isAnimated:
+                viewModel.scope == .selection && viewModel.state == .updating
         )
         .onTapGesture { viewModel.scope = .selection }
         .disabled(!viewModel.hasSelectedTracks)
