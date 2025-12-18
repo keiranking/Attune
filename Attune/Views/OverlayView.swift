@@ -28,7 +28,10 @@ final class OverlayViewModel {
             currentTrack.genre,
             currentTrack.comment,
             currentTrack.grouping
-        ].joined(separator: " • ")
+        ]
+            .compactMap { $0 }
+            .filter { $0 != "" }
+            .joined(separator: " • ")
     }
     var currentTrackSubtitle: ScopeRowView.SubtitleContent {
         return if hasCurrentTrack {
@@ -59,7 +62,10 @@ final class OverlayViewModel {
             firstTrack.genre,
             firstTrack.comment,
             firstTrack.grouping
-        ].joined(separator: " • ")
+        ]
+            .compactMap { $0 }
+            .filter { $0 != "" }
+            .joined(separator: " • ")
     }
     var selectedTrackSubtitle: ScopeRowView.SubtitleContent {
         switch selectedTracks.count {
