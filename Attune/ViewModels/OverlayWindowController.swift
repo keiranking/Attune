@@ -119,7 +119,7 @@ final class OverlayWindowController {
     private func submit(_ text: String, _ dismiss: Bool = true) {
         Task {
             await MainActor.run {
-                self.viewModel.state = .writing
+                self.viewModel.state = .updating
             }
 
             let result = await self.music.tagger.process(

@@ -2,6 +2,6 @@ import Foundation
 
 enum TaggingState: Equatable {
     case ready
-    case writing
+    case updating
     case failed(String)
 }
