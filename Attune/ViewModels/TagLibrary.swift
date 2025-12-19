@@ -2,10 +2,11 @@ import Foundation
 import Combine
 import SwiftUI
 
-final class TagLibrary: ObservableObject {
+@Observable
+final class TagLibrary {
     static let shared = TagLibrary()
 
-    @Published var tags: [Tag] = [] {
+    var tags: [Tag] = [] {
         didSet {
             save()
         }

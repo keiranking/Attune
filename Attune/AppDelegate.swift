@@ -67,7 +67,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func openTagManager() {
         if tagManagerWindow == nil {
             let contentView = TagManagerView()
-                .environmentObject(TagLibrary.shared)
+                .environment(TagLibrary.shared)
 
             let window = NSWindow(
                 contentRect: NSRect(x: 0, y: 0, width: 400, height: 500),

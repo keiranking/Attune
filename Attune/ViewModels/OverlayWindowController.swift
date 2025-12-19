@@ -85,7 +85,6 @@ final class OverlayWindowController {
             viewModel: viewModel,
             onSubmit: submit
         )
-        .environmentObject(TagLibrary.shared)
         .environmentObject(AppSettings.shared)
         .environment(music)
 

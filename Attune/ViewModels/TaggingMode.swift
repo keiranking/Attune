@@ -1,13 +1,13 @@
 import Foundation
 
-enum TaggingMode: String, CaseIterable {
-    case remove = "Remove from"
-    case add = "Add to"
+enum TaggingMode: CaseIterable {
+    case remove
+    case add
 
     var systemImage: String {
         switch self {
-        case .add:      "plus"
-        case .remove:   "minus"
+        case .add:      Icon.add
+        case .remove:   Icon.remove
         }
     }
 }

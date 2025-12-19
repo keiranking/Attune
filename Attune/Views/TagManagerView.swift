@@ -1,26 +1,28 @@
 import SwiftUI
 
 struct TagManagerView: View {
-    @EnvironmentObject var library: TagLibrary
+    @Environment(TagLibrary.self) var library
+
     @State private var newTagName: String = ""
     @State private var selectedCategory: TagCategory = .comment
 
     var body: some View {
         VStack {
-            HStack {
-                Picker("Category", selection: $selectedCategory) {
-                    ForEach(TagCategory.allCases) { cat in
-                        Text(cat.rawValue).tag(cat)
-                    }
+            Picker("", selection: $selectedCategory) {
+                ForEach(TagCategory.allCases) { cat in
+                    Text(cat.rawValue).tag(cat)
                 }
-                .pickerStyle(MenuPickerStyle())
-                .frame(width: 120)
+            }
+            .pickerStyle(.segmented)
 
-                TextField("Tag", text: $newTagName, onCommit: addTag)
+            HStack {
+
+                TextField("", text: $newTagName, onCommit: addTag)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
 
                 Button(action: addTag) {
-                    Image(systemName: "plus")
+                    Label("Add keyword", systemImage: Icon.add)
+                        .labelStyle(.iconOnly)
                 }
                 .disabled(newTagName.isEmpty)
             }
