@@ -42,7 +42,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
-        menu.addItem(NSMenuItem(title: "Manage Tags...",
+        menu.addItem(NSMenuItem(title: "Manage Whitelists...",
                                 action: #selector(openTagManager),
                                 keyEquivalent: ""))
 
@@ -74,7 +74,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 styleMask: [.titled, .closable, .miniaturizable, .resizable],
                 backing: .buffered, defer: false
             )
-            window.title = "Manage Tags"
+            window.title = "Manage Whitelists"
             window.center()
             window.contentView = NSHostingView(rootView: contentView)
             window.isReleasedWhenClosed = false

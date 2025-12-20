@@ -7,10 +7,14 @@ final class TagLibrary {
     static let shared = TagLibrary()
 
     var tags: [Tag] = [] {
-        didSet {
-            save()
-        }
+        didSet { save() }
     }
+
+    // MARK: Helpers
+
+    var genreTags: [Tag] { tags.filter { $0.category == .genre} }
+    var commentTags: [Tag] { tags.filter { $0.category == .comment} }
+    var groupingTags: [Tag] { tags.filter { $0.category == .grouping} }
 
     private let storageKey = "AttuneTagLibrary"
 
@@ -56,6 +60,14 @@ final class TagLibrary {
     func getWhitelist(for category: TagCategory) -> Set<String> {
         let filtered = tags.filter { $0.category == category }
         return Set(filtered.map { $0.normalizedName })
+    }
+
+    static func makeTags(from csv: String, in category: TagCategory) -> [Tag] {
+        csv
+            .components(separatedBy: ",")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .map { Tag(name: String($0), category: category) }
+
     }
 
     // MARK: - Persistence

@@ -26,3 +26,9 @@ extension Array {
         return foundElements
     }
 }
+
+extension Array where Element: Identifiable, Element.ID: StringProtocol {
+    var listed: String {
+        compactMap(\.id).joined(separator: ", ")
+    }
+}
