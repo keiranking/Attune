@@ -1,24 +1,25 @@
 import SwiftUI
 import Combine
 
-final class AppSettings: ObservableObject {
+@Observable
+final class AppSettings {
     static let shared = AppSettings()
 
-    @AppStorage("globalHotkeyKeyCode") var keyCode: Int = 49 // Space
-//    @AppStorage("globalHotkeyModifiers") var modifiers: [Int] = [524288, 262144] // Option, Ctrl
-
-    var shortcutDescription: String {
-        // Todo: parse Carbon modifiers to string symbols
-        return "Cmd + Option + Ctrl + Space"
+    var enforceWhitelists: Bool {
+        didSet {
+            defaults.set(enforceWhitelists, forKey: StorageKey.enforceWhitelists)
+        }
     }
 
-    func updateHotkey(code: Int, mods: [Int]) {
-        self.keyCode = code
-//        self.modifiers = mods
-        NotificationCenter.default.post(name: .hotKeyConfigurationChanged, object: nil)
+    private let defaults = UserDefaults.standard
+
+    private init() {
+        self.enforceWhitelists = defaults.bool(forKey: StorageKey.enforceWhitelists)
     }
 }
 
-extension Notification.Name {
-    static let hotKeyConfigurationChanged = Notification.Name("hotKeyConfigurationChanged")
+private extension AppSettings {
+    enum StorageKey {
+        static let enforceWhitelists = "Attune.AppSettings.enforceWhitelists"
+    }
 }

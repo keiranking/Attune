@@ -13,7 +13,7 @@ final class TagLibrary {
     var commentTags: [Tag] { tags.filter { $0.category == .comment} }
     var groupingTags: [Tag] { tags.filter { $0.category == .grouping} }
 
-    private let storageKey = "AttuneTagLibrary"
+    private let storageKey = "Attune.TagLibrary.tags"
 
     init() {
         load()

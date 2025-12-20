@@ -72,7 +72,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func openSettings() {
         if settingsWindow == nil {
             let contentView = SettingsView()
-                .environmentObject(AppSettings.shared)
+                .environment(AppSettings.shared)
 
             let window = NSWindow(
                 contentRect: NSRect(x: 0, y: 0, width: 350, height: 200),

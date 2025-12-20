@@ -7,6 +7,11 @@ extension TagManagerView {
         var commentText: String = ""
         var groupingText: String = ""
 
+        var enforceWhitelists: Bool {
+            get { AppSettings.shared.enforceWhitelists }
+            set { AppSettings.shared.enforceWhitelists = newValue }
+        }
+
         init() {
             load()
         }
@@ -30,16 +35,11 @@ extension TagManagerView {
 struct TagManagerView: View {
     @Bindable var viewModel: ViewModel
 
-    @State private var isEnabled: Bool = true
-
-    var onSubmit: (() -> Void)?
-
     var body: some View {
-        VStack {
+        VStack(spacing: 20) {
             toggle
-                .padding(.bottom, 20)
 
-            if isEnabled {
+            if viewModel.enforceWhitelists {
                 VStack(spacing: 20) {
                     WhitelistEditor(title: "Genre", text: $viewModel.genreText)
 
@@ -55,7 +55,11 @@ struct TagManagerView: View {
 
     var toggle: some View {
         VStack(alignment: .leading) {
-            Toggle("Limit input to whitelists", isOn: $isEnabled)
+            Toggle(
+                "Limit input to whitelists",
+                isOn: $viewModel.enforceWhitelists
+            )
+
             Text(
                 """
                 Only allow whitelisted keywords when editing track metadata.
@@ -70,11 +74,9 @@ struct TagManagerView: View {
     }
 
     init(
-        viewModel: ViewModel,
-        onSubmit: (() -> Void)? = nil
+        viewModel: ViewModel
     ) {
         self.viewModel = viewModel
-        self.onSubmit = onSubmit
     }
 }
 

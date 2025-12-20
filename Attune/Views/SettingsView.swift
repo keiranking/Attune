@@ -1,25 +1,13 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @EnvironmentObject var settings: AppSettings
+    @Environment(AppSettings.self) var settings
 
     var body: some View {
         Form {
-            Section(header: Text("Global Hotkey")) {
-                HStack {
-                    Text("Toggle Attune:")
-                    Spacer()
-                    Text(settings.shortcutDescription)
-                        .foregroundColor(.secondary)
-                    Button("Edit") {
-                        // Placeholder
-                    }
-                }
-            }
-
             Section {
                 Text("Attune")
-                Text("Curate your music with keywords and moods.")
+                Text("Curate your music with keywords.")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }

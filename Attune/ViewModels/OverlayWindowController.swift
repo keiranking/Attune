@@ -85,7 +85,7 @@ final class OverlayWindowController {
             viewModel: viewModel,
             onSubmit: submit
         )
-        .environmentObject(AppSettings.shared)
+        .environment(AppSettings.shared)
         .environment(music)
 
         hosting.rootView = AnyView(overlayView)
