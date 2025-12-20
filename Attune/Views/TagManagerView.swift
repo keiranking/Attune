@@ -1,13 +1,38 @@
 import SwiftUI
 
-struct TagManagerView: View {
-    @Environment(TagLibrary.self) var library
+extension TagManagerView {
+    @Observable
+    final class ViewModel {
+        var genreText: String = ""
+        var commentText: String = ""
+        var groupingText: String = ""
 
-    @State private var genreText: String
-    @State private var commentText: String
-    @State private var groupingText: String
+        init() {
+            load()
+        }
+
+        func load() {
+            genreText = TagLibrary.shared.genreTags.listed
+            commentText = TagLibrary.shared.commentTags.listed
+            groupingText = TagLibrary.shared.groupingTags.listed
+        }
+
+        func save() {
+            TagLibrary.shared.updateTags([
+                TagLibrary.tags(from: genreText, in: .genre),
+                TagLibrary.tags(from: commentText, in: .comment),
+                TagLibrary.tags(from: groupingText, in: .grouping)
+            ].flatMap { $0 })
+        }
+    }
+}
+
+struct TagManagerView: View {
+    @Bindable var viewModel: ViewModel
 
     @State private var isEnabled: Bool = true
+
+    var onSubmit: (() -> Void)?
 
     var body: some View {
         VStack {
@@ -16,17 +41,16 @@ struct TagManagerView: View {
 
             if isEnabled {
                 VStack(spacing: 20) {
-                    WhitelistEditor(title: "Genre", text: $genreText)
+                    WhitelistEditor(title: "Genre", text: $viewModel.genreText)
 
-                    WhitelistEditor(title: "Comments", text: $commentText)
+                    WhitelistEditor(title: "Comments", text: $viewModel.commentText)
 
-                    WhitelistEditor(title: "Grouping", text: $groupingText)
+                    WhitelistEditor(title: "Grouping", text: $viewModel.groupingText)
                 }
             }
         }
         .padding()
         .frame(width: 400)
-        .onDisappear(perform: updateTags)
     }
 
     var toggle: some View {
@@ -45,20 +69,12 @@ struct TagManagerView: View {
         }
     }
 
-    private func updateTags() {
-        print("Updating tags...")
-        var newTags: [Tag] = []
-        newTags.append(contentsOf: TagLibrary.makeTags(from: genreText, in: .genre))
-        newTags.append(contentsOf: TagLibrary.makeTags(from: commentText, in: .comment))
-        newTags.append(contentsOf: TagLibrary.makeTags(from: groupingText, in: .grouping))
-
-        library.tags = newTags
-    }
-
-    init() {
-        genreText = TagLibrary.shared.genreTags.listed
-        commentText = TagLibrary.shared.commentTags.listed
-        groupingText = TagLibrary.shared.groupingTags.listed
+    init(
+        viewModel: ViewModel,
+        onSubmit: (() -> Void)? = nil
+    ) {
+        self.viewModel = viewModel
+        self.onSubmit = onSubmit
     }
 }
 

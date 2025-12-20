@@ -6,7 +6,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var overlayController: OverlayWindowController!
     var hotKeyManager: HotKeyManager!
 
-    var tagManagerWindow: NSWindow?
+    var tagManagerController: TagManagerWindowController!
     var settingsWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -18,6 +18,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.menu = createMenu()
 
         overlayController = OverlayWindowController()
+        tagManagerController = TagManagerWindowController()
 
         hotKeyManager = HotKeyManager()
         let hotKey = ( // Default: Cmd+Opt+Ctrl+Space (49)
@@ -65,24 +66,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func openTagManager() {
-        if tagManagerWindow == nil {
-            let contentView = TagManagerView()
-                .environment(TagLibrary.shared)
-
-            let window = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 400, height: 500),
-                styleMask: [.titled, .closable, .miniaturizable, .resizable],
-                backing: .buffered, defer: false
-            )
-            window.title = "Manage Whitelists"
-            window.center()
-            window.contentView = NSHostingView(rootView: contentView)
-            window.isReleasedWhenClosed = false
-            tagManagerWindow = window
-        }
-
-        NSApp.activate()
-        tagManagerWindow?.makeKeyAndOrderFront(nil)
+        tagManagerController.show()
     }
 
     @objc func openSettings() {

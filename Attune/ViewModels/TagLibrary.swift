@@ -6,7 +6,7 @@ import SwiftUI
 final class TagLibrary {
     static let shared = TagLibrary()
 
-    var tags: [Tag] = [] {
+    private(set) var tags: [Tag] = [] {
         didSet { save() }
     }
 
@@ -23,6 +23,10 @@ final class TagLibrary {
     }
 
     // MARK: - CRUD
+
+    func updateTags(_ tags: [Tag]) {
+        self.tags = tags
+    }
 
     func addTag(name: String, category: TagCategory) {
         guard !name.trimmingCharacters(in: .whitespaces).isEmpty else { return }
@@ -62,13 +66,16 @@ final class TagLibrary {
         return Set(filtered.map { $0.normalizedName })
     }
 
-    static func makeTags(from csv: String, in category: TagCategory) -> [Tag] {
+    static func tags(from csv: String, in category: TagCategory) -> [Tag] {
         csv
             .components(separatedBy: ",")
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty && !TagLibrary.blacklist.contains($0.lowercased()) }
             .map { Tag(name: String($0), category: category) }
 
     }
+
+    static var blacklist: [String] = Track.ratingRange.map { "\($0)" }
 
     // MARK: - Persistence
 
