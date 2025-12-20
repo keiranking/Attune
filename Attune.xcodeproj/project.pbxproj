@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		379B95E02EF71989006F4448 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 379B95DF2EF71989006F4448 /* Algorithms */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		37B4EEEA2EEB27660083A145 /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = System/Library/Frameworks/ScriptingBridge.framework; sourceTree = SDKROOT; };
 		37D8F3122EDC6CD600B5DA27 /* Attune.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Attune.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -24,6 +28,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				379B95E02EF71989006F4448 /* Algorithms in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,6 +80,7 @@
 			);
 			name = Attune;
 			packageProductDependencies = (
+				379B95DF2EF71989006F4448 /* Algorithms */,
 			);
 			productName = Attune;
 			productReference = 37D8F3122EDC6CD600B5DA27 /* Attune.app */;
@@ -105,6 +111,9 @@
 			);
 			mainGroup = 37D8F3092EDC6CD600B5DA27;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				379B95DE2EF71989006F4448 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 37D8F3132EDC6CD600B5DA27 /* Products */;
 			projectDirPath = "";
@@ -371,6 +380,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		379B95DE2EF71989006F4448 /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-algorithms.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		379B95DF2EF71989006F4448 /* Algorithms */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 379B95DE2EF71989006F4448 /* XCRemoteSwiftPackageReference "swift-algorithms" */;
+			productName = Algorithms;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 37D8F30A2EDC6CD600B5DA27 /* Project object */;
 }

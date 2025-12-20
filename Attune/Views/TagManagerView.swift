@@ -19,9 +19,9 @@ extension TagManagerView {
 
         func save() {
             TagLibrary.shared.updateTags([
-                TagLibrary.tags(from: genreText, in: .genre),
-                TagLibrary.tags(from: commentText, in: .comment),
-                TagLibrary.tags(from: groupingText, in: .grouping)
+                TagLibrary.tags(from: genreText, as: .genre),
+                TagLibrary.tags(from: commentText, as: .comment),
+                TagLibrary.tags(from: groupingText, as: .grouping)
             ].flatMap { $0 })
         }
     }

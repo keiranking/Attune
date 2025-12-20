@@ -1,6 +1,5 @@
 import Foundation
-import Combine
-import SwiftUI
+import Algorithms
 
 @Observable
 final class TagLibrary {
@@ -9,8 +8,6 @@ final class TagLibrary {
     private(set) var tags: [Tag] = [] {
         didSet { save() }
     }
-
-    // MARK: Helpers
 
     var genreTags: [Tag] { tags.filter { $0.category == .genre} }
     var commentTags: [Tag] { tags.filter { $0.category == .comment} }
@@ -26,27 +23,9 @@ final class TagLibrary {
 
     func updateTags(_ tags: [Tag]) {
         self.tags = tags
-    }
-
-    func addTag(name: String, category: TagCategory) {
-        guard !name.trimmingCharacters(in: .whitespaces).isEmpty else { return }
-        guard !exists(name: name) else { return }
-        let newTag = Tag(name: name, category: category)
-        tags.append(newTag)
-    }
-
-    func deleteTags(at offsets: IndexSet, in category: TagCategory? = nil) {
-        if let category = category {
-            let categoryTags = tags.enumerated().filter { $0.element.category == category }
-            let indicesToDelete = offsets.map { categoryTags[$0].offset }
-            tags.remove(atOffsets: IndexSet(indicesToDelete))
-        } else {
-            tags.remove(atOffsets: offsets)
-        }
-    }
-
-    func exists(name: String) -> Bool {
-        tags.contains { $0.normalizedName == name.trimmingCharacters(in: .whitespaces).lowercased() }
+            .filter { !TagLibrary.blacklist.contains($0.normalizedName) }
+            .uniqued(on: { $0.normalizedName })
+            .sorted()
     }
 
     // MARK: - Helpers
@@ -66,11 +45,13 @@ final class TagLibrary {
         return Set(filtered.map { $0.normalizedName })
     }
 
-    static func tags(from csv: String, in category: TagCategory) -> [Tag] {
+    static func tags(from csv: String, as category: TagCategory) -> [Tag] {
         csv
             .components(separatedBy: ",")
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty && !TagLibrary.blacklist.contains($0.lowercased()) }
+            .filter { !$0.isEmpty }
+            .uniqued(on: { $0.lowercased() })
+            .sorted()
             .map { Tag(name: String($0), category: category) }
 
     }
