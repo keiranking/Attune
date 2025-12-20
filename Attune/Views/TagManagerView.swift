@@ -62,8 +62,8 @@ struct TagManagerView: View {
 
             Text(
                 """
-                Only allow whitelisted keywords when editing track metadata.
-                Existing metadata is not affected. Separate keywords with commas.
+                Only allow whitelisted keywords to be added to tracks.
+                Separate keywords with commas.
                 """
             )
                 .font(.caption)

@@ -54,9 +54,15 @@ extension Music {
 
             if !tokens.isEmpty {
                 for i in mutated.indices {
-                    mode == .add
-                    ? mutated[i].add(tokens: tokens)
-                    : mutated[i].remove(tokens: tokens)
+                    if mode == .remove {
+                        mutated[i].remove(tokens: tokens)
+                    } else {
+                        let tags = AppSettings.shared.enforceWhitelists
+                        ? TagLibrary.shared.tags.filter { tokens.contains($0.normalizedName) }
+                        : TagLibrary.tags(from: tokens.joined(separator: ", "), as: .comment)
+
+                        mutated[i].add(tags: tags)
+                    }
                 }
                 writeMetadata(mutated)
             }

@@ -41,7 +41,7 @@ struct Track: Identifiable, Codable, Hashable {
 
     mutating func add(tokens: [String]) {
         for token in tokens {
-            guard let category = TagLibrary.shared.category(for: token) else { break }
+            let category = TagLibrary.shared.category(for: token) ?? .comment
             let tag = Tag(name: token, category: category)
             tags.insert(tag)
         }
