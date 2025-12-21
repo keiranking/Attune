@@ -6,10 +6,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var overlayController: OverlayWindowController!
     var hotKeyManager: HotKeyManager!
 
-    var settingsController: SettingsWindowController!
-    var settingsWindow: NSWindow?
+    let whitelistSettingsViewModel = WhitelistSettingsView.ViewModel()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+//        NSApp.setActivationPolicy(.accessory)
+
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem.button {
             button.image = NSImage(systemSymbolName: "tag",
@@ -18,7 +19,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.menu = createMenu()
 
         overlayController = OverlayWindowController()
-        settingsController = SettingsWindowController()
 
         hotKeyManager = HotKeyManager()
         let hotKey = ( // Default: Cmd+Opt+Ctrl+Space (49)
@@ -44,8 +44,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(NSMenuItem.separator())
 
         menu.addItem(NSMenuItem(title: "Settings...",
-                                action: #selector(openSettings),
-                                keyEquivalent: ""))
+                                action: nil,
+                                keyEquivalent: ","))
 
         menu.addItem(NSMenuItem.separator())
 
@@ -59,10 +59,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc func toggleOverlay(_ sender: Any?) {
         overlayController.isShown ? overlayController.hide() : overlayController.show()
-    }
-
-    @objc func openSettings() {
-        settingsController.show()
     }
 
     func applicationWillTerminate(_ notification: Notification) {

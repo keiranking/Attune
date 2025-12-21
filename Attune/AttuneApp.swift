@@ -6,7 +6,10 @@ struct AttuneApp: App {
 
     var body: some Scene {
         Settings {
-            EmptyView() // prevents default window, but persists app lifecycle
+            SettingsView(
+                whitelistSettingsViewModel: appDelegate.whitelistSettingsViewModel
+            )
+            .environment(AppSettings.shared)
         }
     }
 }
