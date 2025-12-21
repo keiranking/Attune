@@ -39,15 +39,26 @@ struct TagManagerView: View {
         VStack(spacing: 20) {
             toggle
 
-            if viewModel.enforceWhitelists {
-                VStack(spacing: 20) {
-                    WhitelistEditor(title: "Genre", text: $viewModel.genreText)
+            VStack(spacing: 20) {
+                WhitelistEditor(
+                    title: "Genre",
+                    text: $viewModel.genreText,
+                    placeholder: "Classical, Jazz, Reggae"
+                )
 
-                    WhitelistEditor(title: "Comments", text: $viewModel.commentText)
+                WhitelistEditor(
+                    title: "Comments",
+                    text: $viewModel.commentText,
+                    placeholder: "lively, sad, traditional"
+                )
 
-                    WhitelistEditor(title: "Grouping", text: $viewModel.groupingText)
-                }
+                WhitelistEditor(
+                    title: "Grouping",
+                    text: $viewModel.groupingText,
+                    placeholder: "brass, strings, vocal"
+                )
             }
+            .disabled(!viewModel.enforceWhitelists)
         }
         .padding()
         .frame(width: 400)
@@ -56,14 +67,14 @@ struct TagManagerView: View {
     var toggle: some View {
         VStack(alignment: .leading) {
             Toggle(
-                "Limit input to whitelists",
+                "Enforce whitelists",
                 isOn: $viewModel.enforceWhitelists
             )
 
             Text(
                 """
                 Only allow whitelisted keywords to be added to tracks.
-                Separate keywords with commas.
+                Existing metadata is not affected.
                 """
             )
                 .font(.caption)
@@ -83,6 +94,7 @@ struct TagManagerView: View {
 private struct WhitelistEditor: View {
     let title: String
     @Binding var text: String
+    let placeholder: String?
 
     @FocusState private var isFocused: Bool
 
@@ -91,20 +103,17 @@ private struct WhitelistEditor: View {
             Text(title)
                 .font(.headline)
 
-            TextEditor(text: $text)
+            TextField(placeholder ?? "", text: $text, axis: .vertical)
                 .focused($isFocused)
-                .scrollContentBackground(.hidden)
-                .padding(4)
-                .background {
-                    RoundedRectangle(cornerRadius: 8)
-                        .foregroundStyle(.background)
-                }
-                .overlay {
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(isFocused ? Color.accentColor : Color.primary.opacity(0.1), lineWidth: 1)
-                }
+                .lineLimit(5, reservesSpace: true)
                 .font(.body)
-                .frame(minHeight: 100)
+                .frame(maxWidth: .infinity)
         }
+    }
+
+    init(title: String, text: Binding<String>, placeholder: String? = nil) {
+        self.title = title
+        self._text = text
+        self.placeholder = placeholder
     }
 }
