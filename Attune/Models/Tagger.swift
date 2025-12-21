@@ -57,7 +57,7 @@ extension Music {
                     if mode == .remove {
                         mutated[i].remove(tokens: tokens)
                     } else {
-                        let tags = AppSettings.shared.enforceWhitelists
+                        let tags = AppSettings.shared.enforceWhitelist
                         ? TagLibrary.shared.tags.filter { tokens.contains($0.normalizedName) }
                         : TagLibrary.tags(from: tokens.joined(separator: ", "), as: .comment)
 

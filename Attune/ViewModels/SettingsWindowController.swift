@@ -1,8 +1,8 @@
 import Cocoa
 import SwiftUI
 
-final class TagManagerWindowController: NSObject, NSWindowDelegate {
-    let viewModel = TagManagerView.ViewModel()
+final class SettingsWindowController: NSObject, NSWindowDelegate {
+    let whitelistSettingsViewModel = WhitelistSettingsView.ViewModel()
     let window: NSWindow
 
     var isShown: Bool { window.isVisible }
@@ -17,11 +17,11 @@ final class TagManagerWindowController: NSObject, NSWindowDelegate {
 
         super.init()
 
-        let view = TagManagerView(
-            viewModel: viewModel
+        let view = WhitelistSettingsView(
+            viewModel: whitelistSettingsViewModel
         )
 
-        window.title = "Manage Whitelists"
+        window.title = "Manage Whitelist"
         window.center()
         window.contentView = NSHostingView(rootView: view)
         window.isReleasedWhenClosed = false
@@ -30,7 +30,7 @@ final class TagManagerWindowController: NSObject, NSWindowDelegate {
     }
 
     func show() {
-        viewModel.load()
+        whitelistSettingsViewModel.load()
         NSApp.activate()
         window.makeKeyAndOrderFront(nil)
     }
@@ -40,6 +40,6 @@ final class TagManagerWindowController: NSObject, NSWindowDelegate {
     }
 
     func windowWillClose(_ notification: Notification) {
-        viewModel.save()
+        whitelistSettingsViewModel.save()
     }
 }

@@ -1,15 +1,15 @@
 import SwiftUI
 
-extension TagManagerView {
+extension WhitelistSettingsView {
     @Observable
     final class ViewModel {
         var genreText: String = ""
         var commentText: String = ""
         var groupingText: String = ""
 
-        var enforceWhitelists: Bool {
-            get { AppSettings.shared.enforceWhitelists }
-            set { AppSettings.shared.enforceWhitelists = newValue }
+        var enforceWhitelist: Bool {
+            get { AppSettings.shared.enforceWhitelist }
+            set { AppSettings.shared.enforceWhitelist = newValue }
         }
 
         init() {
@@ -32,7 +32,7 @@ extension TagManagerView {
     }
 }
 
-struct TagManagerView: View {
+struct WhitelistSettingsView: View {
     @Bindable var viewModel: ViewModel
 
     var body: some View {
@@ -58,7 +58,7 @@ struct TagManagerView: View {
                     placeholder: "brass, strings, vocal"
                 )
             }
-            .disabled(!viewModel.enforceWhitelists)
+            .disabled(!viewModel.enforceWhitelist)
         }
         .padding()
         .frame(width: 400)
@@ -67,8 +67,8 @@ struct TagManagerView: View {
     var toggle: some View {
         VStack(alignment: .leading) {
             Toggle(
-                "Enforce whitelists",
-                isOn: $viewModel.enforceWhitelists
+                "Enforce whitelist",
+                isOn: $viewModel.enforceWhitelist
             )
 
             Text(

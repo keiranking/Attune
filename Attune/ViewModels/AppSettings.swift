@@ -5,21 +5,21 @@ import Combine
 final class AppSettings {
     static let shared = AppSettings()
 
-    var enforceWhitelists: Bool {
+    var enforceWhitelist: Bool {
         didSet {
-            defaults.set(enforceWhitelists, forKey: StorageKey.enforceWhitelists)
+            defaults.set(enforceWhitelist, forKey: StorageKey.enforceWhitelist)
         }
     }
 
     private let defaults = UserDefaults.standard
 
     private init() {
-        self.enforceWhitelists = defaults.bool(forKey: StorageKey.enforceWhitelists)
+        self.enforceWhitelist = defaults.bool(forKey: StorageKey.enforceWhitelist)
     }
 }
 
 private extension AppSettings {
     enum StorageKey {
-        static let enforceWhitelists = "Attune.AppSettings.enforceWhitelists"
+        static let enforceWhitelist = "Attune.AppSettings.enforceWhitelist"
     }
 }

@@ -6,7 +6,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var overlayController: OverlayWindowController!
     var hotKeyManager: HotKeyManager!
 
-    var tagManagerController: TagManagerWindowController!
+    var settingsController: SettingsWindowController!
     var settingsWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -18,7 +18,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.menu = createMenu()
 
         overlayController = OverlayWindowController()
-        tagManagerController = TagManagerWindowController()
+        settingsController = SettingsWindowController()
 
         hotKeyManager = HotKeyManager()
         let hotKey = ( // Default: Cmd+Opt+Ctrl+Space (49)
@@ -43,11 +43,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
-        menu.addItem(NSMenuItem(title: "Manage Whitelists...",
-                                action: #selector(openTagManager),
-                                keyEquivalent: ""))
-
-        menu.addItem(NSMenuItem(title: "Preferences...",
+        menu.addItem(NSMenuItem(title: "Settings...",
                                 action: #selector(openSettings),
                                 keyEquivalent: ""))
 
@@ -65,29 +61,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         overlayController.isShown ? overlayController.hide() : overlayController.show()
     }
 
-    @objc func openTagManager() {
-        tagManagerController.show()
-    }
-
     @objc func openSettings() {
-        if settingsWindow == nil {
-            let contentView = SettingsView()
-                .environment(AppSettings.shared)
-
-            let window = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 350, height: 200),
-                styleMask: [.titled, .closable],
-                backing: .buffered, defer: false
-            )
-            window.title = "Preferences"
-            window.center()
-            window.contentView = NSHostingView(rootView: contentView)
-            window.isReleasedWhenClosed = false
-            settingsWindow = window
-        }
-
-        NSApp.activate()
-        settingsWindow?.makeKeyAndOrderFront(nil)
+        settingsController.show()
     }
 
     func applicationWillTerminate(_ notification: Notification) {
