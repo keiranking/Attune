@@ -101,7 +101,7 @@ final class OverlayViewModel {
     }
     var selectedTrackSubtitle: ScopeRowView.SubtitleContent {
         switch selectedTracks.count {
-        case 0:     .text("Select a track in the Music app")
+        case 0:     .text("Select track(s) in the Music app")
         case 1:     showSecondaryInfo
                     ? .text(selectedTrackArtist ?? "")
                     : .label(text: selectedTrackMetadata ?? "",
@@ -194,6 +194,7 @@ struct OverlayView: View {
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .task { isFocused = true }
         .overlay { keyboardShortcuts }
+        .disabled(music.isClosed)
     }
 
     var omniBar: some View {
