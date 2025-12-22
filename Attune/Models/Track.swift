@@ -1,7 +1,11 @@
 import Foundation
 
+extension Track {
+    typealias PersistentID = String
+}
+
 struct Track: Identifiable, Codable, Hashable {
-    let id: String
+    let id: PersistentID
     let title: String
     let artist: String
     var rating: Int
@@ -66,7 +70,7 @@ extension Track: Equatable {
 }
 
 extension Track {
-    init(id: String, title: String, artist: String, rating: Int, comment: String, grouping: String, genre: String) {
+    init(id: PersistentID, title: String, artist: String, rating: Int, comment: String, grouping: String, genre: String) {
         self.id = id
         self.title = title
         self.artist = artist
