@@ -2,8 +2,8 @@ import Foundation
 import Algorithms
 
 @Observable
-final class TagLibrary {
-    static let shared = TagLibrary()
+final class Whitelist {
+    static let shared = Whitelist()
 
     private(set) var tags: [Tag] = [] {
         didSet { save() }
@@ -13,7 +13,7 @@ final class TagLibrary {
     var commentTags: [Tag] { tags.filter { $0.category == .comment} }
     var groupingTags: [Tag] { tags.filter { $0.category == .grouping} }
 
-    private let storageKey = "Attune.TagLibrary.tags"
+    private let storageKey = "Attune.Whitelist.tags"
 
     init() {
         load()
@@ -23,14 +23,14 @@ final class TagLibrary {
 
     func updateTags(_ tags: [Tag]) {
         self.tags = tags
-            .filter { !TagLibrary.blacklist.contains($0.normalizedName) }
+            .filter { !Whitelist.blacklist.contains($0.normalizedName) }
             .uniqued(on: { $0.normalizedName })
             .sorted()
     }
 
     // MARK: - Helpers
 
-    func category(for tagName: String) -> TagCategory? {
+    func category(for tagName: String) -> Tag.Category? {
         let normalized = tagName.trimmingCharacters(in: .whitespaces).lowercased()
 
         if getWhitelist(for: .genre).contains(normalized) { return .genre }
@@ -40,12 +40,12 @@ final class TagLibrary {
         return nil
     }
 
-    func getWhitelist(for category: TagCategory) -> Set<String> {
+    func getWhitelist(for category: Tag.Category) -> Set<String> {
         let filtered = tags.filter { $0.category == category }
         return Set(filtered.map { $0.normalizedName })
     }
 
-    static func tags(from csv: String, as category: TagCategory) -> [Tag] {
+    static func tags(from csv: String, as category: Tag.Category) -> [Tag] {
         csv
             .components(separatedBy: ",")
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }

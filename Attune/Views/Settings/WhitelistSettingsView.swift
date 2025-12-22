@@ -17,16 +17,16 @@ extension WhitelistSettingsView {
         }
 
         func load() {
-            genreText = TagLibrary.shared.genreTags.listed
-            commentText = TagLibrary.shared.commentTags.listed
-            groupingText = TagLibrary.shared.groupingTags.listed
+            genreText = Whitelist.shared.genreTags.listed
+            commentText = Whitelist.shared.commentTags.listed
+            groupingText = Whitelist.shared.groupingTags.listed
         }
 
         func save() {
-            TagLibrary.shared.updateTags([
-                TagLibrary.tags(from: genreText, as: .genre),
-                TagLibrary.tags(from: commentText, as: .comment),
-                TagLibrary.tags(from: groupingText, as: .grouping)
+            Whitelist.shared.updateTags([
+                Whitelist.tags(from: genreText, as: .genre),
+                Whitelist.tags(from: commentText, as: .comment),
+                Whitelist.tags(from: groupingText, as: .grouping)
             ].flatMap { $0 })
         }
     }

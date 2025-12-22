@@ -41,7 +41,7 @@ struct Track: Identifiable, Codable, Hashable {
 
     mutating func add(tokens: [String]) {
         for token in tokens {
-            let category = TagLibrary.shared.category(for: token) ?? .comment
+            let category = Whitelist.shared.category(for: token) ?? .comment
             let tag = Tag(name: token, category: category)
             tags.insert(tag)
         }
@@ -79,7 +79,7 @@ extension Track {
         self.tags.formUnion(Track.parseTags(from: genre, category: .genre))
     }
 
-    private static func parseTags(from string: String, category: TagCategory) -> Set<Tag> {
+    private static func parseTags(from string: String, category: Tag.Category) -> Set<Tag> {
         let names = string.components(separatedBy: ",")
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }

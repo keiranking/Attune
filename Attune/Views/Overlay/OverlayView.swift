@@ -3,10 +3,10 @@ import SwiftUI
 @Observable
 final class OverlayViewModel {
     var text: String = ""
-    var scope: TaggingScope?
-    var mode: TaggingMode = .add
-    var state: TaggingState = .ready
-    var outcome: TaggingOutcome? = nil
+    var scope: Tagging.Scope?
+    var mode: Tagging.Mode = .add
+    var state: Tagging.State = .ready
+    var outcome: Tagging.Outcome? = nil
 
     var currentTrack: Track?
     var selectedTracks: [Track] = []
@@ -16,7 +16,7 @@ final class OverlayViewModel {
     var showSecondaryInfo: Bool = false
 
     var textPlaceholder: String {
-        TagLibrary.shared.tags.count < 5 ? "Enter space-separated tags" : ""
+        Whitelist.shared.tags.count < 5 ? "Enter space-separated tags" : ""
     }
 
     // MARK: Current track, derived properties
@@ -215,7 +215,7 @@ struct OverlayView: View {
 
     var modeControls: some View {
         Picker("", selection: $viewModel.mode) {
-            ForEach(TaggingMode.allCases, id: \.self) { mode in
+            ForEach(Tagging.Mode.allCases, id: \.self) { mode in
                 Image(systemName: mode.systemImage).tag(mode)
             }
         }

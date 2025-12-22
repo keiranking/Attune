@@ -21,8 +21,8 @@ extension Music {
 
         func process(
             command: String,
-            scope: TaggingScope?,
-            mode: TaggingMode
+            scope: Tagging.Scope?,
+            mode: Tagging.Mode
         ) async -> Result<Void, Tagger.Error> {
 
             Music.shared.refresh()
@@ -58,8 +58,8 @@ extension Music {
                         mutated[i].remove(tokens: tokens)
                     } else {
                         let tags = AppSettings.shared.enforceWhitelist
-                        ? TagLibrary.shared.tags.filter { tokens.contains($0.normalizedName) }
-                        : TagLibrary.tags(from: tokens.joined(separator: ", "), as: .comment)
+                        ? Whitelist.shared.tags.filter { tokens.contains($0.normalizedName) }
+                        : Whitelist.tags(from: tokens.joined(separator: ", "), as: .comment)
 
                         mutated[i].add(tags: tags)
                     }
@@ -131,7 +131,7 @@ extension Music {
 
         private func verify(
             expected: [Track],
-            scope: TaggingScope?
+            scope: Tagging.Scope?
         ) async -> Result<Void, Tagger.Error> {
 
             let expectedByID = Dictionary(
