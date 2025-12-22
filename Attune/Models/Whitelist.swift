@@ -21,7 +21,7 @@ final class Whitelist {
 
     // MARK: - CRUD
 
-    func updateTags(_ tags: [Tag]) {
+    func replace(with tags: [Tag]) {
         self.tags = tags
             .filter { !Whitelist.blacklist.contains($0.normalizedName) }
             .uniqued(on: { $0.normalizedName })
@@ -71,12 +71,12 @@ final class Whitelist {
            let decoded = try? JSONDecoder().decode([Tag].self, from: data) {
             self.tags = decoded.sorted { $0.name < $1.name }
         } else {
-            seedDefaults()
+            self.tags = exampleTags()
         }
     }
 
-    private func seedDefaults() {
-        let defaultComments = [
+    private func exampleTags() -> [Tag] {
+        let comments = [
             "action", "advice", "ballad", "celebration", "clip", "ethnic", "exmas",
             "family", "forgiveness", "friendship", "grand", "heroic", "island", "light",
             "lively", "longing", "lust", "new", "nostalgic", "old", "promise", "rare",
@@ -84,22 +84,23 @@ final class Whitelist {
             "seduction", "self", "sexy", "sinister", "slow", "society", "traditional",
             "theme"
         ]
-        let defaultGroupings = [
+        let groupings = [
             "boy", "girl", "vocal", "group", "choir", "acapella", "brass", "chant",
             "guitar", "organ", "pan", "piano", "perc", "strings", "synth", "wind",
             "whistle", "solo", "band", "orchestra"
         ]
-        let defaultGenres = [
+        let genres = [
             "Alternative", "Broadway", "Blues", "Christmas", "Classical", "Country",
             "Electronica", "Folk", "Jazz", "Karaoke", "Latin", "OST", "Personal", "Pop",
             "R&B", "Rap", "Reggae", "Rock", "Soca", "Soul", "Standards"
         ]
 
-        var newTags: [Tag] = []
-        newTags.append(contentsOf: defaultComments.map { Tag(name: $0, category: .comment) })
-        newTags.append(contentsOf: defaultGroupings.map { Tag(name: $0, category: .grouping) })
-        newTags.append(contentsOf: defaultGenres.map { Tag(name: $0, category: .genre) })
-
-        self.tags = newTags.sorted { $0.name < $1.name }
+        return [
+            comments.map    { Tag(name: $0, category: .comment) },
+            groupings.map   { Tag(name: $0, category: .grouping) },
+            genres.map      { Tag(name: $0, category: .genre) }
+        ]
+            .flatMap { $0 }
+            .sorted { $0.name < $1.name }
     }
 }

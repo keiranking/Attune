@@ -23,7 +23,7 @@ extension WhitelistSettingsView {
         }
 
         func save() {
-            Whitelist.shared.updateTags([
+            Whitelist.shared.replace(with: [
                 Whitelist.tags(from: genreText, as: .genre),
                 Whitelist.tags(from: commentText, as: .comment),
                 Whitelist.tags(from: groupingText, as: .grouping)
