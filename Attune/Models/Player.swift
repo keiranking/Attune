@@ -4,20 +4,18 @@ extension Music {
             Music.shared.playbackState == .playing
         }
 
-        var isDisabled: Bool {
-            Music.shared.app == nil
-        }
+        var isDisabled: Bool { Music.shared.isClosed }
 
         func playPause() {
-            Music.shared.app?.playpause()
+            Music.shared.withApp { $0.playpause() }
         }
 
         func next() {
-            Music.shared.app?.nextTrack()
+            Music.shared.withApp { $0.nextTrack() }
         }
 
         func previous() {
-            Music.shared.app?.previousTrack()
+            Music.shared.withApp { $0.previousTrack() }
         }
     }
 }

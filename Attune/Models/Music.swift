@@ -6,15 +6,14 @@ import ScriptingBridge
 final class Music { // core functions, setup
     static let shared = Music()
 
-    var currentTrack: Track?
+    var currentTrack: Track? = nil
     var selectedTracks: [Track] = []
 
-    var playbackState: PlaybackState?
+    var playbackState: PlaybackState? = nil
 
     let player = Player()
     let tagger = Tagger()
 
-    private var proxy: MusicApplication?
     var onChange: (() -> Void)?
 
     private init() {
@@ -42,25 +41,30 @@ extension Music {
     }
 }
 
-extension Music { // ensure we can always connect to and control the Music app
-    var app: MusicApplication? {
-        validateProxy()
-        return proxy
+extension Music {
+    func withApp<T>(_ work: (MusicApplication) -> T) -> T? {
+        let apps = NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.Music")
+
+        guard let musicApp = apps.first(where: { !$0.isTerminated })
+        else { return nil }
+
+        let pid = musicApp.processIdentifier
+        guard let base = SBApplication(processIdentifier: pid),
+              let app = unsafeBitCast(base, to: MusicApplication.self) as MusicApplication?
+        else { return nil }
+
+        return work(app)
     }
 
-    private func validateProxy() {
-        if proxy == nil || proxy?.isRunning == false {
-            proxy = createProxy()
-        }
+    var isOpen: Bool {
+        guard
+            let app = NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.Music").first
+        else { return false }
+
+        return !app.isTerminated && app.processIdentifier != -1
     }
 
-    private func createProxy() -> MusicApplication? {
-        guard let base = SBApplication(bundleIdentifier: "com.apple.Music") else {
-            print("MusicApp: SBApplication returned nil.")
-            return nil
-        }
-        return unsafeBitCast(base, to: MusicApplication.self)
-    }
+    var isClosed: Bool { !isOpen }
 }
 
 extension Music { // respond and update
@@ -70,25 +74,34 @@ extension Music { // respond and update
         }
 
         Task {
-            try? await Task.sleep(nanoseconds: 20_000_000)
+            try? await Task.sleep(nanoseconds: 100_000_000)
+
             refresh()
             await MainActor.run { onChange?() }
         }
     }
 
     func refresh() {
+        guard isOpen else {
+            reset()
+            return
+        }
+
         readCurrentTrack()
         readSelection()
         readPlayerState()
     }
 
+    func reset() {
+        currentTrack = nil
+        selectedTracks = []
+        playbackState = nil
+    }
+
     private func readCurrentTrack() {
-        if let musicTrack = app?.currentTrack,
-           let track = Track(musicTrack: musicTrack) {
-            currentTrack = track
-        } else {
-            currentTrack = nil
-        }
+        currentTrack = withApp {
+            Track(musicTrack: $0.currentTrack)
+        } ?? nil
     }
 
     private func readSelection() {
@@ -96,16 +109,16 @@ extension Music { // respond and update
     }
 
     private func readPlayerState() {
-        guard let state = app?.playerState else { return }
-
-        playbackState = switch state {
-        case MusicEPlSPlaying:          .playing
-        case MusicEPlSPaused:           .paused
-        case MusicEPlSStopped:          .stopped
-        case MusicEPlSFastForwarding:   .seekingForward
-        case MusicEPlSRewinding:        .seekingBackward
-        default: nil
-        }
+        playbackState = withApp {
+            switch $0.playerState {
+            case MusicEPlSPlaying:          .playing
+            case MusicEPlSPaused:           .paused
+            case MusicEPlSStopped:          .stopped
+            case MusicEPlSFastForwarding:   .seekingForward
+            case MusicEPlSRewinding:        .seekingBackward
+            default: nil
+            }
+        } ?? nil
     }
 }
 
