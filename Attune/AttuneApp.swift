@@ -114,9 +114,7 @@ extension AttuneApp {
         private func showOverlay() {
             guard let window = overlayWindow else { return }
 
-            overlayViewModel.text = ""
-            overlayViewModel.mode = .add
-            overlayViewModel.scope = nil
+            overlayViewModel.reset()
             sync()
 
             if let screenFrame = NSScreen.main?.visibleFrame {

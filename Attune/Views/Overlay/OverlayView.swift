@@ -113,6 +113,13 @@ final class OverlayViewModel {
 
     // MARK: Functions
 
+    func reset() {
+        text = ""
+        mode = .add
+        scope = nil
+        state = .ready
+    }
+
     func chooseDefaultScope() {
         if hasCurrentTrack { scope = .current }
         else if hasSelectedTracks { scope = .selection }

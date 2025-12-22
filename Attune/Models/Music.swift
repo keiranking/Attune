@@ -79,6 +79,7 @@ extension Music { // respond and update
     func refresh() {
         readCurrentTrack()
         readSelection()
+        readPlayerState()
     }
 
     private func readCurrentTrack() {
@@ -92,6 +93,19 @@ extension Music { // respond and update
 
     private func readSelection() {
         selectedTracks = tagger.readSelection()
+    }
+
+    private func readPlayerState() {
+        guard let state = app?.playerState else { return }
+
+        playbackState = switch state {
+        case MusicEPlSPlaying:          .playing
+        case MusicEPlSPaused:           .paused
+        case MusicEPlSStopped:          .stopped
+        case MusicEPlSFastForwarding:   .seekingForward
+        case MusicEPlSRewinding:        .seekingBackward
+        default: nil
+        }
     }
 }
 
