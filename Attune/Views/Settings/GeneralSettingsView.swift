@@ -1,23 +1,29 @@
 import SwiftUI
 import KeyboardShortcuts
+import LaunchAtLogin
 
 struct GeneralSettingsView: View {
     var body: some View {
         Form {
             Section {
-                VStack(alignment: .leading, spacing: 10) {
-                    KeyboardShortcuts.Recorder(
-                        "Attune Hotkey:",
-                        name: .toggleOverlay
-                    )
+                KeyboardShortcuts.Recorder(
+                    "Attune Hotkey:",
+                    name: .toggleOverlay
+                )
 
-                    Text("Select this field and type the hotkey you would like to use to control Attune.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .frame(maxWidth: .infinity)
+                Text("Select this field and type the hotkey you would like to use to control Attune.")
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Divider()
+                .padding(.vertical, 10)
+
+            Section {
+                LaunchAtLogin.Toggle()
             }
         }
-        .padding()
     }
 }

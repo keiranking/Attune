@@ -43,6 +43,8 @@ struct SettingsView: View {
                 .tabItem { Label("Whitelist", systemImage: viewModel.whitelistSettingsIcon) }
                 .tag(Tab.whitelist)
         }
+        .padding()
+        .frame(width: 400)
         .fixedSize(horizontal: true, vertical: false)
     }
 }

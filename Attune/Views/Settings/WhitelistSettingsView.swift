@@ -60,8 +60,6 @@ struct WhitelistSettingsView: View {
             }
             .disabled(!viewModel.enforceWhitelist)
         }
-        .padding()
-        .frame(width: 400)
     }
 
     var toggle: some View {

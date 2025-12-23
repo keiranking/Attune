@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		370EAF742EFA6D1A00747F34 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 370EAF732EFA6D1A00747F34 /* KeyboardShortcuts */; };
+		370EAF792EFB606200747F34 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 370EAF782EFB606200747F34 /* LaunchAtLogin */; };
 		379B95E02EF71989006F4448 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 379B95DF2EF71989006F4448 /* Algorithms */; };
 /* End PBXBuildFile section */
 
@@ -29,6 +30,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				370EAF792EFB606200747F34 /* LaunchAtLogin in Frameworks */,
 				379B95E02EF71989006F4448 /* Algorithms in Frameworks */,
 				370EAF742EFA6D1A00747F34 /* KeyboardShortcuts in Frameworks */,
 			);
@@ -84,6 +86,7 @@
 			packageProductDependencies = (
 				379B95DF2EF71989006F4448 /* Algorithms */,
 				370EAF732EFA6D1A00747F34 /* KeyboardShortcuts */,
+				370EAF782EFB606200747F34 /* LaunchAtLogin */,
 			);
 			productName = Attune;
 			productReference = 37D8F3122EDC6CD600B5DA27 /* Attune.app */;
@@ -117,6 +120,7 @@
 			packageReferences = (
 				379B95DE2EF71989006F4448 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 				370EAF722EFA6D1A00747F34 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+				370EAF772EFB606200747F34 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 37D8F3132EDC6CD600B5DA27 /* Products */;
@@ -394,6 +398,14 @@
 				minimumVersion = 2.4.0;
 			};
 		};
+		370EAF772EFB606200747F34 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		379B95DE2EF71989006F4448 /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-algorithms.git";
@@ -409,6 +421,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 370EAF722EFA6D1A00747F34 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
 			productName = KeyboardShortcuts;
+		};
+		370EAF782EFB606200747F34 /* LaunchAtLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 370EAF772EFB606200747F34 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
+			productName = LaunchAtLogin;
 		};
 		379B95DF2EF71989006F4448 /* Algorithms */ = {
 			isa = XCSwiftPackageProductDependency;
