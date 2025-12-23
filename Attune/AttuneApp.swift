@@ -1,4 +1,9 @@
 import SwiftUI
+import KeyboardShortcuts
+
+extension KeyboardShortcuts.Name {
+    static let toggleOverlay = Self("Attune.KeyboardShortcuts.toggleOverlay")
+}
 
 @main
 struct AttuneApp: App {
@@ -37,6 +42,15 @@ struct AttuneApp: App {
             .environment(AppSettings.shared)
         }
     }
+
+    init() {
+        if KeyboardShortcuts.getShortcut(for: .toggleOverlay) == nil {
+            KeyboardShortcuts.setShortcut(
+                .init(.space, modifiers: [.command, .option, .control]),
+                for: .toggleOverlay
+            )
+        }
+    }
 }
 
 extension AttuneApp {
@@ -52,8 +66,8 @@ extension AttuneApp {
         private var priorApplication: NSRunningApplication?
 
         init() {
-            setupHotKey()
             setupOverlayWindow()
+            setupHotKey()
 
             music.onChange = { [weak self] in self?.sync() }
         }
@@ -61,10 +75,7 @@ extension AttuneApp {
         // MARK: - Setup
 
         private func setupHotKey() {
-            hotKeyManager = HotKeyManager()
-            let hotKey = (cmd: true, shift: false, option: true, control: true, keyCode: UInt32(49))
-
-            hotKeyManager?.register(hotKey: hotKey) { [weak self] in
+            KeyboardShortcuts.onKeyUp(for: .toggleOverlay) { [weak self] in
                 Task { @MainActor in
                     self?.toggleOverlay()
                 }

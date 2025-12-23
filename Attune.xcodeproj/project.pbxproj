@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		370EAF742EFA6D1A00747F34 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 370EAF732EFA6D1A00747F34 /* KeyboardShortcuts */; };
 		379B95E02EF71989006F4448 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 379B95DF2EF71989006F4448 /* Algorithms */; };
 /* End PBXBuildFile section */
 
@@ -29,6 +30,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				379B95E02EF71989006F4448 /* Algorithms in Frameworks */,
+				370EAF742EFA6D1A00747F34 /* KeyboardShortcuts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,6 +83,7 @@
 			name = Attune;
 			packageProductDependencies = (
 				379B95DF2EF71989006F4448 /* Algorithms */,
+				370EAF732EFA6D1A00747F34 /* KeyboardShortcuts */,
 			);
 			productName = Attune;
 			productReference = 37D8F3122EDC6CD600B5DA27 /* Attune.app */;
@@ -113,6 +116,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				379B95DE2EF71989006F4448 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
+				370EAF722EFA6D1A00747F34 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 37D8F3132EDC6CD600B5DA27 /* Products */;
@@ -382,6 +386,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		370EAF722EFA6D1A00747F34 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.4.0;
+			};
+		};
 		379B95DE2EF71989006F4448 /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-algorithms.git";
@@ -393,6 +405,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		370EAF732EFA6D1A00747F34 /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 370EAF722EFA6D1A00747F34 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
+		};
 		379B95DF2EF71989006F4448 /* Algorithms */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 379B95DE2EF71989006F4448 /* XCRemoteSwiftPackageReference "swift-algorithms" */;

@@ -35,8 +35,7 @@ struct SettingsView: View {
 
     var body: some View {
         TabView(selection: $viewModel.selection) {
-            ContentUnavailableView("General settings are not yet implemented",
-                                   systemImage: "gearshape")
+            GeneralSettingsView()
                 .tabItem { Label("General", systemImage: viewModel.generalSettingsIcon) }
                 .tag(Tab.general)
 
@@ -44,5 +43,6 @@ struct SettingsView: View {
                 .tabItem { Label("Whitelist", systemImage: viewModel.whitelistSettingsIcon) }
                 .tag(Tab.whitelist)
         }
+        .fixedSize(horizontal: true, vertical: false)
     }
 }
