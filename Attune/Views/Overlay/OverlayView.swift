@@ -191,7 +191,6 @@ struct OverlayView: View {
         .padding(16)
         .frame(width: 600)
         .background { background }
-        .clipShape(RoundedRectangle(cornerRadius: 12))
         .task { isFocused = true }
         .overlay { keyboardShortcuts }
         .disabled(music.isClosed)
@@ -264,8 +263,8 @@ struct OverlayView: View {
     }
 
     var background: some View {
-        VisualEffectView(material: .hudWindow, blendingMode: .behindWindow)
-            .cornerRadius(12)
+        RoundedRectangle(cornerRadius: 12)
+            .fill(.regularMaterial)
     }
 
     var keyboardShortcuts: some View {
