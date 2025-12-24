@@ -223,7 +223,10 @@ struct OverlayView: View {
     var modeControls: some View {
         Picker("", selection: $viewModel.mode) {
             ForEach(Tagging.Mode.allCases, id: \.self) { mode in
-                Image(systemName: mode.systemImage).tag(mode)
+                Label(mode.rawValue, systemImage: mode.systemImage)
+                    .labelStyle(.iconOnly)
+                    .help(mode.rawValue)
+                    .tag(mode)
             }
         }
         .pickerStyle(.segmented)
@@ -244,6 +247,7 @@ struct OverlayView: View {
         )
         .onTapGesture { viewModel.scope = .current }
         .disabled(!viewModel.hasCurrentTrack)
+        .help("Apply changes to current track")
     }
 
     var selectedRow: some View {
@@ -260,6 +264,7 @@ struct OverlayView: View {
         )
         .onTapGesture { viewModel.scope = .selection }
         .disabled(!viewModel.hasSelectedTracks)
+        .help("Apply changes to selected track(s)")
     }
 
     var background: some View {
@@ -292,6 +297,7 @@ struct PlayerControls: View {
         HStack(spacing: 0) {
             Button(action: { music.player.previous() }) {
                 Label("Previous Track", systemImage: Icon.previous)
+                    .help("Skip to previous")
             }
 
             Button(action: { music.player.playPause() }) {
@@ -300,10 +306,12 @@ struct PlayerControls: View {
                     systemImage: music.player.isPlaying ? Icon.pause : Icon.play
                 )
                 .font(.system(size: 24))
+                .help(music.player.isPlaying ? "Pause" : "Play")
             }
 
             Button(action: { music.player.next() }) {
                 Label("Next Track", systemImage: Icon.next)
+                    .help("Skip to next")
             }
         }
         .disabled(music.player.isDisabled)

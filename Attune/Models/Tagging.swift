@@ -1,9 +1,9 @@
 import Foundation
 
 struct Tagging {
-    enum Mode: CaseIterable {
-        case remove
-        case add
+    enum Mode: String, CaseIterable {
+        case remove = "Remove metadata"
+        case add = "Add metadata"
 
         var systemImage: String {
             switch self {
