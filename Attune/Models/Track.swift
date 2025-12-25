@@ -91,7 +91,6 @@ extension Track {
         self.rating = rating / 20
         self.tags = []
 
-        // Parse existing metadata into Tags
         self.tags.formUnion(Track.parseTags(from: comment, category: .comment))
         self.tags.formUnion(Track.parseTags(from: grouping, category: .grouping))
         self.tags.formUnion(Track.parseTags(from: genre, category: .genre))
@@ -137,4 +136,16 @@ extension Track {
         self.tags.formUnion(Track.parseTags(from: grouping, category: .grouping))
         self.tags.formUnion(Track.parseTags(from: genre, category: .genre))
     }
+}
+
+extension Track {
+    static let example = Track(
+        id: "EC31D92EF18EB40Z",
+        title: "Sleep Well, Little Children",
+        artist: "Juan Modelo",
+        album: "An Exemplary Christmas",
+        year: 2007,
+        rating: 3,
+        tags: Set(Tag.examples.randomElements(count: 5))
+    )
 }

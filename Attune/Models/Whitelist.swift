@@ -31,18 +31,8 @@ final class Whitelist {
     // MARK: - Helpers
 
     func category(for tagName: String) -> Tag.Category? {
-        let normalized = tagName.trimmingCharacters(in: .whitespaces).lowercased()
-
-        if getWhitelist(for: .genre).contains(normalized) { return .genre }
-        if getWhitelist(for: .grouping).contains(normalized) { return .grouping }
-        if getWhitelist(for: .comment).contains(normalized) { return .comment }
-
-        return nil
-    }
-
-    func getWhitelist(for category: Tag.Category) -> Set<String> {
-        let filtered = tags.filter { $0.category == category }
-        return Set(filtered.map { $0.normalizedName })
+        let normalized = tagName.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        return tags.first { $0.normalizedName == normalized }?.category
     }
 
     static func tags(from csv: String, as category: Tag.Category) -> [Tag] {
@@ -71,36 +61,7 @@ final class Whitelist {
            let decoded = try? JSONDecoder().decode([Tag].self, from: data) {
             self.tags = decoded.sorted { $0.name < $1.name }
         } else {
-            self.tags = exampleTags()
+            self.tags = Tag.examples
         }
-    }
-
-    private func exampleTags() -> [Tag] {
-        let comments = [
-            "action", "advice", "ballad", "celebration", "clip", "ethnic", "exmas",
-            "family", "forgiveness", "friendship", "grand", "heroic", "island", "light",
-            "lively", "longing", "lust", "new", "nostalgic", "old", "promise", "rare",
-            "regret", "religious", "revenge", "romantic", "running", "sad", "secular",
-            "seduction", "self", "sexy", "sinister", "slow", "society", "traditional",
-            "theme"
-        ]
-        let groupings = [
-            "boy", "girl", "vocal", "group", "choir", "acapella", "brass", "chant",
-            "guitar", "organ", "pan", "piano", "perc", "strings", "synth", "wind",
-            "whistle", "solo", "band", "orchestra"
-        ]
-        let genres = [
-            "Alternative", "Broadway", "Blues", "Christmas", "Classical", "Country",
-            "Electronica", "Folk", "Jazz", "Karaoke", "Latin", "OST", "Personal", "Pop",
-            "R&B", "Rap", "Reggae", "Rock", "Soca", "Soul", "Standards"
-        ]
-
-        return [
-            comments.map    { Tag(name: $0, category: .comment) },
-            groupings.map   { Tag(name: $0, category: .grouping) },
-            genres.map      { Tag(name: $0, category: .genre) }
-        ]
-            .flatMap { $0 }
-            .sorted { $0.name < $1.name }
     }
 }

@@ -32,3 +32,24 @@ extension Array where Element: Identifiable, Element.ID: StringProtocol {
         compactMap(\.id).joined(separator: ", ")
     }
 }
+
+extension Collection where Element: Hashable {
+    func randomElements(count: Int) -> [Element] {
+        guard count >= 0 else { return [] }
+
+        if self.count <= count {
+            return self.shuffled()
+        }
+
+        var result = Set<Element>()
+        let elements = Array(self)
+
+        while result.count < count {
+            if let randomElement = elements.randomElement() {
+                result.insert(randomElement)
+            }
+        }
+
+        return Array(result)
+    }
+}
