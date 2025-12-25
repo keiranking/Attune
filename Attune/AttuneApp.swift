@@ -14,7 +14,6 @@ struct AttuneApp: App {
             Button("Toggle Attune") {
                 viewModel.toggleOverlay()
             }
-            .keyboardShortcut(" ", modifiers: [.command, .option, .control])
 
             Divider()
 
@@ -43,13 +42,17 @@ struct AttuneApp: App {
         }
     }
 
-    init() {
+    func setupDefaultHotkey() {
         if KeyboardShortcuts.getShortcut(for: .toggleOverlay) == nil {
             KeyboardShortcuts.setShortcut(
                 .init(.space, modifiers: [.command, .option, .control]),
                 for: .toggleOverlay
             )
         }
+    }
+
+    init() {
+        setupDefaultHotkey()
     }
 }
 
@@ -67,14 +70,14 @@ extension AttuneApp {
 
         init() {
             setupOverlayWindow()
-            setupHotKey()
+            setupHotkey()
 
             music.onChange = { [weak self] in self?.sync() }
         }
 
         // MARK: - Setup
 
-        private func setupHotKey() {
+        private func setupHotkey() {
             KeyboardShortcuts.onKeyUp(for: .toggleOverlay) { [weak self] in
                 Task { @MainActor in
                     self?.toggleOverlay()
