@@ -36,8 +36,7 @@ final class OverlayViewModel {
     }
 
     var currentTrackTitle: String { currentTrack?.title ?? "No current track" }
-    private var currentTrackArtist: String? { currentTrack?.artist }
-    private var currentTrackRating: Int? { currentTrack?.rating }
+
     private var currentTrackMetadata: String? {
         guard let currentTrack else { return nil }
         return [
@@ -46,18 +45,30 @@ final class OverlayViewModel {
             currentTrack.comment,
             currentTrack.grouping
         ]
-            .compactMap { $0 }
-            .filter { $0 != "" }
-            .joined(separator: " • ")
+        .compactMap { $0 }
+        .filter { $0 != "" }
+        .joined(separator: " • ")
     }
+    private var currentTrackAlternateMetadata: String? {
+        guard let currentTrack else { return nil }
+        return [
+            currentTrack.artist,
+            currentTrack.album == "" ? nil : "— \(currentTrack.album)",
+            currentTrack.year == 0 ? nil :"(\(currentTrack.year))"
+        ]
+        .compactMap { $0 }
+        .filter { $0 != "" }
+        .joined(separator: " ")
+    }
+
     var currentTrackSubtitle: ScopeRowView.SubtitleContent {
-        return if hasCurrentTrack {
-            showSecondaryInfo
-            ? .text(currentTrackArtist ?? "")
-            : .label(text: currentTrackMetadata ?? "",
-                     icon: currentTrackRating == 0 ? Icon.unrated : Icon.rated)
+        guard let currentTrack else { return .text("Play a track in the Music app") }
+
+        return if showSecondaryInfo {
+            .text(currentTrackAlternateMetadata ?? "")
         } else {
-            .text("Play a track in the Music app")
+            .label(text: currentTrackMetadata ?? "",
+                   icon: currentTrack.rating == 0 ? Icon.unrated : Icon.rated)
         }
     }
     var hasCurrentTrack: Bool { currentTrack != nil }
@@ -85,8 +96,6 @@ final class OverlayViewModel {
         default:    "\(selectedTracks.count) selected tracks"
         }
     }
-    private var selectedTrackArtist: String? { selectedTracks.first?.artist }
-    private var selectedTrackRating: Int? { selectedTracks.first?.rating }
     private var selectedTrackMetadata: String? {
         guard let firstTrack = selectedTracks.first else { return nil }
         return [
@@ -95,20 +104,35 @@ final class OverlayViewModel {
             firstTrack.comment,
             firstTrack.grouping
         ]
-            .compactMap { $0 }
-            .filter { $0 != "" }
-            .joined(separator: " • ")
+        .compactMap { $0 }
+        .filter { $0 != "" }
+        .joined(separator: " • ")
     }
+    private var selectedTrackAlternateMetadata: String? {
+        guard let firstTrack = selectedTracks.first else { return nil }
+        return [
+            firstTrack.artist,
+            firstTrack.album == "" ? nil : "— \(firstTrack.album)",
+            firstTrack.year == 0 ? nil :"(\(firstTrack.year))"
+        ]
+        .compactMap { $0 }
+        .filter { $0 != "" }
+        .joined(separator: " ")
+    }
+
     var selectedTrackSubtitle: ScopeRowView.SubtitleContent {
         switch selectedTracks.count {
         case 0:     .text("Select track(s) in the Music app")
-        case 1:     showSecondaryInfo
-                    ? .text(selectedTrackArtist ?? "")
-                    : .label(text: selectedTrackMetadata ?? "",
-                             icon: selectedTrackRating == 0 ? Icon.unrated : Icon.rated)
+        case 1:     if showSecondaryInfo {
+                        .text(selectedTrackAlternateMetadata ?? "")
+                    } else {
+                        .label(text: selectedTrackMetadata ?? "",
+                               icon: selectedTracks.first?.rating == 0 ? Icon.unrated : Icon.rated)
+                    }
         default:    .none
         }
     }
+
     var hasSelectedTracks: Bool { !selectedTracks.isEmpty }
 
     // MARK: Functions

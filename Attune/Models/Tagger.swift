@@ -11,7 +11,7 @@ extension Music {
             tell application id "com.apple.Music"
                 set out to ""
                 repeat with t in selection
-                    set out to out & (persistent id of t) & "\(fieldDelimiter)" & (name of t) & "\(fieldDelimiter)" & (artist of t) & "\(fieldDelimiter)" & (rating of t) & "\(fieldDelimiter)" & (comment of t) & "\(fieldDelimiter)" & (grouping of t) & "\(fieldDelimiter)" & (genre of t) & "\(lineDelimiter)"
+                    set out to out & (persistent id of t) & "\(fieldDelimiter)" & (name of t) & "\(fieldDelimiter)" & (artist of t) & "\(fieldDelimiter)" & (album of t) & "\(fieldDelimiter)" & (year of t) & "\(fieldDelimiter)" & (rating of t) & "\(fieldDelimiter)" & (comment of t) & "\(fieldDelimiter)" & (grouping of t) & "\(fieldDelimiter)" & (genre of t) & "\(lineDelimiter)"
                 end repeat
                 return out
             end tell
@@ -111,15 +111,17 @@ extension Music {
                 .filter { !$0.isEmpty }
                 .compactMap {
                     let p = $0.components(separatedBy: fieldDelimiter)
-                    guard p.count == 7 else { return nil }
+                    guard p.count == 9 else { return nil }
                     return Track(
                         id:         p[0],
                         title:      p[1],
                         artist:     p[2],
-                        rating:     Int(p[3]) ?? 0,
-                        comment:    p[4],
-                        grouping:   p[5],
-                        genre:      p[6]
+                        album:      p[3],
+                        year:       Int(p[4]) ?? 0,
+                        rating:     Int(p[5]) ?? 0,
+                        comment:    p[6],
+                        grouping:   p[7],
+                        genre:      p[8]
                     )
                 }
         }

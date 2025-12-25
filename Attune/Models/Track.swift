@@ -8,6 +8,8 @@ struct Track: Identifiable, Codable, Hashable {
     let id: PersistentID
     let title: String
     let artist: String
+    let album: String
+    let year: Int
     var rating: Int
     var tags: Set<Tag>
 
@@ -70,10 +72,22 @@ extension Track: Equatable {
 }
 
 extension Track {
-    init(id: PersistentID, title: String, artist: String, rating: Int, comment: String, grouping: String, genre: String) {
+    init(
+        id: PersistentID,
+        title: String,
+        artist: String,
+        album: String,
+        year: Int,
+        rating: Int,
+        comment: String,
+        grouping: String,
+        genre: String
+    ) {
         self.id = id
         self.title = title
         self.artist = artist
+        self.album = album
+        self.year = year
         self.rating = rating / 20
         self.tags = []
 
@@ -102,6 +116,9 @@ extension Track {
             return nil
         }
 
+        let album = musicTrack.album ?? ""
+        let year = musicTrack.year
+
         let starRating = musicTrack.rating / 20
 
         let comment = musicTrack.comment ?? ""
@@ -111,6 +128,8 @@ extension Track {
         self.id = id
         self.title = title
         self.artist = artist
+        self.album = album
+        self.year = year
         self.rating = starRating
         self.tags = []
 
