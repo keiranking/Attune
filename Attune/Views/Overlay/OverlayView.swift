@@ -16,7 +16,13 @@ final class OverlayViewModel {
     var showSecondaryInfo: Bool = false
 
     var textPlaceholder: String {
-        Whitelist.shared.tags.count < 5 ? "Enter space-separated tags" : ""
+        guard Whitelist.shared.tags.count < 5 else { return "" }
+
+        return (
+            ["e.g."]
+            + Tag.examples.randomElements(3).map { $0.name }
+            + ["\(Int.random(in: Track.ratingRange))"]
+        ).joined(separator: " ")
     }
 
     // MARK: Current track, derived properties
@@ -239,6 +245,12 @@ struct OverlayView: View {
                     .stroke(Color.primary.opacity(0.1), lineWidth: 1)
             )
             .focused($isFocused)
+            .help(
+                """
+                Enter keywords and/or rating
+                Then Submit (⏎) or Submit and Continue (⌘⏎)
+                """
+            )
         }
     }
 
@@ -249,7 +261,7 @@ struct OverlayView: View {
             ForEach(Tagging.Mode.allCases, id: \.self) { mode in
                 Label(mode.rawValue, systemImage: mode.systemImage)
                     .labelStyle(.iconOnly)
-                    .help(mode.rawValue)
+                    .help(mode.tooltip)
                     .tag(mode)
             }
         }
@@ -321,7 +333,7 @@ struct PlayerControls: View {
         HStack(spacing: 0) {
             Button(action: { music.player.previous() }) {
                 Label("Previous Track", systemImage: Icon.previous)
-                    .help("Skip to previous")
+                    .help("Skip to previous (F7)")
             }
 
             Button(action: { music.player.playPause() }) {
@@ -330,12 +342,12 @@ struct PlayerControls: View {
                     systemImage: music.player.isPlaying ? Icon.pause : Icon.play
                 )
                 .font(.system(size: 24))
-                .help(music.player.isPlaying ? "Pause" : "Play")
+                .help((music.player.isPlaying ? "Pause" : "Play") + " (F8)")
             }
 
             Button(action: { music.player.next() }) {
                 Label("Next Track", systemImage: Icon.next)
-                    .help("Skip to next")
+                    .help("Skip to next (F9)")
             }
         }
         .disabled(music.player.isDisabled)

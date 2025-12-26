@@ -1,6 +1,6 @@
 import Foundation
 
-struct Tag: Identifiable, Codable, Comparable, Hashable {
+struct Tag: Identifiable, Codable, Comparable, CustomStringConvertible, Hashable {
     var name: String
     var category: Category
 
@@ -8,6 +8,8 @@ struct Tag: Identifiable, Codable, Comparable, Hashable {
     var normalizedName: String {
         name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     }
+
+    var description: String { name }
 
     static func < (lhs: Tag, rhs: Tag) -> Bool {
         lhs.normalizedName < rhs.normalizedName

@@ -11,6 +11,13 @@ struct Tagging {
             case .remove:   Icon.remove
             }
         }
+
+        var tooltip: String {
+            switch self {
+            case .add:      "Add metadata (⌘+)"
+            case .remove:   "Remove metadata (⌘-)"
+            }
+        }
     }
 
     enum Outcome: Equatable {

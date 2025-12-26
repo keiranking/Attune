@@ -34,7 +34,7 @@ extension Array where Element: Identifiable, Element.ID: StringProtocol {
 }
 
 extension Collection where Element: Hashable {
-    func randomElements(count: Int) -> [Element] {
+    func randomElements(_ count: Int) -> [Element] {
         guard count >= 0 else { return [] }
 
         if self.count <= count {

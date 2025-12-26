@@ -146,6 +146,6 @@ extension Track {
         album: "An Exemplary Christmas",
         year: 2007,
         rating: 3,
-        tags: Set(Tag.examples.randomElements(count: 5))
+        tags: Set(Tag.examples.randomElements(5))
     )
 }
