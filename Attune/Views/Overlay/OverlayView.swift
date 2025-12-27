@@ -141,6 +141,14 @@ final class OverlayViewModel {
 
     var hasSelectedTracks: Bool { !selectedTracks.isEmpty }
 
+    // MARK: Other
+
+    var scopeRowTooltip =
+        """
+        Submit (⏎)
+        (To Apply and Continue, press ⌘⏎)
+        """
+
     // MARK: Functions
 
     func reset() {
@@ -245,12 +253,7 @@ struct OverlayView: View {
                     .stroke(Color.primary.opacity(0.1), lineWidth: 1)
             )
             .focused($isFocused)
-            .help(
-                """
-                Enter keywords and/or rating
-                Then Submit (⏎) or Submit and Continue (⌘⏎)
-                """
-            )
+            .help("Enter keywords and/or rating")
         }
     }
 
@@ -285,7 +288,7 @@ struct OverlayView: View {
         .onHover { _ in viewModel.scope = .current }
         .onTapGesture { onSubmit(viewModel.text, true) }
         .disabled(!viewModel.hasCurrentTrack)
-        .help("Apply changes to current track")
+        .help(viewModel.hasCurrentTrack ? viewModel.scopeRowTooltip : "")
     }
 
     var selectedRow: some View {
@@ -303,7 +306,7 @@ struct OverlayView: View {
         .onHover { _ in viewModel.scope = .selection }
         .onTapGesture { onSubmit(viewModel.text, true) }
         .disabled(!viewModel.hasSelectedTracks)
-        .help("Apply changes to selected track(s)")
+        .help(viewModel.hasSelectedTracks ? viewModel.scopeRowTooltip : "")
     }
 
     var background: some View {
@@ -319,7 +322,7 @@ struct OverlayView: View {
             Button("Remove from") { viewModel.mode = .remove }
                 .keyboardShortcut("-", modifiers: [.command])
 
-            Button("Submit and Continue") {
+            Button("Apply and Continue") {
                 let text = viewModel.text
                 onSubmit(text, false)
             }
@@ -336,7 +339,7 @@ struct PlayerControls: View {
         HStack(spacing: 0) {
             Button(action: { music.player.previous() }) {
                 Label("Previous Track", systemImage: Icon.previous.name)
-                    .help("Skip to previous (F7)")
+                    .help("Skip to Previous (F7)")
             }
 
             Button(action: { music.player.playPause() }) {
@@ -350,7 +353,7 @@ struct PlayerControls: View {
 
             Button(action: { music.player.next() }) {
                 Label("Next Track", systemImage: Icon.next.name)
-                    .help("Skip to next (F9)")
+                    .help("Skip to Next (F9)")
             }
         }
         .disabled(music.player.isDisabled)

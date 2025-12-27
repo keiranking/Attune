@@ -14,8 +14,8 @@ struct Tagging {
 
         var tooltip: String {
             switch self {
-            case .add:      "Add metadata (⌘+)"
-            case .remove:   "Remove metadata (⌘-)"
+            case .add:      "Add Mode (⌘+)"
+            case .remove:   "Remove Mode (⌘-)"
             }
         }
     }
