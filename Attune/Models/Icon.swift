@@ -1,24 +1,34 @@
 import Foundation
 
 struct Icon {
-    static let success = "checkmark"
-    static let failure = "xmark"
+    let name: String
+    let isCustom: Bool
 
-    static let currentPlaying = "speaker.wave.2.fill"
-    static let currentPaused = "speaker.fill"
-    static let currentDisabled = "speaker.slash.fill"
-    static let selected = "rectangle.and.hand.point.up.left.fill"
+    init(_ name: String, isCustom: Bool = false) {
+        self.name = name
+        self.isCustom = isCustom
+    }
+}
 
-    static let updating = "rays"
+extension Icon {
+    static let success = Icon("checkmark")
+    static let failure = Icon("xmark")
 
-    static let pause = "pause.fill"
-    static let play = "play.fill"
-    static let previous = "backward.fill"
-    static let next = "forward.fill"
+    static let currentPlaying = Icon("speaker.wave.2.fill")
+    static let currentPaused = Icon("speaker.fill")
+    static let currentDisabled = Icon("speaker.slash.fill")
+    static let selected = Icon("selected", isCustom: true)
 
-    static let rated = "star.fill"
-    static let unrated = "star"
+    static let updating = Icon("rays")
 
-    static let add = "plus"
-    static let remove = "minus"
+    static let pause = Icon("pause.fill")
+    static let play = Icon("play.fill")
+    static let previous = Icon("backward.fill")
+    static let next = Icon("forward.fill")
+
+    static let rated = Icon("star.fill")
+    static let unrated = Icon("star")
+
+    static let add = Icon("plus")
+    static let remove = Icon("minus")
 }

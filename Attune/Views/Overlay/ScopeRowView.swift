@@ -11,13 +11,13 @@ extension ScopeRowView {
     enum SubtitleContent {
         case none
         case text(String)
-        case label(text: String, icon: String)
+        case label(text: String, icon: Icon)
     }
 }
 
 struct ScopeRowView: View {
     let status: Status
-    let icon: String
+    let icon: Icon
     let title: String
     let subtitle: SubtitleContent
     let color: Color
@@ -38,7 +38,7 @@ struct ScopeRowView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: icon)
+            Group { icon.isCustom ? Image(icon.name) : Image(systemName: icon.name) }
                 .contentTransition(.symbolEffect(.replace, options: .speed(2)))
                 .if(isAnimated) {
                     $0.symbolEffect(.variableColor.iterative.hideInactiveLayers)
@@ -57,7 +57,7 @@ struct ScopeRowView: View {
                         Text(text)
                     } else if case let .label(text, icon) = subtitle, !text.isEmpty {
                         HStack(spacing: 2) {
-                            Image(systemName: icon)
+                            Image(systemName: icon.name)
                             Text(text)
                         }
                     }
@@ -87,7 +87,7 @@ struct ScopeRowView: View {
 
     init(
         status: Status,
-        icon: String,
+        icon: Icon,
         title: String,
         subtitle: SubtitleContent,
         color: Color,

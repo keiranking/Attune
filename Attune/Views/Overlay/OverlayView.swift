@@ -27,7 +27,7 @@ final class OverlayViewModel {
 
     // MARK: Current track, derived properties
 
-    var currentTrackIcon: String {
+    var currentTrackIcon: Icon {
         if scope == .current, let outcome {
             return outcome == .success ? Icon.success : Icon.failure
         }
@@ -83,7 +83,7 @@ final class OverlayViewModel {
 
     private var selectedTracksCount: Int { selectedTracks.count }
 
-    var selectedTrackIcon: String {
+    var selectedTrackIcon: Icon {
         if scope == .selection, let outcome {
             return outcome == .success ? Icon.success : Icon.failure
         }
@@ -332,21 +332,21 @@ struct PlayerControls: View {
     var body: some View {
         HStack(spacing: 0) {
             Button(action: { music.player.previous() }) {
-                Label("Previous Track", systemImage: Icon.previous)
+                Label("Previous Track", systemImage: Icon.previous.name)
                     .help("Skip to previous (F7)")
             }
 
             Button(action: { music.player.playPause() }) {
                 Label(
                     "Play/Pause",
-                    systemImage: music.player.isPlaying ? Icon.pause : Icon.play
+                    systemImage: (music.player.isPlaying ? Icon.pause : Icon.play).name
                 )
                 .font(.system(size: 24))
                 .help((music.player.isPlaying ? "Pause" : "Play") + " (F8)")
             }
 
             Button(action: { music.player.next() }) {
-                Label("Next Track", systemImage: Icon.next)
+                Label("Next Track", systemImage: Icon.next.name)
                     .help("Skip to next (F9)")
             }
         }

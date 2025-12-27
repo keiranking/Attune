@@ -7,8 +7,8 @@ struct Tagging {
 
         var systemImage: String {
             switch self {
-            case .add:      Icon.add
-            case .remove:   Icon.remove
+            case .add:      Icon.add.name
+            case .remove:   Icon.remove.name
             }
         }
 
