@@ -266,6 +266,7 @@ struct OverlayView: View {
             }
         }
         .pickerStyle(.segmented)
+        .labelsHidden()
     }
 
     var currentRow: some View {
@@ -281,7 +282,8 @@ struct OverlayView: View {
                 music.player.isPlaying
                 || (viewModel.scope == .current && viewModel.state == .updating)
         )
-        .onTapGesture { viewModel.scope = .current }
+        .onHover { _ in viewModel.scope = .current }
+        .onTapGesture { onSubmit(viewModel.text, true) }
         .disabled(!viewModel.hasCurrentTrack)
         .help("Apply changes to current track")
     }
@@ -298,7 +300,8 @@ struct OverlayView: View {
             isAnimated:
                 viewModel.scope == .selection && viewModel.state == .updating
         )
-        .onTapGesture { viewModel.scope = .selection }
+        .onHover { _ in viewModel.scope = .selection }
+        .onTapGesture { onSubmit(viewModel.text, true) }
         .disabled(!viewModel.hasSelectedTracks)
         .help("Apply changes to selected track(s)")
     }
