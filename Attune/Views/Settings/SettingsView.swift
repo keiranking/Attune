@@ -13,15 +13,11 @@ extension SettingsView {
         var selection: Tab = .general
 
         var generalSettingsIcon: String {
-            selection == .general
-            ? "gearshape.fill"
-            : "gearshape"
+            Icon.generalSettings.name + (selection == .general ? ".fill" : "")
         }
 
         var whitelistSettingsIcon: String {
-            selection == .whitelist
-            ? "checkmark.seal.fill"
-            : "checkmark.seal"
+            Icon.whitelistSettings.name + (selection == .whitelist ? ".fill" : "")
         }
     }
 }

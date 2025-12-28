@@ -11,6 +11,8 @@ struct Icon {
 }
 
 extension Icon {
+    static let app = Icon("attune", isCustom: true)
+
     static let success = Icon("checkmark")
     static let failure = Icon("xmark")
 
@@ -31,4 +33,8 @@ extension Icon {
 
     static let add = Icon("plus")
     static let remove = Icon("minus")
+
+    static let settings = Icon("gearshape")
+    static let generalSettings = Icon("gearshape")
+    static let whitelistSettings = Icon("checkmark.seal")
 }

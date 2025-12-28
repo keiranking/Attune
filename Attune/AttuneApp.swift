@@ -30,7 +30,7 @@ struct AttuneApp: App {
             .keyboardShortcut("q", modifiers: .command)
 
         } label: {
-            Image("attune")
+            Image(Icon.app.name)
                 .resizable()
         }
         .menuBarExtraStyle(.menu)

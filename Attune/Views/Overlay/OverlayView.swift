@@ -27,6 +27,11 @@ final class OverlayViewModel {
 
     // MARK: Current track, derived properties
 
+    var currentTrackStatus: ScopeRowView.Status {
+        if !hasCurrentTrack { .disabled }
+        else { scope == .current ? .active : .inactive }
+    }
+
     var currentTrackIcon: Icon {
         if scope == .current, let outcome {
             return outcome == .success ? Icon.success : Icon.failure
@@ -82,6 +87,11 @@ final class OverlayViewModel {
     // MARK: Selected track, derived properties
 
     private var selectedTracksCount: Int { selectedTracks.count }
+
+    var selectedTrackStatus: ScopeRowView.Status {
+        if !hasSelectedTracks { .disabled }
+        else { scope == .selection ? .active : .inactive }
+    }
 
     var selectedTrackIcon: Icon {
         if scope == .selection, let outcome {
@@ -200,11 +210,12 @@ struct OverlayView: View {
 
     var onSubmit: (_ text: String, _ dismiss: Bool) -> Void
 
+    @Environment(\.openSettings) private var openSettings
     @FocusState private var isFocused: Bool
 
     var body: some View {
         VStack(spacing: 0) {
-            omniBar
+            omnibox
                 .padding(.bottom, 8)
 
             ZStack {
@@ -214,6 +225,8 @@ struct OverlayView: View {
                     modeControls
 
                     Spacer()
+
+                    otherControls
                 }
             }
             .padding(.bottom, 12)
@@ -231,7 +244,7 @@ struct OverlayView: View {
         .disabled(music.isClosed)
     }
 
-    var omniBar: some View {
+    var omnibox: some View {
         HStack {
             TextField("", text: $viewModel.text, prompt: Text(viewModel.textPlaceholder))
             .onSubmit {
@@ -254,8 +267,6 @@ struct OverlayView: View {
         }
     }
 
-    var playerControls: some View { PlayerControls() }
-
     var modeControls: some View {
         Toggle("", isOn: Binding(
             get: { viewModel.mode == .add },
@@ -268,15 +279,23 @@ struct OverlayView: View {
         .help(viewModel.mode == .add ? "Switch to Remove Mode (⌘-)" :"Switch to Add Mode (⌘+)")
     }
 
+    var playerControls: some View { PlayerControls() }
+
+    var otherControls: some View {
+        Button(action: { openSettings() }) {
+            Label("Settings", systemImage: Icon.settings.name)
+                .labelStyle(.iconOnly)
+        }
+        .buttonStyle(.playerButton)
+    }
+
     var currentRow: some View {
         ScopeRowView(
-            status: !viewModel.hasCurrentTrack
-                    ? .disabled
-                    : (viewModel.scope == .current ? .active : .inactive),
-            icon: viewModel.currentTrackIcon,
-            title: viewModel.currentTrackTitle,
-            subtitle: viewModel.currentTrackSubtitle,
-            color: viewModel.mode == .add ? .green : .red,
+            status:     viewModel.currentTrackStatus,
+            icon:       viewModel.currentTrackIcon,
+            title:      viewModel.currentTrackTitle,
+            subtitle:   viewModel.currentTrackSubtitle,
+            color:      viewModel.mode == .add ? .green : .red,
             isAnimated:
                 music.player.isPlaying
                 || (viewModel.scope == .current && viewModel.state == .updating)
@@ -289,13 +308,11 @@ struct OverlayView: View {
 
     var selectedRow: some View {
         ScopeRowView(
-            status: !viewModel.hasSelectedTracks
-                    ? .disabled
-                    : (viewModel.scope == .selection ? .active : .inactive),
-            icon: viewModel.selectedTrackIcon,
-            title: viewModel.selectedTrackTitle,
-            subtitle: viewModel.selectedTrackSubtitle,
-            color: viewModel.mode == .add ? .green : .red,
+            status:     viewModel.selectedTrackStatus,
+            icon:       viewModel.selectedTrackIcon,
+            title:      viewModel.selectedTrackTitle,
+            subtitle:   viewModel.selectedTrackSubtitle,
+            color:      viewModel.mode == .add ? .green : .red,
             isAnimated:
                 viewModel.scope == .selection && viewModel.state == .updating
         )
