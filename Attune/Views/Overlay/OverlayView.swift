@@ -21,6 +21,7 @@ final class OverlayViewModel {
     // MARK: Omnibox
 
     func generateOmniboxPrompt() -> String {
+        let prefix = Bool.random(weight: 0.25) ? ["x", "s"].shuffled().first! : nil
         let comment = Tag.examples.shuffled().first(where: { $0.category == .comment })?.normalizedName
         let genre = Tag.examples.shuffled().first(where: { $0.category == .genre })?.normalizedName
         let grouping = Tag.examples.shuffled().first(where: { $0.category == .grouping })?.normalizedName
@@ -28,8 +29,9 @@ final class OverlayViewModel {
 
         var keywords = [comment, genre, grouping, rating].compactMap({ $0 }).shuffled()
         keywords.removeFirst()
+        if let prefix { keywords.insert(prefix, at: 0) }
 
-        return (["e.g."] + keywords).joined(separator: " ")
+        return keywords.joined(separator: " ")
     }
 
     // MARK: Current track, derived properties
