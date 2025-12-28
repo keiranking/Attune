@@ -36,10 +36,12 @@ struct WhitelistSettingsView: View {
     @Bindable var viewModel: ViewModel
 
     var body: some View {
-        VStack(spacing: 20) {
-            toggle
+        Form {
+            Section {
+                toggle
+            }
 
-            VStack(spacing: 20) {
+            Group {
                 WhitelistEditor(
                     title: "Genre",
                     text: $viewModel.genreText,
@@ -60,6 +62,7 @@ struct WhitelistSettingsView: View {
             }
             .disabled(!viewModel.enforceWhitelist)
         }
+        .padding()
     }
 
     var toggle: some View {
@@ -97,11 +100,10 @@ private struct WhitelistEditor: View {
     @FocusState private var isFocused: Bool
 
     var body: some View {
-        VStack(alignment: .leading) {
-            Text(title)
-                .font(.headline)
-
-            TextField(placeholder ?? "", text: $text, axis: .vertical)
+        Section(
+            header: Text(title).padding(.top, 20)
+        ) {
+            TextField("", text: $text, prompt: Text(placeholder ?? ""), axis: .vertical)
                 .focused($isFocused)
                 .lineLimit(5, reservesSpace: true)
                 .font(.body)

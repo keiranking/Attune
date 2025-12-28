@@ -37,6 +37,7 @@ struct AttuneApp: App {
 
         Settings {
             SettingsView(
+                generalSettingsViewModel: GeneralSettingsView.ViewModel(),
                 whitelistSettingsViewModel: WhitelistSettingsView.ViewModel()
             )
             .environment(AppSettings.shared)

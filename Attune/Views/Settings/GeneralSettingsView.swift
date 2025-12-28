@@ -2,28 +2,55 @@ import SwiftUI
 import KeyboardShortcuts
 import LaunchAtLogin
 
+extension GeneralSettingsView {
+    @Observable
+    final class ViewModel {
+        var showOmniboxPrompt: Bool {
+            get { AppSettings.shared.showOmniboxPrompt }
+            set { AppSettings.shared.showOmniboxPrompt = newValue }
+        }
+
+        init() {}
+    }
+}
+
+
 struct GeneralSettingsView: View {
+    @Bindable var viewModel: ViewModel
+
     var body: some View {
         Form {
             Section {
-                KeyboardShortcuts.Recorder(
-                    "Attune Hotkey:",
-                    name: .toggleOverlay
-                )
+                LaunchAtLogin.Toggle()
 
-                Text("Select this field and type the hotkey you would like to use to control Attune.")
-                    .multilineTextAlignment(.leading)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                VStack(alignment: .leading) {
+                    KeyboardShortcuts.Recorder(
+                        "Attune Hotkey:",
+                        name: .toggleOverlay
+                    )
+
+                    Text("Select this field and type the key combination you would like to use to show/hide the app.")
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.bottom, 20)
             }
-
-            Divider()
-                .padding(.vertical, 10)
 
             Section {
-                LaunchAtLogin.Toggle()
+                Toggle(
+                    "Show omnibox prompt",
+                    isOn: $viewModel.showOmniboxPrompt
+                )
             }
         }
+        .formStyle(.grouped)
+    }
+
+    init(
+        viewModel: ViewModel
+    ) {
+        self.viewModel = viewModel
     }
 }

@@ -27,11 +27,12 @@ struct SettingsView: View {
 
     @Bindable private var viewModel = ViewModel()
 
+    let generalSettingsViewModel: GeneralSettingsView.ViewModel
     let whitelistSettingsViewModel: WhitelistSettingsView.ViewModel
 
     var body: some View {
         TabView(selection: $viewModel.selection) {
-            GeneralSettingsView()
+            GeneralSettingsView(viewModel: generalSettingsViewModel)
                 .tabItem { Label("General", systemImage: viewModel.generalSettingsIcon) }
                 .tag(Tab.general)
 
@@ -39,7 +40,6 @@ struct SettingsView: View {
                 .tabItem { Label("Whitelist", systemImage: viewModel.whitelistSettingsIcon) }
                 .tag(Tab.whitelist)
         }
-        .padding()
         .frame(width: 400)
         .fixedSize(horizontal: true, vertical: false)
     }

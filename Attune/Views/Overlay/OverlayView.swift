@@ -15,14 +15,21 @@ final class OverlayViewModel {
 
     var showSecondaryInfo: Bool = false
 
-    var textPlaceholder: String {
-        guard Whitelist.shared.tags.count < 5 else { return "" }
+    var omniboxPrompt: String = ""
+    var showOmniboxPrompt: Bool { AppSettings.shared.showOmniboxPrompt }
 
-        return (
-            ["e.g."]
-            + Tag.examples.randomElements(3).map { $0.name }
-            + ["\(Int.random(in: Track.ratingRange))"]
-        ).joined(separator: " ")
+    // MARK: Omnibox
+
+    func generateOmniboxPrompt() -> String {
+        let comment = Tag.examples.shuffled().first(where: { $0.category == .comment })?.normalizedName
+        let genre = Tag.examples.shuffled().first(where: { $0.category == .genre })?.normalizedName
+        let grouping = Tag.examples.shuffled().first(where: { $0.category == .grouping })?.normalizedName
+        let rating = Bool.random() ? "\(Int.random(in: Track.ratingRange))" : nil
+
+        var keywords = [comment, genre, grouping, rating].compactMap({ $0 }).shuffled()
+        keywords.removeFirst()
+
+        return (["e.g."] + keywords).joined(separator: " ")
     }
 
     // MARK: Current track, derived properties
@@ -162,6 +169,7 @@ final class OverlayViewModel {
         mode = .add
         scope = nil
         state = .ready
+        omniboxPrompt = generateOmniboxPrompt()
     }
 
     func chooseDefaultScope() {
@@ -241,7 +249,11 @@ struct OverlayView: View {
 
     var omnibox: some View {
         HStack {
-            TextField("", text: $viewModel.text, prompt: Text(viewModel.textPlaceholder))
+            TextField(
+                "",
+                text: $viewModel.text,
+                prompt: viewModel.showOmniboxPrompt ? Text(viewModel.omniboxPrompt) : nil
+            )
             .onSubmit {
                 onSubmit(viewModel.text, true)
             }
