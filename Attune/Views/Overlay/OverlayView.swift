@@ -175,9 +175,7 @@ final class OverlayViewModel {
         }
     }
 
-    func toggleMode() {
-        mode = (mode == .add) ? .remove : .add
-    }
+    func toggleMode() { mode.toggle() }
 
     func processInlineCommands() {
         let trimmed = text.trimmingCharacters(in: .whitespaces)
@@ -214,7 +212,6 @@ struct OverlayView: View {
 
                 HStack {
                     modeControls
-                        .frame(width: 150)
 
                     Spacer()
                 }
@@ -260,16 +257,15 @@ struct OverlayView: View {
     var playerControls: some View { PlayerControls() }
 
     var modeControls: some View {
-        Picker("", selection: $viewModel.mode) {
-            ForEach(Tagging.Mode.allCases, id: \.self) { mode in
-                Label(mode.rawValue, systemImage: mode.systemImage)
-                    .labelStyle(.iconOnly)
-                    .help(mode.tooltip)
-                    .tag(mode)
-            }
-        }
-        .pickerStyle(.segmented)
-        .labelsHidden()
+        Toggle("", isOn: Binding(
+            get: { viewModel.mode == .add },
+            set: { _ in viewModel.toggleMode() }
+        ))
+        .toggleStyle(SymbolSwitchToggleStyle(
+            onSymbol: Icon.add.name,
+            offSymbol: Icon.remove.name
+        ))
+        .help(viewModel.mode == .add ? "Switch to Remove Mode (⌘-)" :"Switch to Add Mode (⌘+)")
     }
 
     var currentRow: some View {
@@ -316,11 +312,19 @@ struct OverlayView: View {
 
     var keyboardShortcuts: some View {
         HStack {
-            Button("Add to") { viewModel.mode = .add }
-                .keyboardShortcut("+", modifiers: [.command])
+            Button("Add Mode") {
+                withAnimation(.easeInOut(duration: 0.1)) {
+                    viewModel.mode = .add
+                }
+            }
+            .keyboardShortcut("+", modifiers: [.command])
 
-            Button("Remove from") { viewModel.mode = .remove }
-                .keyboardShortcut("-", modifiers: [.command])
+            Button("Remove Mode") {
+                withAnimation(.easeInOut(duration: 0.1)) {
+                    viewModel.mode = .remove
+                }
+            }
+            .keyboardShortcut("-", modifiers: [.command])
 
             Button("Apply and Continue") {
                 let text = viewModel.text

@@ -1,22 +1,12 @@
 import Foundation
 
 struct Tagging {
-    enum Mode: String, CaseIterable {
-        case remove = "Remove metadata"
-        case add = "Add metadata"
+    enum Mode: CaseIterable {
+        case remove
+        case add
 
-        var systemImage: String {
-            switch self {
-            case .add:      Icon.add.name
-            case .remove:   Icon.remove.name
-            }
-        }
-
-        var tooltip: String {
-            switch self {
-            case .add:      "Add Mode (⌘+)"
-            case .remove:   "Remove Mode (⌘-)"
-            }
+        mutating func toggle() {
+            self = (self == .add) ? .remove : .add
         }
     }
 
