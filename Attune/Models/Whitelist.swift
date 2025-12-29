@@ -13,6 +13,8 @@ final class Whitelist {
     var commentTags: [Tag] { tags.filter { $0.category == .comment} }
     var groupingTags: [Tag] { tags.filter { $0.category == .grouping} }
 
+    var suggestions: [String] { tags.map(\.normalizedName) }
+
     private let storageKey = "Attune.Whitelist.tags"
 
     init() {

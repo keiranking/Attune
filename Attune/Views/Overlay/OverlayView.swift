@@ -17,22 +17,7 @@ final class OverlayViewModel {
 
     var omniboxPrompt: String = ""
     var showOmniboxPrompt: Bool { AppSettings.shared.showOmniboxPrompt }
-
-    // MARK: Omnibox
-
-    func generateOmniboxPrompt() -> String {
-        let prefix = Bool.random(weight: 0.25) ? ["x", "s"].shuffled().first! : nil
-        let comment = Tag.examples.shuffled().first(where: { $0.category == .comment })?.normalizedName
-        let genre = Tag.examples.shuffled().first(where: { $0.category == .genre })?.normalizedName
-        let grouping = Tag.examples.shuffled().first(where: { $0.category == .grouping })?.normalizedName
-        let rating = Bool.random() ? "\(Int.random(in: Track.ratingRange))" : nil
-
-        var keywords = [comment, genre, grouping, rating].compactMap({ $0 }).shuffled()
-        keywords.removeFirst()
-        if let prefix { keywords.insert(prefix, at: 0) }
-
-        return keywords.joined(separator: " ")
-    }
+    var showAutocompletion: Bool { true }
 
     // MARK: Current track, derived properties
 
@@ -164,6 +149,38 @@ final class OverlayViewModel {
 
     var scopeRowTooltip = "Submit Changes (⏎)"
 
+    // MARK: Omnibox
+
+    func generateOmniboxPrompt() -> String {
+        let prefix = Bool.random(weight: 0.25) ? ["x", "s"].shuffled().first! : nil
+        let comment = Tag.examples.shuffled().first(where: { $0.category == .comment })?.normalizedName
+        let genre = Tag.examples.shuffled().first(where: { $0.category == .genre })?.normalizedName
+        let grouping = Tag.examples.shuffled().first(where: { $0.category == .grouping })?.normalizedName
+        let rating = Bool.random() ? "\(Int.random(in: Track.ratingRange))" : nil
+
+        var keywords = [comment, genre, grouping, rating].compactMap({ $0 }).shuffled()
+        keywords.removeFirst()
+        if let prefix { keywords.insert(prefix, at: 0) }
+
+        return keywords.joined(separator: " ")
+    }
+
+    func processInlineCommands() {
+        let trimmed = text.trimmingCharacters(in: .whitespaces)
+
+        if trimmed.hasPrefix("x ") {
+            mode = .remove
+            text = String(trimmed.dropFirst(2))
+            return
+        }
+
+        if trimmed.hasPrefix("s ") {
+            scope = .selection
+            text = String(trimmed.dropFirst(2))
+            return
+        }
+    }
+
     // MARK: Functions
 
     func reset() {
@@ -192,22 +209,6 @@ final class OverlayViewModel {
     }
 
     func toggleMode() { mode.toggle() }
-
-    func processInlineCommands() {
-        let trimmed = text.trimmingCharacters(in: .whitespaces)
-
-        if trimmed.hasPrefix("x ") {
-            mode = .remove
-            text = String(trimmed.dropFirst(2))
-            return
-        }
-
-        if trimmed.hasPrefix("s ") {
-            scope = .selection
-            text = String(trimmed.dropFirst(2))
-            return
-        }
-    }
 }
 
 struct OverlayView: View {
@@ -255,6 +256,11 @@ struct OverlayView: View {
                 "",
                 text: $viewModel.text,
                 prompt: viewModel.showOmniboxPrompt ? Text(viewModel.omniboxPrompt) : nil
+            )
+            .autocomplete(
+                text: $viewModel.text,
+                using: Whitelist.shared.suggestions,
+                disabled: !viewModel.showAutocompletion
             )
             .onSubmit {
                 onSubmit(viewModel.text, true)
