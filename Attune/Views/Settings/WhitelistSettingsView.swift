@@ -12,6 +12,11 @@ extension WhitelistSettingsView {
             set { AppSettings.shared.enforceWhitelist = newValue }
         }
 
+        var showAutocompletion: Bool {
+            get { AppSettings.shared.showAutocompletion }
+            set { AppSettings.shared.showAutocompletion = newValue }
+        }
+
         init() {
             load()
         }
@@ -38,10 +43,14 @@ struct WhitelistSettingsView: View {
     var body: some View {
         Form {
             Section {
-                toggle
+                enforceWhitelistToggle
             }
 
             Group {
+                Divider()
+
+                showAutocompletionToggle
+
                 WhitelistEditor(
                     title: "Genre",
                     text: $viewModel.genreText,
@@ -65,7 +74,7 @@ struct WhitelistSettingsView: View {
         .padding()
     }
 
-    var toggle: some View {
+    var enforceWhitelistToggle: some View {
         VStack(alignment: .leading) {
             Toggle(
                 "Enforce whitelist",
@@ -83,6 +92,13 @@ struct WhitelistSettingsView: View {
                 .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .top))
                 .fixedSize(horizontal: false, vertical: true)
         }
+    }
+
+    var showAutocompletionToggle: some View {
+        Toggle(
+            "Autocomplete keywords from whitelist",
+            isOn: $viewModel.showAutocompletion
+        )
     }
 
     init(
