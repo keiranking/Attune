@@ -52,7 +52,7 @@ struct AutocompleteModifier: ViewModifier {
     }
 
     private func updateSuggestion(for input: String) {
-        let lastWord = input.split(separator: " ").last?.lowercased() ?? ""
+        let lastWord = input.components(separatedBy: " ").last?.lowercased() ?? ""
 
         guard lastWord.count > 1 else {
             suggestion = ""
