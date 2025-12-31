@@ -7,7 +7,7 @@ struct AutocompleteModifier: ViewModifier {
 
     let characterLimit: Int = 45
     var remainingCharacters: Int { characterLimit - text.count }
-    @State private var shakeTrigger: Int = 0
+    @State private var rejectInputAnimationTrigger: Int = 0
 
     @State private var suggestion: String = ""
     @State private var isForwardTyping: Bool = false
@@ -15,19 +15,21 @@ struct AutocompleteModifier: ViewModifier {
     func body(content: Content) -> some View {
         ZStack(alignment: .leading) {
             content
-                .onKeyPress(.rightArrow) { handleAcceptIntent() }
-                .onKeyPress(.tab) { handleAcceptIntent() }
+                .onKeyPress(.rightArrow, action: handleAcceptIntent)
+                .onKeyPress(.tab, action: handleAcceptIntent)
                 .onReceive(NotificationCenter.default.publisher(for: NSTextView.didChangeSelectionNotification)) { _ in
                     if !isForwardTyping {
                         suggestion = ""
                     }
                 }
-                .onChange(of: text) { old, new in
-                    handleTextChange(old: old, new: new)
-                }
-                .phaseAnimator([0, 10, -10, 10, -10, 0], trigger: shakeTrigger) { content, offset in
-                    content.offset(x: offset)
-                } animation: { _ in .linear(duration: 0.05) }
+                .onChange(of: text, handleTextChange)
+                .phaseAnimator(
+                    [0, 10, -10, 10, -10, 0],
+                    trigger: rejectInputAnimationTrigger,
+                    content: { content, phase in content.offset(x: phase) },
+                    animation: { _ in .linear(duration: 0.05) }
+                )
+
             HStack(spacing: 0) {
                 Text(text).foregroundStyle(.clear)
                 Text(suggestion).foregroundStyle(Color.tertiary)
@@ -47,7 +49,7 @@ struct AutocompleteModifier: ViewModifier {
     private func handleTextChange(old: String, new: String) {
         if new.count > characterLimit {
             text = old
-            signalCharacterLimitReached()
+            signalRejectInput()
             return
         }
 
@@ -84,8 +86,8 @@ struct AutocompleteModifier: ViewModifier {
         }
     }
 
-    private func signalCharacterLimitReached() {
-        shakeTrigger += 1
+    private func signalRejectInput() {
+        rejectInputAnimationTrigger += 1
         NSSound(named: "Basso")?.play()
     }
 }
