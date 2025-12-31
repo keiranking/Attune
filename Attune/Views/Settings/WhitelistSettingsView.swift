@@ -29,9 +29,9 @@ extension WhitelistSettingsView {
 
         func save() {
             Whitelist.shared.replace(with: [
-                Whitelist.tags(from: genreText, as: .genre),
-                Whitelist.tags(from: commentText, as: .comment),
-                Whitelist.tags(from: groupingText, as: .grouping)
+                Tag.array(from: genreText, as: .genre),
+                Tag.array(from: commentText, as: .comment),
+                Tag.array(from: groupingText, as: .grouping)
             ].flatMap { $0 })
         }
     }

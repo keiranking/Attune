@@ -27,10 +27,7 @@ extension Music {
 
             Music.shared.refresh()
 
-            var tokens = command
-                .replacingOccurrences(of: ",", with: " ")
-                .split(whereSeparator: \.isWhitespace)
-                .map(String.init)
+            var tokens = command.tokenized
 
             let ratings = tokens
                 .subtract(where: { Track.ratingRange.contains(Int($0) ?? -1) })
@@ -59,7 +56,7 @@ extension Music {
                     } else {
                         let tags = AppSettings.shared.enforceWhitelist
                         ? Whitelist.shared.tags.filter { tokens.contains($0.normalizedName) }
-                        : Whitelist.tags(from: tokens.joined(separator: ", "), as: .comment)
+                        : Tag.array(from: tokens.joined(separator: ", "), as: .comment)
 
                         mutated[i].add(tags: tags)
                     }

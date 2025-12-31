@@ -14,6 +14,13 @@ struct Tag: Identifiable, Codable, Comparable, CustomStringConvertible, Hashable
     static func < (lhs: Tag, rhs: Tag) -> Bool {
         lhs.normalizedName < rhs.normalizedName
     }
+
+    init?(_ name: String, category: Category = .comment) {
+        guard let validName = name.validated else { return nil }
+
+        self.name = validName
+        self.category = category
+    }
 }
 
 extension Tag {
@@ -27,6 +34,12 @@ extension Tag {
 }
 
 extension Tag {
+    static func array(from string: String, as category: Category) -> [Tag] {
+        string.tokenized.sorted().compactMap { Tag(String($0), category: category) }
+    }
+}
+
+extension Tag {
     static var examples: [Tag] {
         let comments = [
             "action", "advice", "ballad", "celebration", "clip", "ethnic", "exmas",
@@ -35,24 +48,20 @@ extension Tag {
             "regret", "religious", "revenge", "romantic", "running", "sad", "secular",
             "seduction", "self", "sexy", "sinister", "slow", "society", "traditional",
             "theme"
-        ]
+        ].compactMap { Tag($0, category: .comment) }
+
         let groupings = [
             "boy", "girl", "vocal", "group", "choir", "acapella", "brass", "chant",
             "guitar", "organ", "pan", "piano", "perc", "strings", "synth", "wind",
             "whistle", "solo", "band", "orchestra"
-        ]
+        ].compactMap { Tag($0, category: .grouping) }
+
         let genres = [
             "Alternative", "Broadway", "Blues", "Christmas", "Classical", "Country",
             "Electronica", "Folk", "Jazz", "Karaoke", "Latin", "OST", "Personal", "Pop",
             "R&B", "Rap", "Reggae", "Rock", "Soca", "Soul", "Standards"
-        ]
+        ].compactMap { Tag($0, category: .genre) }
 
-        return [
-            comments.map    { .init(name: $0, category: .comment) },
-            groupings.map   { .init(name: $0, category: .grouping) },
-            genres.map      { .init(name: $0, category: .genre) }
-        ]
-        .flatMap { $0 }
-        .sorted { $0.name < $1.name }
+        return (comments + groupings + genres).sorted { $0.name < $1.name }
     }
 }

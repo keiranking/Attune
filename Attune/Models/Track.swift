@@ -48,7 +48,7 @@ struct Track: Identifiable, Codable, Hashable {
     mutating func add(tokens: [String]) {
         for token in tokens {
             let category = Whitelist.shared.category(for: token) ?? .comment
-            let tag = Tag(name: token, category: category)
+            guard let tag = Tag(token, category: category) else { return }
             tags.insert(tag)
         }
     }
@@ -91,17 +91,9 @@ extension Track {
         self.rating = rating / 20
         self.tags = []
 
-        self.tags.formUnion(Track.parseTags(from: comment, category: .comment))
-        self.tags.formUnion(Track.parseTags(from: grouping, category: .grouping))
-        self.tags.formUnion(Track.parseTags(from: genre, category: .genre))
-    }
-
-    private static func parseTags(from string: String, category: Tag.Category) -> Set<Tag> {
-        let names = string.components(separatedBy: ",")
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty }
-
-        return Set(names.map { Tag(name: $0, category: category) })
+        self.tags.formUnion(Tag.array(from: comment, as: .comment))
+        self.tags.formUnion(Tag.array(from: grouping, as: .grouping))
+        self.tags.formUnion(Tag.array(from: genre, as: .genre))
     }
 }
 
@@ -132,9 +124,9 @@ extension Track {
         self.rating = starRating
         self.tags = []
 
-        self.tags.formUnion(Track.parseTags(from: comment, category: .comment))
-        self.tags.formUnion(Track.parseTags(from: grouping, category: .grouping))
-        self.tags.formUnion(Track.parseTags(from: genre, category: .genre))
+        self.tags.formUnion(Tag.array(from: comment, as: .comment))
+        self.tags.formUnion(Tag.array(from: grouping, as: .grouping))
+        self.tags.formUnion(Tag.array(from: genre, as: .genre))
     }
 }
 

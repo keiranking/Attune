@@ -37,17 +37,6 @@ final class Whitelist {
         return tags.first { $0.normalizedName == normalized }?.category
     }
 
-    static func tags(from csv: String, as category: Tag.Category) -> [Tag] {
-        csv
-            .components(separatedBy: ",")
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty }
-            .uniqued(on: { $0.lowercased() })
-            .sorted()
-            .map { Tag(name: String($0), category: category) }
-
-    }
-
     static var blacklist: [String] = Track.ratingRange.map { "\($0)" }
 
     // MARK: - Persistence
