@@ -1,8 +1,13 @@
 import SwiftUI
+import AppKit
 
 struct AutocompleteModifier: ViewModifier {
     @Binding var text: String
     let candidates: [String]
+
+    let characterLimit: Int = 45
+    var remainingCharacters: Int { characterLimit - text.count }
+    @State private var shakeTrigger: Int = 0
 
     @State private var suggestion: String = ""
     @State private var isForwardTyping: Bool = false
@@ -10,8 +15,8 @@ struct AutocompleteModifier: ViewModifier {
     func body(content: Content) -> some View {
         ZStack(alignment: .leading) {
             content
-                .onKeyPress(.rightArrow) { handleAccept() }
-                .onKeyPress(.tab) { handleAccept() }
+                .onKeyPress(.rightArrow) { handleAcceptIntent() }
+                .onKeyPress(.tab) { handleAcceptIntent() }
                 .onReceive(NotificationCenter.default.publisher(for: NSTextView.didChangeSelectionNotification)) { _ in
                     if !isForwardTyping {
                         suggestion = ""
@@ -20,7 +25,9 @@ struct AutocompleteModifier: ViewModifier {
                 .onChange(of: text) { old, new in
                     handleTextChange(old: old, new: new)
                 }
-
+                .phaseAnimator([0, 10, -10, 10, -10, 0], trigger: shakeTrigger) { content, offset in
+                    content.offset(x: offset)
+                } animation: { _ in .linear(duration: 0.05) }
             HStack(spacing: 0) {
                 Text(text).foregroundStyle(.clear)
                 Text(suggestion).foregroundStyle(Color.tertiary)
@@ -30,7 +37,7 @@ struct AutocompleteModifier: ViewModifier {
         }
     }
 
-    private func handleAccept() -> KeyPress.Result {
+    private func handleAcceptIntent() -> KeyPress.Result {
         guard !suggestion.isEmpty else { return .ignored }
         text += suggestion
         suggestion = ""
@@ -38,6 +45,12 @@ struct AutocompleteModifier: ViewModifier {
     }
 
     private func handleTextChange(old: String, new: String) {
+        if new.count > characterLimit {
+            text = old
+            signalCharacterLimitReached()
+            return
+        }
+
         if new.count > old.count && new.hasPrefix(old) {
             isForwardTyping = true
             updateSuggestion(for: new)
@@ -59,11 +72,21 @@ struct AutocompleteModifier: ViewModifier {
             return
         }
 
-        if let match = candidates.first(where: { $0.lowercased().hasPrefix(lastWord) && $0.lowercased() != lastWord }) {
+        if let match = candidates.first(where: {
+            $0.lowercased().hasPrefix(lastWord)
+            && $0.lowercased() != lastWord
+        }) {
             suggestion = String(match.dropFirst(lastWord.count))
+
+            if suggestion.count > remainingCharacters { suggestion = "" }
         } else {
             suggestion = ""
         }
+    }
+
+    private func signalCharacterLimitReached() {
+        shakeTrigger += 1
+        NSSound(named: "Basso")?.play()
     }
 }
 
