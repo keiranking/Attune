@@ -1,18 +1,24 @@
 import Foundation
 
-struct Tag: Identifiable, Codable, Comparable, CustomStringConvertible, Hashable {
+struct Tag: Identifiable, Codable, Comparable, CustomStringConvertible, Equatable, Hashable {
     var name: String
     var category: Category
 
-    var id: String { name }
-    var normalizedName: String {
-        name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-    }
+    var id: String { normalizedName }
+    var normalizedName: String { name.lowercased() }
 
     var description: String { name }
 
     static func < (lhs: Tag, rhs: Tag) -> Bool {
         lhs.normalizedName < rhs.normalizedName
+    }
+
+    static func == (lhs: Tag, rhs: Tag) -> Bool {
+        lhs.normalizedName == rhs.normalizedName
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(normalizedName)
     }
 
     init?(_ name: String, category: Category = .comment) {
