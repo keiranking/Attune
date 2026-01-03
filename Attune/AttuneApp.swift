@@ -65,7 +65,6 @@ extension AttuneApp {
         let overlayViewModel = OverlayViewModel()
 
         private var overlayWindow: OverlayWindow?
-        private var hotKeyManager: HotKeyManager?
         private let music = Music.shared
 
         private var priorApplication: NSRunningApplication?
