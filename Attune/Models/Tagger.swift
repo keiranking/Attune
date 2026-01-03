@@ -45,7 +45,7 @@ extension Music {
             var mutated = tracks
 
             if let rating = ratings.last {
-                for i in mutated.indices { mutated[i].rating = rating }
+                for i in mutated.indices { mutated[i].rate(rating) }
                 writeRating(mutated)
             }
 
@@ -115,7 +115,7 @@ extension Music {
                         artist:     p[2],
                         album:      p[3],
                         year:       Int(p[4]) ?? 0,
-                        rating:     Int(p[5]) ?? 0,
+                        rating:     (Int(p[5]) ?? 0) / 20,
                         comment:    p[6],
                         grouping:   p[7],
                         genre:      p[8]

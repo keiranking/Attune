@@ -2,6 +2,7 @@ import Foundation
 
 extension Track {
     typealias PersistentID = String
+    typealias StarRating = Int
 }
 
 struct Track: Identifiable, Codable, Hashable {
@@ -10,8 +11,8 @@ struct Track: Identifiable, Codable, Hashable {
     let artist: String
     let album: String
     let year: Int
-    var rating: Int
-    var tags: Set<Tag>
+    private(set) var rating: StarRating
+    private(set) var tags: Set<Tag>
 
     var tagDelimiter = ", "
     var comment: String {
@@ -42,7 +43,7 @@ struct Track: Identifiable, Codable, Hashable {
     }
 
     mutating func rate(_ rating: Int) {
-        self.rating = rating
+        self.rating = rating.clamped(to: Track.ratingRange)
     }
 
     mutating func add(tokens: [String]) {
@@ -58,9 +59,26 @@ struct Track: Identifiable, Codable, Hashable {
         tags = tags.filter { !unwantedTokens.contains($0.normalizedName) }
     }
 
-    static let minRating: Int = 0
-    static let maxRating: Int = 5
-    static let ratingRange: ClosedRange<Int> = Track.minRating...Track.maxRating
+    init(
+        id: PersistentID,
+        title: String,
+        artist: String,
+        album: String,
+        year: Int,
+        rating: StarRating,
+        tags: Set<Tag>
+    ) {
+        self.id = id
+        self.title = title
+        self.artist = artist
+        self.album = album
+        self.year = year.clamped(to: Track.yearRange)
+        self.rating = rating.clamped(to: Track.ratingRange)
+        self.tags = tags
+    }
+
+    static let ratingRange: ClosedRange<Int> = 0...5
+    static let yearRange: ClosedRange<Int> = 1900...Calendar.current.component(.year, from: Date())
 }
 
 extension Track: Equatable {
@@ -78,7 +96,7 @@ extension Track {
         artist: String,
         album: String,
         year: Int,
-        rating: Int,
+        rating: StarRating,
         comment: String,
         grouping: String,
         genre: String
@@ -87,8 +105,8 @@ extension Track {
         self.title = title
         self.artist = artist
         self.album = album
-        self.year = year
-        self.rating = rating / 20
+        self.year = year.clamped(to: Track.yearRange)
+        self.rating = rating.clamped(to: Track.ratingRange)
         self.tags = []
 
         self.tags.formUnion(Tag.array(from: comment, as: .comment))
@@ -110,7 +128,7 @@ extension Track {
         let album = musicTrack.album ?? ""
         let year = musicTrack.year
 
-        let starRating = musicTrack.rating / 20
+        let rating = (musicTrack.rating / 20).clamped(to: Track.ratingRange)
 
         let comment = musicTrack.comment ?? ""
         let grouping = musicTrack.grouping ?? ""
@@ -121,7 +139,7 @@ extension Track {
         self.artist = artist
         self.album = album
         self.year = year
-        self.rating = starRating
+        self.rating = rating
         self.tags = []
 
         self.tags.formUnion(Tag.array(from: comment, as: .comment))
@@ -140,4 +158,10 @@ extension Track {
         rating: 3,
         tags: Set(Tag.examples.randomElements(5))
     )
+}
+
+private extension Comparable {
+    func clamped(to range: ClosedRange<Self>) -> Self {
+        max(range.lowerBound, min(self, range.upperBound))
+    }
 }
