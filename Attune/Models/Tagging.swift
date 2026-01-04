@@ -10,17 +10,17 @@ struct Tagging {
         }
     }
 
-    enum Outcome: Equatable {
+    enum Outcome {
         case success
         case failure
     }
 
-    enum Scope: String, CaseIterable {
-        case current = "Current Track"
-        case selection = "Selection"
+    enum Scope {
+        case current
+        case selection
     }
 
-    enum State: Equatable {
+    enum State {
         case ready
         case updating
     }
