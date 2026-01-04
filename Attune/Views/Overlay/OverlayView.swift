@@ -17,9 +17,7 @@ final class OverlayViewModel {
 
     var omniboxPrompt: String = ""
     var showOmniboxPrompt: Bool { AppSettings.shared.showOmniboxPrompt }
-    var showAutocompletion: Bool {
-        AppSettings.shared.enforceWhitelist && AppSettings.shared.showAutocompletion
-    }
+    var showAutocompletion: Bool { AppSettings.shared.showAutocompletion }
 
     // MARK: Current track, derived properties
 

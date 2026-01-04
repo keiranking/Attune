@@ -45,34 +45,31 @@ struct WhitelistSettingsView: View {
         Form {
             Section {
                 enforceWhitelistToggle
+                showAutocompletionToggle
             }
 
-            Group {
-                Divider()
-
-                showAutocompletionToggle
-
-                WhitelistEditor(
+            Section {
+                ListEditor(
                     title: "Genre",
                     text: $viewModel.genreText,
                     placeholder: "Classical, Jazz, Reggae"
                 )
 
-                WhitelistEditor(
+                ListEditor(
                     title: "Comments",
                     text: $viewModel.commentText,
                     placeholder: "lively, sad, traditional"
                 )
 
-                WhitelistEditor(
+                ListEditor(
                     title: "Grouping",
                     text: $viewModel.groupingText,
                     placeholder: "brass, strings, vocal"
                 )
             }
-            .disabled(!viewModel.enforceWhitelist)
         }
-        .padding()
+        .formStyle(.grouped)
+        .frame(minHeight: 550)
         .onDisappear() { viewModel.save() }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .background { viewModel.save() }
@@ -88,7 +85,7 @@ struct WhitelistSettingsView: View {
 
             Text(
                 """
-                Only allow whitelisted keywords to be added to tracks.
+                Only whitelisted keywords can be added to tracks.
                 Existing metadata is not affected.
                 """
             )
@@ -101,7 +98,7 @@ struct WhitelistSettingsView: View {
 
     var showAutocompletionToggle: some View {
         Toggle(
-            "Autocomplete keywords from whitelist",
+            "Show suggestions as you type",
             isOn: $viewModel.showAutocompletion
         )
     }
@@ -113,7 +110,7 @@ struct WhitelistSettingsView: View {
     }
 }
 
-private struct WhitelistEditor: View {
+private struct ListEditor: View {
     let title: String
     @Binding var text: String
     let placeholder: String?
@@ -121,14 +118,19 @@ private struct WhitelistEditor: View {
     @FocusState private var isFocused: Bool
 
     var body: some View {
-        Section(
-            header: Text(title).padding(.top, 20)
-        ) {
+        LabeledContent(title) {
             TextField("", text: $text, prompt: Text(placeholder ?? ""), axis: .vertical)
                 .focused($isFocused)
                 .lineLimit(5, reservesSpace: true)
+                .multilineTextAlignment(.leading)
                 .font(.body)
                 .frame(maxWidth: .infinity)
+                .textFieldStyle(.plain)
+                .padding(6)
+                .background(
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color(NSColor.textBackgroundColor))
+                )
         }
     }
 
