@@ -7,41 +7,48 @@ final class AppSettings {
 
     var enforceWhitelist: Bool {
         didSet {
-            defaults.set(enforceWhitelist, forKey: StorageKey.enforceWhitelist)
+            storage.set(enforceWhitelist, forKey: StorageKey.enforceWhitelist)
         }
     }
 
     var showAutocompletion: Bool {
         didSet {
-            defaults.set(showAutocompletion, forKey: StorageKey.showAutocompletion)
+            storage.set(showAutocompletion, forKey: StorageKey.showAutocompletion)
         }
     }
 
     var showOmniboxPrompt: Bool {
         didSet {
-            defaults.set(showOmniboxPrompt, forKey: StorageKey.showOmniboxPrompt)
+            storage.set(showOmniboxPrompt, forKey: StorageKey.showOmniboxPrompt)
         }
     }
 
-    private let defaults = UserDefaults.standard
+    private let storage: Storable
 
-    private init() {
-        defaults.register(defaults: [
-            StorageKey.enforceWhitelist: false,
-            StorageKey.showAutocompletion: true,
-            StorageKey.showOmniboxPrompt: true
-        ])
+    init(storage: Storable = UserDefaults.standard) {
+        self.storage = storage
 
-        self.enforceWhitelist = defaults.bool(forKey: StorageKey.enforceWhitelist)
-        self.showAutocompletion = defaults.bool(forKey: StorageKey.showAutocompletion)
-        self.showOmniboxPrompt = defaults.bool(forKey: StorageKey.showOmniboxPrompt)
+        let enforceWhitelist = storage.bool(forKey: StorageKey.enforceWhitelist) ?? false
+        let showAutocompletion = storage.bool(forKey: StorageKey.showAutocompletion) ?? true
+        let showOmniboxPrompt = storage.bool(forKey: StorageKey.showOmniboxPrompt) ?? true
+
+
+        self.enforceWhitelist = enforceWhitelist
+        self.showAutocompletion = showAutocompletion
+        self.showOmniboxPrompt = showOmniboxPrompt
     }
 }
 
-private extension AppSettings {
+extension AppSettings {
     enum StorageKey {
         static let enforceWhitelist = "Attune.AppSettings.enforceWhitelist"
         static let showAutocompletion = "Attune.AppSettings.showAutocompletion"
         static let showOmniboxPrompt = "Attune.AppSettings.showOmniboxPrompt"
+    }
+}
+
+private extension Storable {
+    func bool(forKey key: String) -> Bool? {
+        (self as? UserDefaults)?.object(forKey: key) as? Bool
     }
 }
