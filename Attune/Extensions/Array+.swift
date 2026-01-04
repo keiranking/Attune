@@ -33,6 +33,12 @@ extension Array where Element: Identifiable, Element.ID: StringProtocol {
     }
 }
 
+extension Array where Element: StringProtocol {
+    var listed: String {
+        self.joined(separator: ", ")
+    }
+}
+
 extension Collection where Element: Hashable {
     func randomElements(_ count: Int) -> [Element] {
         guard count >= 0 else { return [] }
