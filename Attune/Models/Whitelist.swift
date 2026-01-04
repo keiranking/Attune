@@ -15,9 +15,11 @@ final class Whitelist {
 
     var suggestions: [String] { tags.map(\.normalizedName) }
 
+    private let storage: Storable
     private let storageKey = "Attune.Whitelist.tags"
 
-    init() {
+    init(storage: Storable = UserDefaults.standard) {
+        self.storage = storage
         load()
     }
 
@@ -43,16 +45,16 @@ final class Whitelist {
 
     private func save() {
         if let encoded = try? JSONEncoder().encode(tags) {
-            UserDefaults.standard.set(encoded, forKey: storageKey)
+            storage.set(encoded, forKey: storageKey)
         }
     }
 
     private func load() {
-        if let data = UserDefaults.standard.data(forKey: storageKey),
+        if let data = storage.data(forKey: storageKey),
            let decoded = try? JSONDecoder().decode([Tag].self, from: data) {
             self.tags = decoded.sorted { $0.name < $1.name }
         } else {
-            self.tags = Tag.examples
+            self.tags = []
         }
     }
 }

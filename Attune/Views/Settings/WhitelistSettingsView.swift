@@ -39,6 +39,7 @@ extension WhitelistSettingsView {
 
 struct WhitelistSettingsView: View {
     @Bindable var viewModel: ViewModel
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         Form {
@@ -72,6 +73,10 @@ struct WhitelistSettingsView: View {
             .disabled(!viewModel.enforceWhitelist)
         }
         .padding()
+        .onDisappear() { viewModel.save() }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .background { viewModel.save() }
+        }
     }
 
     var enforceWhitelistToggle: some View {

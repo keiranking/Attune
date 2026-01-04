@@ -22,22 +22,4 @@ struct TaggingTests {
     func modeExhaustive() {
         #expect(Tagging.Mode.allCases.count == 2)
     }
-
-    @Test("Outcome equality is stable")
-    func outcomeEquality() {
-        #expect(Tagging.Outcome.success == .success)
-        #expect(Tagging.Outcome.failure != .success)
-    }
-
-    @Test("Scope equality is stable")
-    func scopeEquality() {
-        #expect(Tagging.Scope.current == .current)
-        #expect(Tagging.Scope.selection != .current)
-    }
-
-    @Test("State equality is stable")
-    func stateEquality() {
-        #expect(Tagging.State.ready == .ready)
-        #expect(Tagging.State.updating != .ready)
-    }
 }

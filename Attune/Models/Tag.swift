@@ -4,7 +4,7 @@ struct Tag: Identifiable, Codable, Comparable, CustomStringConvertible, Equatabl
     var name: String
     var category: Category
 
-    var id: String { normalizedName }
+    var id: String { name }
     var normalizedName: String { name.lowercased() }
 
     var description: String { name }
