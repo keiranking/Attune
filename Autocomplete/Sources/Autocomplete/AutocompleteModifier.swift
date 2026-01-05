@@ -55,7 +55,7 @@ struct AutocompleteModifier: ViewModifier {
 
         if new.count > old.count && new.hasPrefix(old) {
             isForwardTyping = true
-            updateSuggestion(for: new)
+            suggestion = suggestion(for: new)
         } else {
             isForwardTyping = false
             suggestion = ""
@@ -66,24 +66,21 @@ struct AutocompleteModifier: ViewModifier {
         }
     }
 
-    private func updateSuggestion(for input: String) {
+    private func suggestion(for input: String) -> String {
         let lastWord = input.components(separatedBy: " ").last?.lowercased() ?? ""
 
-        guard lastWord.count > 1 else {
-            suggestion = ""
-            return
-        }
+        guard lastWord.count > 1 else { return "" }
 
         if let match = candidates.first(where: {
             $0.lowercased().hasPrefix(lastWord)
             && $0.lowercased() != lastWord
         }) {
-            suggestion = String(match.dropFirst(lastWord.count))
+            let suggestion = String(match.dropFirst(lastWord.count))
 
-            if suggestion.count > remainingCharacters { suggestion = "" }
-        } else {
-            suggestion = ""
+            if suggestion.count <= remainingCharacters { return suggestion }
         }
+
+        return ""
     }
 
     private func signalRejectInput() {
@@ -92,7 +89,7 @@ struct AutocompleteModifier: ViewModifier {
     }
 }
 
-extension View {
+public extension View {
     @ViewBuilder
     func autocomplete(
         text: Binding<String>,

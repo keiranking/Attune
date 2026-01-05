@@ -1,4 +1,5 @@
 import SwiftUI
+import Autocomplete
 
 struct TaggingEditView: View {
     @Bindable var viewModel: ViewModel

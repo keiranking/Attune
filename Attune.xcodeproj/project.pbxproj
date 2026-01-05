@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		370EAF742EFA6D1A00747F34 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 370EAF732EFA6D1A00747F34 /* KeyboardShortcuts */; };
 		370EAF792EFB606200747F34 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 370EAF782EFB606200747F34 /* LaunchAtLogin */; };
+		3732BF892F0B8E0B00FFFFAD /* Autocomplete in Frameworks */ = {isa = PBXBuildFile; productRef = 3732BF882F0B8E0B00FFFFAD /* Autocomplete */; };
 		379B95E02EF71989006F4448 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 379B95DF2EF71989006F4448 /* Algorithms */; };
 /* End PBXBuildFile section */
 
@@ -24,6 +25,7 @@
 
 /* Begin PBXFileReference section */
 		372B941F2F04CE50007E9C38 /* AttuneTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AttuneTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3732BF862F0B8DDE00FFFFAD /* Autocomplete */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Autocomplete; sourceTree = "<group>"; };
 		37B4EEEA2EEB27660083A145 /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = System/Library/Frameworks/ScriptingBridge.framework; sourceTree = SDKROOT; };
 		37D8F3122EDC6CD600B5DA27 /* Attune.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Attune.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -55,6 +57,7 @@
 			files = (
 				370EAF792EFB606200747F34 /* LaunchAtLogin in Frameworks */,
 				379B95E02EF71989006F4448 /* Algorithms in Frameworks */,
+				3732BF892F0B8E0B00FFFFAD /* Autocomplete in Frameworks */,
 				370EAF742EFA6D1A00747F34 /* KeyboardShortcuts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -73,6 +76,7 @@
 		37D8F3092EDC6CD600B5DA27 = {
 			isa = PBXGroup;
 			children = (
+				3732BF862F0B8DDE00FFFFAD /* Autocomplete */,
 				37D8F3142EDC6CD600B5DA27 /* Attune */,
 				372B94202F04CE50007E9C38 /* AttuneTests */,
 				37B4EEE92EEB27660083A145 /* Frameworks */,
@@ -135,6 +139,7 @@
 				379B95DF2EF71989006F4448 /* Algorithms */,
 				370EAF732EFA6D1A00747F34 /* KeyboardShortcuts */,
 				370EAF782EFB606200747F34 /* LaunchAtLogin */,
+				3732BF882F0B8E0B00FFFFAD /* Autocomplete */,
 			);
 			productName = Attune;
 			productReference = 37D8F3122EDC6CD600B5DA27 /* Attune.app */;
@@ -173,6 +178,7 @@
 				379B95DE2EF71989006F4448 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 				370EAF722EFA6D1A00747F34 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 				370EAF772EFB606200747F34 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
+				3732BF872F0B8E0B00FFFFAD /* XCLocalSwiftPackageReference "Autocomplete" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 37D8F3132EDC6CD600B5DA27 /* Products */;
@@ -513,6 +519,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		3732BF872F0B8E0B00FFFFAD /* XCLocalSwiftPackageReference "Autocomplete" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Autocomplete;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		370EAF722EFA6D1A00747F34 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -550,6 +563,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 370EAF772EFB606200747F34 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
 			productName = LaunchAtLogin;
+		};
+		3732BF882F0B8E0B00FFFFAD /* Autocomplete */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Autocomplete;
 		};
 		379B95DF2EF71989006F4448 /* Algorithms */ = {
 			isa = XCSwiftPackageProductDependency;
