@@ -3,13 +3,13 @@ import AppKit
 
 struct AutocompleteModifier: ViewModifier {
     @Binding var text: String
-    let candidates: [String]
+    let autocompleter: Autocompleter
 
     let characterLimit: Int = 45
     var remainingCharacters: Int { characterLimit - text.count }
     @State private var rejectInputAnimationTrigger: Int = 0
 
-    @State private var suggestion: String = ""
+    @State private var suggestion: String? = nil
     @State private var isForwardTyping: Bool = false
 
     func body(content: Content) -> some View {
@@ -32,21 +32,21 @@ struct AutocompleteModifier: ViewModifier {
 
             HStack(spacing: 0) {
                 Text(text).foregroundStyle(.clear)
-                Text(suggestion).foregroundStyle(Color.tertiary)
+                Text(suggestion ?? "").foregroundStyle(Color.tertiary)
             }
             .allowsHitTesting(false)
             .lineLimit(1)
         }
     }
 
-    private func handleAcceptIntent() -> KeyPress.Result {
-        guard !suggestion.isEmpty else { return .ignored }
+    func handleAcceptIntent() -> KeyPress.Result {
+        guard let suggestion else { return .ignored }
         text += suggestion
-        suggestion = ""
+        self.suggestion = nil
         return .handled
     }
 
-    private func handleTextChange(old: String, new: String) {
+    func handleTextChange(old: String, new: String) {
         if new.count > characterLimit {
             text = old
             signalRejectInput()
@@ -58,7 +58,7 @@ struct AutocompleteModifier: ViewModifier {
             suggestion = suggestion(for: new)
         } else {
             isForwardTyping = false
-            suggestion = ""
+            suggestion = nil
         }
 
         DispatchQueue.main.async {
@@ -66,24 +66,18 @@ struct AutocompleteModifier: ViewModifier {
         }
     }
 
-    private func suggestion(for input: String) -> String {
-        let lastWord = input.components(separatedBy: " ").last?.lowercased() ?? ""
+    func suggestion(for input: String) -> String? {
+        guard
+            let lastWord = input.lastWord,
+            lastWord.count > 1,
+            let suggestion = autocompleter.complete(lastWord),
+            suggestion.count <= remainingCharacters
+        else { return nil }
 
-        guard lastWord.count > 1 else { return "" }
-
-        if let match = candidates.first(where: {
-            $0.lowercased().hasPrefix(lastWord)
-            && $0.lowercased() != lastWord
-        }) {
-            let suggestion = String(match.dropFirst(lastWord.count))
-
-            if suggestion.count <= remainingCharacters { return suggestion }
-        }
-
-        return ""
+        return suggestion
     }
 
-    private func signalRejectInput() {
+    func signalRejectInput() {
         rejectInputAnimationTrigger += 1
         NSSound(named: "Basso")?.play()
     }
@@ -97,6 +91,11 @@ public extension View {
         disabled: Bool = false
     ) -> some View {
         if disabled { self }
-        else { self.modifier(AutocompleteModifier(text: text, candidates: candidates)) }
+        else { self.modifier(
+            AutocompleteModifier(
+                text: text,
+                autocompleter: Autocompleter(candidates: candidates)
+            )
+        ) }
     }
 }

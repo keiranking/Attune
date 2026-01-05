@@ -10,3 +10,9 @@ extension Color {
 extension ShapeStyle where Self == Color {
     static var tertiary: Color { .tertiary }
 }
+
+extension String {
+    var lastWord: String? {
+        split(separator: " ").last.map(String.init)
+    }
+}
