@@ -6,12 +6,12 @@ import Testing
 @testable import Attune
 
 @MainActor
-@Suite("OverlayViewModel unit tests")
-struct OverlayViewModelTests {
+@Suite("TaggingEditViewModel unit tests")
+struct TaggingEditViewModelTests {
 
     @Test("Defaults are sane on init")
     func defaults() {
-        let vm = OverlayViewModel()
+        let vm = TaggingEditView.ViewModel()
 
         #expect(vm.text == "")
         #expect(vm.mode == .add)
@@ -26,7 +26,7 @@ struct OverlayViewModelTests {
 
     @Test("Reset clears transient state")
     func reset() {
-        let vm = OverlayViewModel()
+        let vm = TaggingEditView.ViewModel()
         vm.text = "foo"
         vm.mode = .remove
         vm.scope = .selection
@@ -43,7 +43,7 @@ struct OverlayViewModelTests {
 
     @Test("Inline remove command switches mode")
     func inlineRemoveCommand() {
-        let vm = OverlayViewModel()
+        let vm = TaggingEditView.ViewModel()
         vm.text = "x ambient"
 
         vm.processInlineCommands()
@@ -54,7 +54,7 @@ struct OverlayViewModelTests {
 
     @Test("Inline selection command switches scope")
     func inlineSelectionCommand() {
-        let vm = OverlayViewModel()
+        let vm = TaggingEditView.ViewModel()
         vm.text = "s jazz"
 
         vm.processInlineCommands()
@@ -65,7 +65,7 @@ struct OverlayViewModelTests {
 
     @Test("Default scope prefers current track")
     func defaultScopePrefersCurrent() throws {
-        let vm = OverlayViewModel()
+        let vm = TaggingEditView.ViewModel()
         vm.currentTrack = .mock()
 
         vm.chooseDefaultScope()
@@ -75,7 +75,7 @@ struct OverlayViewModelTests {
 
     @Test("Default scope falls back to selection")
     func defaultScopeSelectionFallback() throws {
-        let vm = OverlayViewModel()
+        let vm = TaggingEditView.ViewModel()
         vm.selectedTracks = [.mock()]
 
         vm.chooseDefaultScope()
@@ -85,7 +85,7 @@ struct OverlayViewModelTests {
 
     @Test("Toggle scope switches when both scopes exist")
     func toggleScopeSwitches() throws {
-        let vm = OverlayViewModel()
+        let vm = TaggingEditView.ViewModel()
         vm.currentTrack = .mock(id: "A")
         vm.selectedTracks = [.mock(id: "B")]
         vm.scope = .current
@@ -97,7 +97,7 @@ struct OverlayViewModelTests {
 
     @Test("Toggle scope does nothing if alternative unavailable")
     func toggleScopeNoOp() throws {
-        let vm = OverlayViewModel()
+        let vm = TaggingEditView.ViewModel()
         vm.currentTrack = .mock()
         vm.scope = .current
 
@@ -109,7 +109,7 @@ struct OverlayViewModelTests {
     @Test("Selected track equals current detection")
     func selectedTrackIsCurrent() throws {
         let track = Track.mock()
-        let vm = OverlayViewModel()
+        let vm = TaggingEditView.ViewModel()
 
         vm.currentTrack = track
         vm.selectedTracks = [track]
@@ -119,7 +119,7 @@ struct OverlayViewModelTests {
 
     @Test("Selected track title recognizes multiple tracks")
     func multipleSelectedTracksTitle() throws {
-        let vm = OverlayViewModel()
+        let vm = TaggingEditView.ViewModel()
         vm.selectedTracks = [.mock(id: "A"), .mock(id: "B")]
 
         #expect(vm.selectedTrackTitle == "2 selected tracks")

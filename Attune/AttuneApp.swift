@@ -62,7 +62,7 @@ extension AttuneApp {
     @Observable
     final class ViewModel {
         var isOverlayPresented: Bool = false
-        let overlayViewModel = OverlayViewModel()
+        let taggingEditViewModel = TaggingEditView.ViewModel()
 
         private var overlayWindow: OverlayWindow?
         private let music = Music.shared
@@ -87,8 +87,8 @@ extension AttuneApp {
         }
 
         private func setupOverlayWindow() {
-            let rootView = OverlayView(
-                viewModel: overlayViewModel,
+            let rootView = TaggingEditView(
+                viewModel: taggingEditViewModel,
                 onSubmit: { [weak self] text, dismiss in
                     self?.submit(text, dismiss)
                 }
@@ -107,13 +107,13 @@ extension AttuneApp {
 
             window.arrowKeyAction = { [weak self] in
                 withAnimation(.easeInOut(duration: 0.1)) {
-                    self?.overlayViewModel.toggleScope()
+                    self?.taggingEditViewModel.toggleScope()
                 }
             }
 
             window.optionKeyAction = { [weak self] isOptionDown in
                 withAnimation(.easeInOut(duration: 0.1)) {
-                    self?.overlayViewModel.showSecondaryInfo = isOptionDown
+                    self?.taggingEditViewModel.showSecondaryInfo = isOptionDown
                 }
             }
 
@@ -129,7 +129,7 @@ extension AttuneApp {
         private func showOverlay() {
             guard let window = overlayWindow else { return }
 
-            overlayViewModel.reset()
+            taggingEditViewModel.reset()
             sync()
 
             if let screenFrame = NSScreen.main?.visibleFrame {
@@ -164,42 +164,42 @@ extension AttuneApp {
         private func sync() {
             music.refresh()
 
-            overlayViewModel.currentTrack = music.currentTrack
-            overlayViewModel.selectedTracks = music.selectedTracks
+            taggingEditViewModel.currentTrack = music.currentTrack
+            taggingEditViewModel.selectedTracks = music.selectedTracks
 
-            if overlayViewModel.scope == nil {
-                overlayViewModel.chooseDefaultScope()
+            if taggingEditViewModel.scope == nil {
+                taggingEditViewModel.chooseDefaultScope()
             }
         }
 
         private func submit(_ text: String, _ dismiss: Bool) {
             Task {
                 await MainActor.run {
-                    overlayViewModel.state = .updating
-                    overlayViewModel.outcome = nil
+                    taggingEditViewModel.state = .updating
+                    taggingEditViewModel.outcome = nil
                 }
 
                 let result = await music.tagger.process(
                     command: text,
-                    scope: overlayViewModel.scope,
-                    mode: overlayViewModel.mode
+                    scope: taggingEditViewModel.scope,
+                    mode: taggingEditViewModel.mode
                 )
 
                 await MainActor.run {
-                    overlayViewModel.state = .ready
-                    overlayViewModel.outcome = result.isSuccess ? .success : .failure
+                    taggingEditViewModel.state = .ready
+                    taggingEditViewModel.outcome = result.isSuccess ? .success : .failure
                 }
 
                 try? await Task.sleep(for: .milliseconds(750))
 
                 await MainActor.run {
-                    let lastOutcome = overlayViewModel.outcome
-                    overlayViewModel.outcome = nil
+                    let lastOutcome = taggingEditViewModel.outcome
+                    taggingEditViewModel.outcome = nil
 
                     if dismiss {
                         hideOverlay()
                     } else {
-                        if lastOutcome == .success { overlayViewModel.text = "" }
+                        if lastOutcome == .success { taggingEditViewModel.text = "" }
                         sync()
                     }
                 }
