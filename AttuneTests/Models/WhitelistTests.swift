@@ -5,18 +5,6 @@
 import Testing
 @testable import Attune
 
-private final class TestStorage: Storable {
-    private var storage: [String: Data] = [:]
-
-    func data(forKey key: String) -> Data? {
-        storage[key]
-    }
-
-    func set(_ value: Any?, forKey key: String) {
-        storage[key] = value as! Data?
-    }
-}
-
 @Suite("Whitelist unit tests")
 struct WhitelistTests {
 

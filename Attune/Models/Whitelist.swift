@@ -23,8 +23,6 @@ final class Whitelist {
         load()
     }
 
-    // MARK: - CRUD
-
     func replace(with tags: [Tag]) {
         self.tags = tags
             .filter { !Whitelist.blacklist.contains($0.normalizedName) }
@@ -32,16 +30,12 @@ final class Whitelist {
             .sorted()
     }
 
-    // MARK: - Helpers
-
     func category(for tagName: String) -> Tag.Category? {
         let normalized = tagName.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         return tags.first { $0.normalizedName == normalized }?.category
     }
 
     static var blacklist: [String] = Track.ratingRange.map { "\($0)" }
-
-    // MARK: - Persistence
 
     private func save() {
         if let encoded = try? JSONEncoder().encode(tags) {

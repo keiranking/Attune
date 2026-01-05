@@ -27,3 +27,19 @@ extension Track {
         )
     }
 }
+
+final class TestStorage: Storable {
+    private var storage: [String: Any] = [:]
+
+    func data(forKey key: String) -> Data? {
+        storage[key] as? Data
+    }
+
+    func set(_ value: Any?, forKey key: String) {
+        storage[key] = value
+    }
+
+    func bool(forKey key: String) -> Bool? {
+        storage[key] as? Bool
+    }
+}
