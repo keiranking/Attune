@@ -11,7 +11,7 @@ struct Icon {
 }
 
 extension Icon {
-    static let app = Icon("attune", isCustom: true)
+    static let app = Icon("attunoid", isCustom: true)
 
     static let success = Icon("checkmark")
     static let failure = Icon("xmark")
