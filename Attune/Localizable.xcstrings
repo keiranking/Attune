@@ -1,0 +1,427 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "AttuneApp.quitMenuItem" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quit Attune"
+          }
+        }
+      }
+    },
+    "AttuneApp.settingsMenuItem" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings…"
+          }
+        }
+      }
+    },
+    "AttuneApp.toggleAttuneMenuItem" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle Attune"
+          }
+        }
+      }
+    },
+    "GeneralSettingsView.globalHotkeyCaption" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select this field and type the key combination you would like to use to show/hide the app."
+          }
+        }
+      }
+    },
+    "GeneralSettingsView.globalHotkeyLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attune hotkey:"
+          }
+        }
+      }
+    },
+    "GeneralSettingsView.showOmniboxPromptLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show placeholder in omnibox"
+          }
+        }
+      }
+    },
+    "PlayerControlsView.nextButtonLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next track"
+          }
+        }
+      }
+    },
+    "PlayerControlsView.nextButtonTooltip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next track (F9)"
+          }
+        }
+      }
+    },
+    "PlayerControlsView.playButtonIsPausedTooltip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play track (F8)"
+          }
+        }
+      }
+    },
+    "PlayerControlsView.playButtonIsPlayingTooltip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause track (F8)"
+          }
+        }
+      }
+    },
+    "PlayerControlsView.playButtonLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play/Pause"
+          }
+        }
+      }
+    },
+    "PlayerControlsView.previousButtonLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previous track"
+          }
+        }
+      }
+    },
+    "PlayerControlsView.previousButtonTooltip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previous track (F7)"
+          }
+        }
+      }
+    },
+    "SettingsView.generalSettingsTabLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
+          }
+        }
+      }
+    },
+    "SettingsView.whitelistSettingsTabLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whitelist"
+          }
+        }
+      }
+    },
+    "TaggingEditView.activeScopeRowTooltip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Submit changes (⏎)"
+          }
+        }
+      }
+    },
+    "TaggingEditView.addModeButtonLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add mode"
+          }
+        }
+      }
+    },
+    "TaggingEditView.modeControlIsAddTooltip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add mode (⌘+)"
+          }
+        }
+      }
+    },
+    "TaggingEditView.modeControlIsRemoveTooltip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove mode (⌘-)"
+          }
+        }
+      }
+    },
+    "TaggingEditView.noCurrentTrackCaption" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play a track in the Music app"
+          }
+        }
+      }
+    },
+    "TaggingEditView.noCurrentTrackLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No current track"
+          }
+        }
+      }
+    },
+    "TaggingEditView.noSelectedTracksCaption" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select track(s) in the Music app"
+          }
+        }
+      }
+    },
+    "TaggingEditView.noSelectedTracksLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No selected tracks"
+          }
+        }
+      }
+    },
+    "TaggingEditView.omniboxTooltip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter keywords and/or rating"
+          }
+        }
+      }
+    },
+    "TaggingEditView.removeModeButtonLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove mode"
+          }
+        }
+      }
+    },
+    "TaggingEditView.selectedTracksLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld selected tracks"
+          }
+        }
+      }
+    },
+    "TaggingEditView.settingsButtonLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings…"
+          }
+        }
+      }
+    },
+    "TaggingEditView.settingsButtonTooltip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings… (⌘,)"
+          }
+        }
+      }
+    },
+    "TaggingEditView.submitAndContinueButtonLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply changes and continue"
+          }
+        }
+      }
+    },
+    "WhitelistSettingsView.commentsLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comments"
+          }
+        }
+      }
+    },
+    "WhitelistSettingsView.commentsPlaceholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lively, sad, traditional"
+          }
+        }
+      }
+    },
+    "WhitelistSettingsView.enforceWhitelistToggleCaption" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Existing metadata will not be affected."
+          }
+        }
+      }
+    },
+    "WhitelistSettingsView.enforceWhitelistToggleLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enforce whitelist when adding metadata"
+          }
+        }
+      }
+    },
+    "WhitelistSettingsView.genreLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Genre"
+          }
+        }
+      }
+    },
+    "WhitelistSettingsView.genrePlaceholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classical, Jazz, Reggae"
+          }
+        }
+      }
+    },
+    "WhitelistSettingsView.groupingLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grouping"
+          }
+        }
+      }
+    },
+    "WhitelistSettingsView.groupingPlaceholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "brass, strings, vocal"
+          }
+        }
+      }
+    },
+    "WhitelistSettingsView.showAutocompletionToggleLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show whitelist suggestions in omnibox"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.1"
+}

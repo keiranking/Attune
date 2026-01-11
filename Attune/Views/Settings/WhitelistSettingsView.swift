@@ -50,21 +50,21 @@ struct WhitelistSettingsView: View {
 
             Section {
                 ListEditor(
-                    title: "Genre",
+                    title: String(localized: .whitelistSettingsViewGenreLabel),
                     text: $viewModel.genreText,
-                    placeholder: "Classical, Jazz, Reggae"
+                    placeholder: String(localized: .whitelistSettingsViewGenrePlaceholder)
                 )
 
                 ListEditor(
-                    title: "Comments",
+                    title: String(localized: .whitelistSettingsViewCommentsLabel),
                     text: $viewModel.commentText,
-                    placeholder: "lively, sad, traditional"
+                    placeholder: String(localized: .whitelistSettingsViewCommentsPlaceholder)
                 )
 
                 ListEditor(
-                    title: "Grouping",
+                    title: String(localized: .whitelistSettingsViewGroupingLabel),
                     text: $viewModel.groupingText,
-                    placeholder: "brass, strings, vocal"
+                    placeholder: String(localized: .whitelistSettingsViewGroupingPlaceholder)
                 )
             }
         }
@@ -79,16 +79,11 @@ struct WhitelistSettingsView: View {
     var enforceWhitelistToggle: some View {
         VStack(alignment: .leading) {
             Toggle(
-                "Enforce whitelist",
+                .whitelistSettingsViewEnforceWhitelistToggleLabel,
                 isOn: $viewModel.enforceWhitelist
             )
 
-            Text(
-                """
-                Only whitelisted keywords can be added to tracks.
-                Existing metadata is not affected.
-                """
-            )
+            Text(.whitelistSettingsViewEnforceWhitelistToggleCaption)
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .top))
@@ -98,7 +93,7 @@ struct WhitelistSettingsView: View {
 
     var showAutocompletionToggle: some View {
         Toggle(
-            "Show suggestions as you type",
+            .whitelistSettingsViewShowAutocompletionToggleLabel,
             isOn: $viewModel.showAutocompletion
         )
     }

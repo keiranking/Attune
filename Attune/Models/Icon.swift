@@ -34,6 +34,8 @@ extension Icon {
     static let add = Icon("plus")
     static let remove = Icon("minus")
 
+    static let enter = Icon("return")
+
     static let settings = Icon("gearshape")
     static let generalSettings = Icon("gearshape")
     static let whitelistSettings = Icon("checkmark.seal")

@@ -72,7 +72,7 @@ struct ScopeRowView: View {
             Spacer()
 
             if isActive {
-                Image(systemName: "return")
+                Image(systemName: Icon.enter.name)
                     .foregroundColor(.primary.opacity(0.6))
             }
         }

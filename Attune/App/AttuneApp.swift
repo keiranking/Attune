@@ -6,16 +6,16 @@ struct AttuneApp: App {
 
     var body: some Scene {
         MenuBarExtra {
-            Button("Toggle Attune") { coordinator.toggleOverlay() }
+            Button(.attuneAppToggleAttuneMenuItem) { coordinator.toggleOverlay() }
 
             Divider()
 
-            SettingsLink { Text("Settings...") }
+            SettingsLink { Text(.attuneAppSettingsMenuItem) }
                 .keyboardShortcut(",", modifiers: .command)
 
             Divider()
 
-            Button("Quit Attune") { NSApp.terminate(nil) }
+            Button(.attuneAppQuitMenuItem) { NSApp.terminate(nil) }
                 .keyboardShortcut("q", modifiers: .command)
         } label: {
             Image(Icon.app.name).resizable()

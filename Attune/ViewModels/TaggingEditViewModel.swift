@@ -41,7 +41,9 @@ extension TaggingEditView {
             return state == .updating ? Icon.updating : base
         }
 
-        var currentTrackTitle: String { currentTrack?.title ?? "No current track" }
+        var currentTrackTitle: String {
+            currentTrack?.title ?? .init(localized: .taggingEditViewNoCurrentTrackLabel)
+        }
 
         private var currentTrackMetadata: String? {
             guard let currentTrack else { return nil }
@@ -68,7 +70,9 @@ extension TaggingEditView {
         }
 
         var currentTrackSubtitle: ScopeRowView.SubtitleContent {
-            guard let currentTrack else { return .text("Play a track in the Music app") }
+            guard let currentTrack else {
+                return .text(String(localized: .taggingEditViewNoCurrentTrackCaption))
+            }
 
             return if showSecondaryInfo {
                 .text(currentTrackAlternateMetadata ?? "")
@@ -102,8 +106,8 @@ extension TaggingEditView {
 
         var selectedTrackTitle: String {
             switch selectedTracks.count {
-            case 0:     "No selected tracks"
-            case 1:     selectedTracks.first?.title ?? "1 selected track"
+            case 0:     String(localized: .taggingEditViewNoSelectedTracksLabel)
+            case 1:     selectedTracks.first?.title ?? "\(selectedTracks.count) selected tracks"
             default:    "\(selectedTracks.count) selected tracks"
             }
         }
@@ -133,7 +137,7 @@ extension TaggingEditView {
 
         var selectedTrackSubtitle: ScopeRowView.SubtitleContent {
             switch selectedTracks.count {
-            case 0:     .text("Select track(s) in the Music app")
+            case 0:     .text(String(localized: .taggingEditViewNoSelectedTracksCaption))
             case 1:     if showSecondaryInfo {
                 .text(selectedTrackAlternateMetadata ?? "")
             } else {
@@ -145,10 +149,6 @@ extension TaggingEditView {
         }
 
         var hasSelectedTracks: Bool { !selectedTracks.isEmpty }
-
-        // MARK: Other
-
-        var scopeRowTooltip = "Submit Changes (⏎)"
 
         // MARK: Omnibox
 

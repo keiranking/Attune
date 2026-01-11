@@ -25,11 +25,11 @@ struct GeneralSettingsView: View {
 
                 VStack(alignment: .leading) {
                     KeyboardShortcuts.Recorder(
-                        "Attune Hotkey:",
+                        String(localized: .generalSettingsViewGlobalHotkeyLabel),
                         name: .toggleOverlay
                     )
 
-                    Text("Select this field and type the key combination you would like to use to show/hide the app.")
+                    Text(.generalSettingsViewGlobalHotkeyCaption)
                         .multilineTextAlignment(.leading)
                         .fixedSize(horizontal: false, vertical: true)
                         .font(.caption)
@@ -40,7 +40,7 @@ struct GeneralSettingsView: View {
 
             Section {
                 Toggle(
-                    "Show omnibox prompt",
+                    .generalSettingsViewShowOmniboxPromptLabel,
                     isOn: $viewModel.showOmniboxPrompt
                 )
             }

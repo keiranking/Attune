@@ -6,22 +6,24 @@ struct PlayerControlsView: View {
     var body: some View {
         HStack(spacing: 0) {
             Button(action: { music.player.previous() }) {
-                Label("Previous Track", systemImage: Icon.previous.name)
-                    .help("Previous (F7)")
+                Label(.playerControlsViewPreviousButtonLabel, systemImage: Icon.previous.name)
+                    .help(.playerControlsViewPreviousButtonTooltip)
             }
 
             Button(action: { music.player.playPause() }) {
                 Label(
-                    "Play/Pause",
+                    .playerControlsViewPlayButtonLabel,
                     systemImage: (music.player.isPlaying ? Icon.pause : Icon.play).name
                 )
                 .font(.system(size: 24))
-                .help((music.player.isPlaying ? "Pause" : "Play") + " (F8)")
+                .help((music.player.isPlaying
+                       ? .playerControlsViewPlayButtonIsPlayingTooltip
+                       : .playerControlsViewPlayButtonIsPausedTooltip))
             }
 
             Button(action: { music.player.next() }) {
-                Label("Next Track", systemImage: Icon.next.name)
-                    .help("Next (F9)")
+                Label(.playerControlsViewNextButtonLabel, systemImage: Icon.next.name)
+                    .help(.playerControlsViewNextButtonTooltip)
             }
         }
         .disabled(music.player.isDisabled)
