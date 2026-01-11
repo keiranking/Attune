@@ -77,9 +77,10 @@ struct ScopeRowView: View {
             }
         }
         .padding(.vertical, 8)
-        .padding(.horizontal, 12)
+        .padding(.leading, 12)
+        .padding(.trailing, 20)
         .background(
-            RoundedRectangle(cornerRadius: 8)
+            Attunoid(cornerRadius: 8)
                 .fill(isActive ? color.opacity(0.8) : Color.clear)
         )
         .contentShape(Rectangle()) // Makes empty space tappable
