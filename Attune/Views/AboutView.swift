@@ -33,6 +33,7 @@ struct AboutView: View {
         }
         .padding([.horizontal, .bottom])
         .frame(width: 480, height: 240)
+        .appearOnTop()
     }
 
     private var bundle: Bundle { .main }

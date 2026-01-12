@@ -48,5 +48,6 @@ struct SettingsView: View {
         }
         .frame(width: 400)
         .fixedSize(horizontal: true, vertical: false)
+        .appearOnTop()
     }
 }
