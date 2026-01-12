@@ -4,6 +4,50 @@
     "" : {
 
     },
+    "AboutView.appDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attune is a free, [open-source](https://github.com/keiranking/Attune) music tagger."
+          }
+        }
+      }
+    },
+    "AboutView.callsToAction" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[Buy me a coffee](https://buymeacoffee.com/keiranking) or [report a bug](https://github.com/keiranking/Attune/issues/new/choose)."
+          }
+        }
+      }
+    },
+    "AboutView.legalRights" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " [Keiran King](https://keiranking.com/). Licensed under [CC-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/deed.en)."
+          }
+        }
+      }
+    },
+    "AttuneApp.aboutMenuItem" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About Attune"
+          }
+        }
+      }
+    },
     "AttuneApp.quitMenuItem" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -322,6 +366,9 @@
           }
         }
       }
+    },
+    "v%@" : {
+
     },
     "WhitelistSettingsView.commentsLabel" : {
       "extractionState" : "manual",

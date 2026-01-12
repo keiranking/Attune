@@ -2,10 +2,14 @@ import SwiftUI
 
 @main
 struct AttuneApp: App {
+    @Environment(\.openWindow) private var openWindow
+
     private let coordinator = AppCoordinator()
 
     var body: some Scene {
         MenuBarExtra {
+            Button(.attuneAppAboutMenuItem) { openWindow(id: "about") }
+
             Button(.attuneAppToggleAttuneMenuItem) { coordinator.toggleOverlay() }
 
             Divider()
@@ -29,5 +33,11 @@ struct AttuneApp: App {
             )
             .environment(AppSettings.shared)
         }
+
+        Window("", id: "about") {
+            AboutView()
+        }
+        .windowStyle(.hiddenTitleBar)
+        .windowResizability(.contentSize)
     }
 }
