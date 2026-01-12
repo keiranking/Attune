@@ -70,11 +70,6 @@ struct ScopeRowView: View {
             .frame(height: 38)
 
             Spacer()
-
-            if isActive {
-                Image(systemName: Icon.enter.name)
-                    .foregroundColor(.primary.opacity(0.6))
-            }
         }
         .padding(.vertical, 8)
         .padding(.leading, 12)

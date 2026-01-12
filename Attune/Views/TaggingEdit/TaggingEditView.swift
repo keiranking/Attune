@@ -81,11 +81,7 @@ struct TaggingEditView: View {
             onSymbol: Icon.add.name,
             offSymbol: Icon.remove.name
         ))
-        .help(
-            viewModel.mode == .add
-            ? .taggingEditViewModeControlIsAddTooltip
-            : .taggingEditViewModeControlIsRemoveTooltip
-        )
+        .help(.taggingEditViewModeControlTooltip)
     }
 
     var playerControls: some View { PlayerControlsView() }

@@ -219,7 +219,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Submit changes (⏎)"
+            "value" : "Submit changes (⏎)\nApply changes and continue (⌘⏎)"
           }
         }
       }
@@ -235,24 +235,13 @@
         }
       }
     },
-    "TaggingEditView.modeControlIsAddTooltip" : {
+    "TaggingEditView.modeControlTooltip" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add mode (⌘+)"
-          }
-        }
-      }
-    },
-    "TaggingEditView.modeControlIsRemoveTooltip" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remove mode (⌘-)"
+            "value" : "Remove (⌘-) / Add (⌘+) on submit"
           }
         }
       }
