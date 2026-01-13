@@ -1,14 +1,28 @@
-# Attune
+<div align="center">
+  <img
+    src="Attune/Assets.xcassets/AppIcon.appiconset/Attune-macOS-Default-128x128@2x.png"
+    width="128" height="128"
+  >
+  <h1>Attune</h1>
+  <p>
+    <b>Tag your music as it plays.</b>
+  </p>
+  <br>
+  <br>
+  <br>
+</div>
 
-**Tag your music as it plays.**
-
-Attune is a macOS music tagger app for adding keywords while you listen. It runs
-as a lightweight menu bar utility and communicates with the system Music app via
-[AppleScript] and [Scripting Bridge]. It uses a keyboard-driven overlay for
-fast, forgiving, unobtrusive editing.
+Attune is a macOS music tagger app for adding keywords while you listen to your
+local music library. It runs as a lightweight menu bar utility and communicates
+with the system Music app via [AppleScript] and [Scripting Bridge]. It uses a
+keyboard-driven overlay for fast, forgiving, unobtrusive editing.
 
 [AppleScript]: https://developer.apple.com/library/archive/documentation/AppleScript/Conceptual/AppleScriptLangGuide/introduction/ASLR_intro.html
 [Scripting Bridge]: https://developer.apple.com/documentation/scriptingbridge
+
+<div align="center">
+  <img width="640" alt="Attune user interface" src="screenshot@2x.webp">
+</div>
 
 ## Features
 
@@ -16,6 +30,14 @@ fast, forgiving, unobtrusive editing.
 - **Fast:** Quickly add or remove keywords or ratings
 - **Forgiving:** Normalize data and prevent mistakes with a whitelist and autocomplete
 - **Unobtrusive:** Edit current and selected Music tracks without switching contexts
+
+## Install
+
+Requires macOS 14+.
+
+[Download] the latest release.
+
+[Download]: https://github.com/keiranking/attune/releases/latest
 
 ## License
 
