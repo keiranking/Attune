@@ -48,24 +48,23 @@ extension Tag {
 extension Tag {
     static var examples: [Tag] {
         let comments = [
-            "action", "advice", "ballad", "celebration", "clip", "ethnic", "exmas",
-            "family", "forgiveness", "friendship", "grand", "heroic", "island", "light",
-            "lively", "longing", "lust", "new", "nostalgic", "old", "promise", "rare",
-            "regret", "religious", "revenge", "romantic", "running", "sad", "secular",
-            "seduction", "self", "sexy", "sinister", "slow", "society", "traditional",
-            "theme"
+            "defiant", "dramatic", "driving", "experimental", "grand", "happy",
+            "haunting", "heavy", "heroic", "intense", "light", "lively",
+            "nostalgic", "rare", "sad", "sexy", "sinister", "slow",
+            "traditional", "uplifting"
         ].compactMap { Tag($0, category: .comment) }
 
         let groupings = [
-            "boy", "girl", "vocal", "group", "choir", "acapella", "brass", "chant",
-            "guitar", "organ", "pan", "piano", "perc", "strings", "synth", "wind",
-            "whistle", "solo", "band", "orchestra"
+            "acapella", "acoustic", "band", "brass", "chant", "choir", "female",
+            "group", "guitar", "male", "orchestra", "organ", "percussion",
+            "piano", "solo", "strings", "synth", "whistle", "wind", "vocal"
         ].compactMap { Tag($0, category: .grouping) }
 
         let genres = [
-            "Alternative", "Broadway", "Blues", "Christmas", "Classical", "Country",
-            "Electronica", "Folk", "Jazz", "Karaoke", "Latin", "OST", "Personal", "Pop",
-            "R&B", "Rap", "Reggae", "Rock", "Soca", "Soul", "Standards"
+            "Afrobeat", "Alternative", "Broadway", "Blues", "Classical",
+            "Country", "Electronica", "Folk", "Jazz", "Latin", "Metal", "Pop",
+            "R&B", "Rap", "Reggae", "Rock", "Soca", "Soul", "Soundtracks",
+            "Standards"
         ].compactMap { Tag($0, category: .genre) }
 
         return (comments + groupings + genres).sorted { $0.name < $1.name }
