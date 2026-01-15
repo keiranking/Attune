@@ -50,6 +50,7 @@ struct TaggingEditView: View {
             .autocomplete(
                 text: $viewModel.text,
                 using: Whitelist.shared.suggestions,
+                characterLimit: 45,
                 disabled: !viewModel.showAutocompletion
             )
             .onSubmit {
@@ -59,7 +60,6 @@ struct TaggingEditView: View {
                 viewModel.processInlineCommands()
             }
             .font(.system(size: 24))
-            .textFieldStyle(.plain)
             .padding(12)
             .background(Color.antiprimary.opacity(0.2))
             .cornerRadius(8)

@@ -1,10 +1,13 @@
 ## User settings
 xcuserdata/
+DerivedData/
 
 ## Obj-C/Swift specific
 *.hmap
 
 ## App packaging
+build/
+.build/
 *.ipa
 *.dSYM.zip
 *.dSYM
@@ -15,9 +18,17 @@ Preview\ Content/
 # Swift Package Manager dependencies.
 Packages/
 Package.pins
-Package.resolved
 
-.build/
+# Ignore all Xcode workspaces by default
+*.xcworkspace/
 
-# Add this line if you want to avoid checking in source code from the Xcode workspace
-*.xcworkspace
+# Allow the implicit workspace inside the project
+!*.xcodeproj/project.xcworkspace/
+
+# Ignore everything inside it again
+*.xcodeproj/project.xcworkspace/**
+
+# Re-allow only SwiftPM resolution
+!*.xcodeproj/project.xcworkspace/xcshareddata/
+!*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+!*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
