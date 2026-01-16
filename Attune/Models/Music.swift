@@ -76,12 +76,12 @@ extension Music { // respond and update
         Task {
             try? await Task.sleep(nanoseconds: 100_000_000)
 
-            refresh()
+            await refresh()
             await MainActor.run { onChange?() }
         }
     }
 
-    func refresh() {
+    func refresh() async {
         guard isOpen else {
             reset()
             return

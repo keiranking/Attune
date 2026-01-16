@@ -25,7 +25,7 @@ extension Music {
             mode: Tagging.Mode
         ) async -> Result<Void, Tagger.Error> {
 
-            Music.shared.refresh()
+            await Music.shared.refresh()
 
             var tokens = command.tokenized
 
@@ -148,7 +148,7 @@ extension Music {
             let deadline = ContinuousClock.now + timeOutTime
 
             while ContinuousClock.now < deadline {
-                Music.shared.refresh()
+                await Music.shared.refresh()
 
                 let actual: [Track] =
                     switch scope {

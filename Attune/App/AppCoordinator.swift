@@ -86,7 +86,6 @@ final class AppCoordinator {
         guard let window = overlayWindow else { return }
 
         taggingEditViewModel.reset()
-        sync()
 
         if let screenFrame = NSScreen.main?.visibleFrame {
             let x = screenFrame.midX - window.frame.width / 2
@@ -102,6 +101,8 @@ final class AppCoordinator {
         isOverlayPresented = true
 
         window.makeFirstResponder(window.contentViewController?.view.firstTextField)
+
+        sync()
     }
 
     private func hideOverlay() {
@@ -118,13 +119,22 @@ final class AppCoordinator {
     }
 
     private func sync() {
-        music.refresh()
+        Task {
+            await MainActor.run {
+                taggingEditViewModel.state = .updating
+            }
 
-        taggingEditViewModel.currentTrack = music.currentTrack
-        taggingEditViewModel.selectedTracks = music.selectedTracks
+            await music.refresh()
 
-        if taggingEditViewModel.scope == nil {
-            taggingEditViewModel.chooseDefaultScope()
+            await MainActor.run {
+                taggingEditViewModel.currentTrack = music.currentTrack
+                taggingEditViewModel.selectedTracks = music.selectedTracks
+
+                if taggingEditViewModel.scope == nil {
+                    taggingEditViewModel.chooseDefaultScope()
+                }
+                taggingEditViewModel.state = .ready
+            }
         }
     }
 
