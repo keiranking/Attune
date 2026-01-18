@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/keiranking/Autocomplete",
       "state" : {
-        "revision" : "b94e95df635982d71f2492b08cca74ee8406fe43",
-        "version" : "0.2.0"
+        "revision" : "414ad5458af11003accab556d17e66b2c94e35a1",
+        "version" : "0.2.1"
       }
     },
     {

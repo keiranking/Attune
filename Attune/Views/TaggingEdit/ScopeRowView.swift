@@ -36,9 +36,13 @@ struct ScopeRowView: View {
         isDisabled ? .tertiary : (isActive ? .primary.opacity(0.8) : .secondary)
     }
 
+    var image: Image {
+        icon.isCustom ? Image(icon.name) : Image(systemName: icon.name)
+    }
+
     var body: some View {
         HStack(spacing: 12) {
-            Group { icon.isCustom ? Image(icon.name) : Image(systemName: icon.name) }
+            image
                 .contentTransition(.symbolEffect(.replace, options: .speed(2)))
                 .if(isAnimated) {
                     $0.symbolEffect(.variableColor.iterative.hideInactiveLayers)
@@ -52,14 +56,12 @@ struct ScopeRowView: View {
                     .font(.system(size: 15, weight: .medium))
                     .foregroundStyle(titleColor)
 
-                Group {
+                HStack(spacing: 2) {
                     if case let .text(text) = subtitle, !text.isEmpty {
                         Text(text)
                     } else if case let .label(text, icon) = subtitle, !text.isEmpty {
-                        HStack(spacing: 2) {
-                            Image(systemName: icon.name)
-                            Text(text)
-                        }
+                        Image(systemName: icon.name)
+                        Text(text)
                     }
                 }
                 .font(.system(size: 12))

@@ -42,7 +42,7 @@ extension TaggingEditView {
         }
 
         var currentTrackTitle: String {
-            currentTrack?.title ?? .init(localized: .taggingEditViewNoCurrentTrackLabel)
+            currentTrack?.title ?? String(localized: "TaggingEditView.noCurrentTrackLabel")
         }
 
         private var currentTrackMetadata: String? {
@@ -71,7 +71,7 @@ extension TaggingEditView {
 
         var currentTrackSubtitle: ScopeRowView.SubtitleContent {
             guard let currentTrack else {
-                return .text(String(localized: .taggingEditViewNoCurrentTrackCaption))
+                return .text(String(localized: "TaggingEditView.noCurrentTrackCaption"))
             }
 
             return if showSecondaryInfo {
@@ -106,7 +106,7 @@ extension TaggingEditView {
 
         var selectedTrackTitle: String {
             switch selectedTracks.count {
-            case 0:     String(localized: .taggingEditViewNoSelectedTracksLabel)
+            case 0:     String(localized: "TaggingEditView.noSelectedTracksLabel")
             case 1:     selectedTracks.first?.title ?? "\(selectedTracks.count) selected tracks"
             default:    "\(selectedTracks.count) selected tracks"
             }
@@ -137,7 +137,7 @@ extension TaggingEditView {
 
         var selectedTrackSubtitle: ScopeRowView.SubtitleContent {
             switch selectedTracks.count {
-            case 0:     .text(String(localized: .taggingEditViewNoSelectedTracksCaption))
+            case 0:     .text(String(localized: "TaggingEditView.noSelectedTracksCaption"))
             case 1:     if showSecondaryInfo {
                 .text(selectedTrackAlternateMetadata ?? "")
             } else {

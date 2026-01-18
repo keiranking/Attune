@@ -6,30 +6,27 @@ struct AboutView: View {
             AppIconView(size: 128)
 
             VStack(alignment: .leading, spacing: 20) {
-                Group {
-                    VStack(alignment: .leading) {
-                        Text(appName)
-                            .font(.system(size: 40, weight: .light))
-                            .fontWeight(.semibold)
+                VStack(alignment: .leading) {
+                    Text(appName)
+                        .font(.system(size: 40, weight: .light))
+                        .fontWeight(.semibold)
 
-                        Text("v\(appVersion)")
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.top, 5)
-
-                    Text(.aboutViewAppDescription)
-
-                    Text(.aboutViewCallsToAction)
-
-                    Spacer()
-
-                    (Text(copyright) + Text(.aboutViewLegalRights))
-                        .font(.footnote)
+                    Text("v\(appVersion)")
                         .foregroundStyle(.secondary)
                 }
-                .multilineTextAlignment(.leading)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 5)
+
+                Text("AboutView.appDescription")
+
+                Text("AboutView.callsToAction")
+
+                Spacer()
+
+                (Text(copyright) + Text("AboutView.legalRights"))
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
             }
+            .multilineTextAlignment(.leading)
         }
         .padding([.horizontal, .bottom])
         .frame(width: 480, height: 240)

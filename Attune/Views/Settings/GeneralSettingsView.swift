@@ -25,11 +25,11 @@ struct GeneralSettingsView: View {
 
                 VStack(alignment: .leading) {
                     KeyboardShortcuts.Recorder(
-                        String(localized: .generalSettingsViewGlobalHotkeyLabel),
+                        "GeneralSettingsView.globalHotkeyLabel",
                         name: .toggleOverlay
                     )
 
-                    Text(.generalSettingsViewGlobalHotkeyCaption)
+                    Text("GeneralSettingsView.globalHotkeyCaption")
                         .multilineTextAlignment(.leading)
                         .fixedSize(horizontal: false, vertical: true)
                         .font(.caption)
@@ -40,7 +40,7 @@ struct GeneralSettingsView: View {
 
             Section {
                 Toggle(
-                    .generalSettingsViewShowOmniboxPromptLabel,
+                    "GeneralSettingsView.showOmniboxPromptLabel",
                     isOn: $viewModel.showOmniboxPrompt
                 )
             }

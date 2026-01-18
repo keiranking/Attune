@@ -49,23 +49,25 @@ struct WhitelistSettingsView: View {
             }
 
             Section {
-                ListEditor(
-                    title: String(localized: .whitelistSettingsViewGenreLabel),
-                    text: $viewModel.genreText,
-                    placeholder: String(localized: .whitelistSettingsViewGenrePlaceholder)
-                )
+                VStack(spacing: 20) {
+                    ListEditor(
+                        title: "WhitelistSettingsView.genreLabel",
+                        text: $viewModel.genreText,
+                        placeholder: "WhitelistSettingsView.genrePlaceholder"
+                    )
 
-                ListEditor(
-                    title: String(localized: .whitelistSettingsViewCommentsLabel),
-                    text: $viewModel.commentText,
-                    placeholder: String(localized: .whitelistSettingsViewCommentsPlaceholder)
-                )
+                    ListEditor(
+                        title: "WhitelistSettingsView.commentsLabel",
+                        text: $viewModel.commentText,
+                        placeholder: "WhitelistSettingsView.commentsPlaceholder"
+                    )
 
-                ListEditor(
-                    title: String(localized: .whitelistSettingsViewGroupingLabel),
-                    text: $viewModel.groupingText,
-                    placeholder: String(localized: .whitelistSettingsViewGroupingPlaceholder)
-                )
+                    ListEditor(
+                        title: "WhitelistSettingsView.groupingLabel",
+                        text: $viewModel.groupingText,
+                        placeholder: "WhitelistSettingsView.groupingPlaceholder"
+                    )
+                }
             }
         }
         .formStyle(.grouped)
@@ -79,11 +81,11 @@ struct WhitelistSettingsView: View {
     var enforceWhitelistToggle: some View {
         VStack(alignment: .leading) {
             Toggle(
-                .whitelistSettingsViewEnforceWhitelistToggleLabel,
+                "WhitelistSettingsView.enforceWhitelistToggleLabel",
                 isOn: $viewModel.enforceWhitelist
             )
 
-            Text(.whitelistSettingsViewEnforceWhitelistToggleCaption)
+            Text("WhitelistSettingsView.enforceWhitelistToggleCaption")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .top))
@@ -93,7 +95,7 @@ struct WhitelistSettingsView: View {
 
     var showAutocompletionToggle: some View {
         Toggle(
-            .whitelistSettingsViewShowAutocompletionToggleLabel,
+            "WhitelistSettingsView.showAutocompletionToggleLabel",
             isOn: $viewModel.showAutocompletion
         )
     }
@@ -106,7 +108,7 @@ struct WhitelistSettingsView: View {
 }
 
 private struct ListEditor: View {
-    let title: String
+    let title: LocalizedStringKey
     @Binding var text: String
     let placeholder: String?
 
@@ -129,7 +131,7 @@ private struct ListEditor: View {
         }
     }
 
-    init(title: String, text: Binding<String>, placeholder: String? = nil) {
+    init(title: LocalizedStringKey, text: Binding<String>, placeholder: String? = nil) {
         self.title = title
         self._text = text
         self.placeholder = placeholder

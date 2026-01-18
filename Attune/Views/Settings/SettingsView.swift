@@ -34,15 +34,19 @@ struct SettingsView: View {
         TabView(selection: $viewModel.selection) {
             GeneralSettingsView(viewModel: generalSettingsViewModel)
                 .tabItem {
-                    Label(.settingsViewGeneralSettingsTabLabel,
-                          systemImage: viewModel.generalSettingsIcon)
+                    Label(
+                        "SettingsView.generalSettingsTabLabel",
+                        systemImage: viewModel.generalSettingsIcon
+                    )
                 }
                 .tag(Tab.general)
 
             WhitelistSettingsView(viewModel: whitelistSettingsViewModel)
                 .tabItem {
-                    Label(.settingsViewWhitelistSettingsTabLabel,
-                          systemImage: viewModel.whitelistSettingsIcon)
+                    Label(
+                        "SettingsView.whitelistSettingsTabLabel",
+                        systemImage: viewModel.whitelistSettingsIcon
+                    )
                 }
                 .tag(Tab.whitelist)
         }

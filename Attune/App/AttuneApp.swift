@@ -8,18 +8,18 @@ struct AttuneApp: App {
 
     var body: some Scene {
         MenuBarExtra {
-            Button(.attuneAppAboutMenuItem) { openWindow(id: "about") }
+            Button("AttuneApp.aboutMenuItem") { openWindow(id: "about") }
 
-            Button(.attuneAppToggleAttuneMenuItem) { coordinator.toggleOverlay() }
+            Button("AttuneApp.toggleAttuneMenuItem") { coordinator.toggleOverlay() }
 
             Divider()
 
-            SettingsLink { Text(.attuneAppSettingsMenuItem) }
+            SettingsLink { Text("AttuneApp.settingsMenuItem") }
                 .keyboardShortcut(",", modifiers: .command)
 
             Divider()
 
-            Button(.attuneAppQuitMenuItem) { NSApp.terminate(nil) }
+            Button("AttuneApp.quitMenuItem") { NSApp.terminate(nil) }
                 .keyboardShortcut("q", modifiers: .command)
         } label: {
             Image(Icon.app.name).resizable()

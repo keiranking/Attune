@@ -68,7 +68,7 @@ struct TaggingEditView: View {
                     .stroke(Color.primary.opacity(0.1), lineWidth: 1)
             )
             .focused($isFocused)
-            .help(.taggingEditViewOmniboxTooltip)
+            .help("TaggingEditView.omniboxTooltip")
         }
     }
 
@@ -81,18 +81,18 @@ struct TaggingEditView: View {
             onSymbol: Icon.add.name,
             offSymbol: Icon.remove.name
         ))
-        .help(.taggingEditViewModeControlTooltip)
+        .help("TaggingEditView.modeControlTooltip")
     }
 
     var playerControls: some View { PlayerControlsView() }
 
     var otherControls: some View {
         Button(action: { openSettings() }) {
-            Label(.taggingEditViewSettingsButtonLabel, systemImage: Icon.settings.name)
+            Label("TaggingEditView.settingsButtonLabel", systemImage: Icon.settings.name)
                 .labelStyle(.iconOnly)
         }
         .buttonStyle(.playerButton)
-        .help(.taggingEditViewSettingsButtonTooltip)
+        .help("TaggingEditView.settingsButtonTooltip")
     }
 
     var currentRow: some View {
@@ -109,7 +109,11 @@ struct TaggingEditView: View {
         .onHover { _ in viewModel.scope = .current }
         .onTapGesture { onSubmit(viewModel.text, true) }
         .disabled(!viewModel.hasCurrentTrack)
-        .help(viewModel.hasCurrentTrack ? .taggingEditViewActiveScopeRowTooltip : "")
+        .help(
+            viewModel.hasCurrentTrack
+            ? "TaggingEditView.activeScopeRowTooltip"
+            : ""
+        )
     }
 
     var selectedRow: some View {
@@ -125,7 +129,11 @@ struct TaggingEditView: View {
         .onHover { _ in viewModel.scope = .selection }
         .onTapGesture { onSubmit(viewModel.text, true) }
         .disabled(!viewModel.hasSelectedTracks)
-        .help(viewModel.hasSelectedTracks ? .taggingEditViewActiveScopeRowTooltip : "")
+        .help(
+            viewModel.hasSelectedTracks
+            ? "TaggingEditView.activeScopeRowTooltip"
+            : ""
+        )
     }
 
     var background: some View {
@@ -135,21 +143,21 @@ struct TaggingEditView: View {
 
     var keyboardShortcuts: some View {
         HStack {
-            Button(.taggingEditViewAddModeButtonLabel) {
+            Button("TaggingEditView.addModeButtonLabel") {
                 withAnimation(.easeInOut(duration: 0.1)) {
                     viewModel.mode = .add
                 }
             }
             .keyboardShortcut("+", modifiers: [.command])
 
-            Button(.taggingEditViewRemoveModeButtonLabel) {
+            Button("TaggingEditView.removeModeButtonLabel") {
                 withAnimation(.easeInOut(duration: 0.1)) {
                     viewModel.mode = .remove
                 }
             }
             .keyboardShortcut("-", modifiers: [.command])
 
-            Button(.taggingEditViewSubmitAndContinueButtonLabel) {
+            Button("TaggingEditView.submitAndContinueButtonLabel") {
                 let text = viewModel.text
                 onSubmit(text, false)
             }
