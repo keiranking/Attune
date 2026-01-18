@@ -92,3 +92,4 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: build/export/${{ env.APP_NAME }}.zip
+          generate_release_notes: true
