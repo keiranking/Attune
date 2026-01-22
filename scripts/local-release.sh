@@ -26,19 +26,30 @@ xcodebuild -exportArchive \
 echo "Verifying codesign..."
 codesign --verify --deep --strict build/export/$APP_NAME.app
 
-echo "Creating temporary zip..."
-(cd build/export && zip -r "$APP_NAME.notarize.zip" "$APP_NAME.app")
+echo "Attempting to staple..."
+if xcrun stapler staple "build/export/$APP_NAME.app"; then
+  echo "Already notarized."
+else
+  echo "Not notarized yet."
 
-echo "Notarizing..."
-xcrun notarytool submit \
-  "build/export/$APP_NAME.notarize.zip" \
-  --apple-id "$APPLE_ID" \
-  --team-id "$APPLE_TEAM_ID" \
-  --password "$APPLE_APP_SPECIFIC_PASSWORD" \
-  --wait
+  echo "Creating temporary zip..."
+  (cd build/export && zip -r "$APP_NAME.notarize.zip" "$APP_NAME.app")
 
-echo "Stapling..."
-xcrun stapler staple "build/export/$APP_NAME.app"
+  echo "Submitting for notarization (with 15-min timeout)..."
+  timeout 900 xcrun notarytool submit \
+    "build/export/$APP_NAME.notarize.zip" \
+    --apple-id "$APPLE_ID" \
+    --team-id "$APPLE_TEAM_ID" \
+    --password "$APPLE_APP_SPECIFIC_PASSWORD" \
+    --wait || {
+      echo "Notarization still pending after 15 min. Re-run later."
+      exit 1
+    }
+
+  echo "Stapling after notarization..."
+  xcrun stapler staple "build/export/$APP_NAME.app"
+fi
+
 xcrun stapler validate "build/export/$APP_NAME.app"
 
 echo "Creating distributable zip (with stapled app)"

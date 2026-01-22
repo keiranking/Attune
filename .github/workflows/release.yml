@@ -5,6 +5,9 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: write
+
 jobs:
   release:
     runs-on: macos-latest
@@ -33,10 +36,17 @@ jobs:
         run: |
           echo "$CERT_P12" | base64 --decode > cert.p12
           security create-keychain -p "" build.keychain
-          security import cert.p12 -k build.keychain -P "$CERT_PASSWORD" -T /usr/bin/codesign
+          security import cert.p12 \
+            -k build.keychain \
+            -P "$CERT_PASSWORD" \
+            -T /usr/bin/codesign
           security list-keychains -s build.keychain
           security unlock-keychain -p "" build.keychain
           security set-keychain-settings
+          security set-key-partition-list \
+            -S apple-tool:,apple:,codesign: \
+            -s \
+            -k "" build.keychain
 
       - name: Clean build directory
         run: |
@@ -61,35 +71,47 @@ jobs:
         run: |
           codesign --verify --deep --strict build/export/$APP_NAME.app
 
-      - name: Create notarization zip
-        run: |
-          cd build/export
-          zip -r "$APP_NAME.notarize.zip" "$APP_NAME.app"
-
-      - name: Notarize
+      - name: Staple or notarize
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
         run: |
-          xcrun notarytool submit \
-            "build/export/$APP_NAME.notarize.zip" \
-            --apple-id "$APPLE_ID" \
-            --team-id "$APPLE_TEAM_ID" \
-            --password "$APPLE_APP_SPECIFIC_PASSWORD" \
-            --wait
+          set -euo pipefail
 
-      - name: Staple app
-        run: |
-          xcrun stapler staple "build/export/$APP_NAME.app"
-          xcrun stapler validate "build/export/$APP_NAME.app"
+          echo "Attempting to staple..."
+          if xcrun stapler staple "build/export/$APP_NAME.app"; then
+            echo "Already notarized."
+          else
+            echo "Not notarized yet."
 
-      - name: Create distributable zip (stapled app)
+            echo "Creating temporary zip..."
+            cd build/export
+            zip -r "$APP_NAME.notarize.zip" "$APP_NAME.app"
+
+            echo "Submitting for notarization (with 15-min timeout)..."
+            xcrun notarytool submit \
+              "$APP_NAME.notarize.zip" \
+              --apple-id "$APPLE_ID" \
+              --team-id "$APPLE_TEAM_ID" \
+              --password "$APPLE_APP_SPECIFIC_PASSWORD" \
+              --wait \
+              --timeout 15m || {
+                echo "Notarization still pending after 15 min. Re-run workflow."
+                exit 1
+              }
+
+            xcrun stapler staple "$APP_NAME.app"
+          fi
+
+          xcrun stapler validate "$APP_NAME.app"
+
+      - name: Create distributable zip (with stapled app)
         run: |
           cd build/export
           zip -r "$APP_NAME.zip" "$APP_NAME.app"
 
-      - name: Gatekeeper check
+      - name: Perform Gatekeeper check
         run: |
           spctl --assess --type execute "build/export/$APP_NAME.app"
 
